@@ -1,0 +1,23 @@
+agent_type = "agent"
+display_name = "Dev - UI"
+description = "Agent pour le développement de l'interface utilisateur"
+safety = "safe"
+disabled_tools = []
+
+[tools.bash]
+permission = "ask"
+
+[tools.read_file]
+permission = "always"
+
+[tools.write_file]
+permission = "ask"
+
+[tools.search_replace]
+permission = "ask"
+
+[tools.grep]
+permission = "always"
+
+[tools.todo]
+permission = "always"

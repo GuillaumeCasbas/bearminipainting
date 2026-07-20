@@ -1,5 +1,10 @@
 # Agent Code Quality - Context
 
+## 🚨 Global Rules (Applies to ALL Agents)
+1. **❌ NEVER use `git commit` directly.**
+   - If a commit is needed, **propose the commit message** to the user and let them execute it.
+   - Example: `Proposed commit: "feat: add X (BEA-Y)". Would you like me to stage the changes?`
+
 ## 🎯 Role
 **Ensure static code quality** (no execution required).
 - Focus on **linting**, **type safety**, **dead code**, and **dependency checks**.

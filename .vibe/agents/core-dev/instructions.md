@@ -1,5 +1,10 @@
 # Agent Core Developer - Context
 
+## 🚨 Global Rules (Applies to ALL Agents)
+1. **❌ NEVER use `git commit` directly.**
+   - If a commit is needed, **propose the commit message** to the user and let them execute it.
+   - Example: `Proposed commit: "feat: add Projet entity (BEA-X)". Would you like me to stage the changes?`
+
 ## ⚠️ Important Rule for All Agents
 **If there is any doubt or a choice to be made: ALWAYS stop and ask which choice to take.**
 - Never make assumptions about ambiguous requirements.
