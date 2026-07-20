@@ -7,16 +7,13 @@ describe("CreateProjetUseCase", () => {
   const mockRepository: ProjetRepository = {
     findByCode: jest.fn(),
     save: jest.fn(),
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    delete: jest.fn(),
   };
 
   const useCase = new CreateProjetUseCase(mockRepository);
 
   it("should throw CodeNotUniqueError if the code is already used", async () => {
     const existingProjet = new Projet("1", "Space Marines", "NMS");
-    mockRepository.findByCode.mockResolvedValue(existingProjet);
+    (mockRepository.findByCode as jest.Mock).mockResolvedValue(existingProjet);
 
     await expect(useCase.execute("New Project", "NMS"))
       .rejects
@@ -24,8 +21,8 @@ describe("CreateProjetUseCase", () => {
   });
 
   it("should create a project if the code is unique", async () => {
-    mockRepository.findByCode.mockResolvedValue(null);
-    mockRepository.save.mockResolvedValue(undefined);
+    (mockRepository.findByCode as jest.Mock).mockResolvedValue(null);
+    (mockRepository.save as jest.Mock).mockResolvedValue(undefined);
 
     const result = await useCase.execute("New Project", "UNIQUE");
 

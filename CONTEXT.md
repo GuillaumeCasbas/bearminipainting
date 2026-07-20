@@ -191,6 +191,69 @@ src/
 - **Never display the key in plain text** in responses or logs.
 - **Revoke the key** if compromised or no longer needed (via Linear Settings → API).
 
+---
+
+### **🎫 How to Fetch a Linear Ticket by Number**
+To retrieve a Linear ticket (issue) by its identifier (e.g., `BEA-5`), use the **GraphQL API** with the following steps:
+
+#### **1. Prerequisites**
+- Ensure the `LINEAR_KEY` is set in the `.env` file at the project root.
+- The key must have **read access** to the Linear workspace.
+
+#### **2. GraphQL Query**
+Use this `curl` command to fetch a ticket by its ID (e.g., `BEA-5`):
+
+```bash
+curl -H "Authorization: $LINEAR_KEY" \
+  -H "Content-Type: application/json" \
+  "https://api.linear.app/graphql" \
+  -d '{
+    "query": "{issue(id: \"BEA-5\") {id title description labels { nodes { name } } priority state { name } assignee { name } team { name }}}"
+  }'
+```
+
+#### **3. Required Headers**
+- **`Authorization`**: The Linear API key (from `.env`).
+- **`Content-Type`**: Must be set to `application/json` (otherwise, Linear blocks the request as a **CSRF attack**).
+
+#### **4. Common Pitfalls & Fixes**
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `400 Bad Request: CSRF blocked` | Missing `Content-Type: application/json` header. | Add `-H "Content-Type: application/json"`. |
+| `400 GraphQL Validation Failed` | Invalid field in query (e.g., `acceptCriteria`). | Use valid fields: `id`, `title`, `description`, `priority`, `state`, `assignee`, `team`, `labels`. |
+| `401 Unauthorized` | Invalid or expired `LINEAR_KEY`. | Regenerate the key in Linear → Settings → API. |
+| `404 Not Found` | Ticket ID does not exist (e.g., `BEA-5` vs `BEA-50`). | Verify the ticket ID in Linear. |
+
+#### **5. Example Response**
+```json
+{
+  "data": {
+    "issue": {
+      "id": "b8293933-347e-405b-8177-c94dcc8d692e",
+      "title": "Create project with unique code",
+      "description": "## 🎯 Implementation Plan...",
+      "priority": 0,
+      "state": { "name": "In Progress" },
+      "assignee": { "name": "Guillaume Casbas" },
+      "team": { "name": "BearMiniPaint" },
+      "labels": { "nodes": [] }
+    }
+  }
+}
+```
+
+#### **6. Alternative: Use `query` Variable (Bash)**
+To avoid escaping quotes in the command line, use a variable:
+```bash
+QUERY='{issue(id: "BEA-5") {id title description priority state { name } assignee { name } team { name }}}'
+curl -H "Authorization: $LINEAR_KEY" \
+  -H "Content-Type: application/json" \
+  "https://api.linear.app/graphql" \
+  -d "{\"query\": \"$QUERY\"}"
+```
+
+---
+
 ### **Linear Project References**
 - **Team**: `BearMiniPaint` (ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5`).
 - **Project**: `MiniPaint MVP` (ID: `4da01f1e-f5a9-484b-b3c4-03682868a3f8`).
