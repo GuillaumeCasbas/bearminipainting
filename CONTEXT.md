@@ -184,6 +184,23 @@ src/
 
 ---
 
+## 🔐 Security & API Access
+### **Linear API Key**
+- The Linear API key is stored in the **root `.env` file** under the variable `LINEAR_KEY`.
+- **Never hardcode the key** in source files or commit it to version control.
+- **Never display the key in plain text** in responses or logs.
+- **Revoke the key** if compromised or no longer needed (via Linear Settings → API).
+
+### **Linear Project References**
+- **Team**: `BearMiniPaint` (ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5`).
+- **Project**: `MiniPaint MVP` (ID: `4da01f1e-f5a9-484b-b3c4-03682868a3f8`).
+
+### **GitHub Integration**
+- The project repository is expected to be linked to Linear for issue tracking.
+- Use **environment variables** for sensitive data (e.g., `.env` file in `.gitignore`).
+
+---
+
 ## 📅 Next Steps (Suggested)
 1. Implement `Projet` entity (simple class with `id`, `name`, `code`, `units`).
 2. Define `ProjetRepository` interface (see [Ports](#🔌-ports-interfaces)).
