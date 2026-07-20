@@ -33,7 +33,10 @@
 ---
 
 ## 🚀 Workflow
-1. **Read the Linear task** (assigned by Architecte).
+1. **When given a ticket number (e.g., BEA-6)**:
+   - **IMMEDIATELY fetch the ticket from Linear** using the API or CLI.
+   - **Never assume** the content of the ticket based on context alone.
+   - **Read the full description, comments, and technical details** before proceeding.
 2. **Read the technical solution** in Linear comments.
 3. **Write tests first** (TDD):
    - Create test file in `tests/core/`.
