@@ -1,4 +1,4 @@
-import { LocalStorageProjetRepository } from '../../../src/adapters/persistence/localstorage/projet.repository';
+import LocalStorageProjetRepository from '../../../src/adapters/persistence/localstorage/projet.repository';
 import { Projet } from '../../../src/core/entities/Projet';
 import { CreateProjetUseCase } from '../../../src/core/usecases/create-projet.usecase';
 import { CodeNotUniqueError } from '../../../src/core/errors/projet.errors';
@@ -92,5 +92,28 @@ describe('LocalStorageProjetRepository Integration', () => {
     
     expect(found).not.toBeNull();
     expect(found?.nom).toBe('Updated Name');
+  });
+
+  it('should return all projects with findAll', async () => {
+    const projet1 = new Projet('id-1', 'Project One', 'CODE-001');
+    const projet2 = new Projet('id-2', 'Project Two', 'CODE-002');
+    const projet3 = new Projet('id-3', 'Project Three', 'CODE-003');
+    
+    await repository.save(projet1);
+    await repository.save(projet2);
+    await repository.save(projet3);
+    
+    const allProjects = await repository.findAll();
+    
+    expect(allProjects).toHaveLength(3);
+    expect(allProjects).toContainEqual(projet1);
+    expect(allProjects).toContainEqual(projet2);
+    expect(allProjects).toContainEqual(projet3);
+  });
+
+  it('should return empty array when no projects exist', async () => {
+    const allProjects = await repository.findAll();
+    
+    expect(allProjects).toEqual([]);
   });
 });

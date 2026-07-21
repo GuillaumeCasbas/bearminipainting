@@ -1,8 +1,12 @@
 import { BaseError } from './base.error';
 
 export class CodeNotUniqueError extends BaseError {
+  readonly code: string;
+
   constructor(code: string) {
     super(`Code '${code}' is not unique`);
+    this.code = code;
+    this.name = 'CodeNotUniqueError';
   }
 }
 

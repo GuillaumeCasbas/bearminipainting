@@ -1,7 +1,7 @@
 import { ProjetRepository } from '../../../core/ports/projet.repository';
 import { Projet } from '../../../core/entities/Projet';
 
-export class LocalStorageProjetRepository implements ProjetRepository {
+export default class LocalStorageProjetRepository implements ProjetRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
 
   async save(projet: Projet): Promise<void> {
@@ -16,6 +16,10 @@ export class LocalStorageProjetRepository implements ProjetRepository {
   async findByCode(code: string): Promise<Projet | null> {
     const projects = this.getAllFromStorage();
     return projects.find((p) => p.code === code) ?? null;
+  }
+
+  async findAll(): Promise<Projet[]> {
+    return this.getAllFromStorage();
   }
 
   private getAllFromStorage(): Projet[] {

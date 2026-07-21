@@ -7,6 +7,7 @@ describe("CreateProjetUseCase", () => {
   const mockRepository: ProjetRepository = {
     findByCode: jest.fn(),
     save: jest.fn(),
+    findAll: jest.fn(),
   };
 
   const useCase = new CreateProjetUseCase(mockRepository);
