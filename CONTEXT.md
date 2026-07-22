@@ -64,6 +64,8 @@ Create a **front-end only** (MVP) application to **organize and track painting t
 ## 🔌 Ports (Interfaces)
 Located in `core/ports/`.
 
+⚠️ **Note**: These interfaces are provided as **examples**. **Do not implement all methods exactly as shown** — each feature should add only what is necessary, following the **YAGNI** principle ("You Aren't Gonna Need It").
+
 ### **ProjetRepository**
 ```typescript
 interface ProjetRepository {

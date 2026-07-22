@@ -51,20 +51,20 @@
 ### **Branches**
 | Type | Format | Example |
 |------|--------|---------|
-| **Feature** | `linear/[issue-id]-description` | `linear/1-create-projet` |
-| **Bugfix** | `fix/[issue-id]-description` | `fix/5-unique-code-validation` |
-| **Refactor** | `refactor/[scope]` | `refactor/core-entities` |
+| **Feature** | `feat/[issue-id]-description` | `feat/BEA-123-create-projet` |
+| **Bugfix** | `fix/[issue-id]-description` | `fix/BEA-123-unique-code-validation` |
+| **Refactor** | `refactor/[issue-id]-scope` | `refactor/core-entities` |
 | **Main** | `main` | Only for production-ready code. |
 
 ### **Commits**
 | Type | Format | Example |
 |------|--------|---------|
-| **Feature** | `feat: [Linear #X] description` | `feat: [Linear #1] add Projet entity` |
-| **Bugfix** | `fix: [Linear #X] description` | `fix: [Linear #5] validate unique code` |
-| **Refactor** | `refactor: [scope] description` | `refactor: core move Todo to constants` |
-| **Test** | `test: [Linear #X] description` | `test: [Linear #1] add Projet tests` |
-| **Docs** | `docs: description` | `docs: update CONTEXT.md with new use case` |
-| **Chore** | `chore: description` | `chore: add .gitignore` |
+| **Feature** | `feat(scope?): description (issue-id)` | `feat: add Projet entity (BEA-123)` |
+| **Bugfix** | `fix(scope?): description (issue-id)` | `fix(project): validate unique code (BEA-123)` |
+| **Refactor** | `refactor(scope?): description (issue-id)` | `refactor: move Todo to constants (BEA-123)` |
+| **Test** | `test(scope?): description (issue-id)` | `test: [Linear #1] add Projet tests (BEA-123)` |
+| **Docs** | `docs(scope?): description (issue-id)` | `docs: update CONTEXT.md with new use case (BEA-123)` |
+| **Chore** | `chore(scope?): description (issue-id)` | `chore: add .gitignore (BEA-123)` |
 
 ---
 
