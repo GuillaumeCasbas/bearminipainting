@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import { Projet } from '../core/entities/Projet';
-import { CreateProjetUseCase } from '../core/usecases/create-projet.usecase';
-import LocalStorageProjetRepository from '../adapters/persistence/localstorage/projet.repository';
-import { CodeNotUniqueError } from '../core/errors/projet.errors';
+import {
+  Projet,
+  LocalStorageProjetRepository,
+  CreateProjetUseCase,
+  CodeNotUniqueError,
+} from '../../adapters/ui/projet';
 
 // Types pour les notifications toast
 type ToastType = 'success' | 'error' | 'info';

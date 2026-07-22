@@ -1,5 +1,5 @@
 import { useProjetStore } from '../stores/projetStore';
-import { Projet } from '../core/entities/Projet';
+import { Projet } from '../../adapters/ui/projet';
 
 export default function ProjetList() {
   const { projets, isLoading } = useProjetStore();

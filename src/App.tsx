@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import ProjetForm from './components/ProjetForm';
-import ProjetList from './components/ProjetList';
-import ToastContainer from './components/Toast';
-import { useProjetStore } from './stores/projetStore';
+import ProjetForm from './ui/components/ProjetForm';
+import ProjetList from './ui/components/ProjetList';
+import ToastContainer from './ui/components/Toast';
+import { useProjetStore } from './ui/stores/projetStore';
 
 function App() {
   const { loadProjets } = useProjetStore();
