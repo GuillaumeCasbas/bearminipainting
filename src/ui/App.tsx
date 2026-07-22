@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
-import ProjetForm from './ui/components/ProjetForm';
-import ProjetList from './ui/components/ProjetList';
-import ToastContainer from './ui/components/Toast';
-import { useProjetStore } from './ui/stores/projetStore';
+import ProjectForm from './components/ProjectForm';
+import ProjectList from './components/ProjectList';
+import ToastContainer from './components/Toast';
+import { useProjectStore } from './stores/projectStore';
 
 function App() {
-  const { loadProjets } = useProjetStore();
+  const { loadProjects } = useProjectStore();
 
-  // Charger les projets au montage
+  // Load projects on mount
   useEffect(() => {
-    loadProjets();
-  }, [loadProjets]);
+    loadProjects();
+  }, [loadProjects]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -18,13 +18,13 @@ function App() {
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
           <p className="text-gray-600 mt-1">
-            Suivez l'avancement de vos armées Warhammer
+            Track your Warhammer army progress
           </p>
         </header>
 
         <main>
-          <ProjetForm />
-          <ProjetList />
+          <ProjectForm />
+          <ProjectList />
         </main>
 
         <ToastContainer />

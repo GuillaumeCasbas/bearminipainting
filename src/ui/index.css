@@ -1,4 +1,4 @@
-/* Animations custom pour les toasts */
+/* Custom toast animations */
 @layer utilities {
   .animate-slide-in-right {
     animation: slideInRight 0.3s ease-out;

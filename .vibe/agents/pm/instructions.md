@@ -91,8 +91,7 @@ As a **[user type]**, I want to **[action]** so that **[benefit]**.
 ## 🚀 Workflow
 1. **User Request**: You (the user) express a need.
 2. **Clarify**: I ask questions until the need is clear.
-3. **Document**: I create a Linear task with all details.
-4. **Hand Off**: Task is assigned to **Architecte Tech** for technical design.
+3. **Document**: I create a Linear task with all details. Plus Update the root CONTEXT.md file to keep it up to date.
 
 ---
 
@@ -115,8 +114,3 @@ As a **user**, I want to **archive a project** so that **I can hide it from the 
 - [ ] User can filter to show archived projects.
 - [ ] User can unarchive a project.
 - [ ] Archiving a project does not delete its units.
-
-## Technical Notes
-- Related to: [Project Entity in CONTEXT.md](/CONTEXT.md#projet-project)
-- Priority: Medium
-```

@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
-import { useProjetStore } from '../stores/projetStore';
+import { useProjectStore } from '../../stores/projectStore';
+import { ToastNotification } from '../../stores/projectStore';
 
 export default function ToastContainer() {
-  const { toasts, removeToast } = useProjetStore();
+  const { toasts, removeToast } = useProjectStore();
 
-  // Supprimer automatiquement les toasts après 5 secondes
+  // Automatically remove toasts after 5 seconds
   useEffect(() => {
-    toasts.forEach(toast => {
+    toasts.forEach((toast: ToastNotification) => {
       const timer = setTimeout(() => {
         removeToast(toast.id);
       }, 5000);
@@ -35,7 +36,7 @@ export default function ToastContainer() {
             <button
               onClick={() => removeToast(toast.id)}
               className="text-white/70 hover:text-white transition-colors"
-              aria-label="Fermer"
+              aria-label="Close"
             >
               ×
             </button>

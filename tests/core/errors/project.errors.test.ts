@@ -1,4 +1,4 @@
-import { CodeNotUniqueError } from '../../../src/core/errors/projet.errors';
+import { CodeNotUniqueError } from '../../../src/core/errors/project.errors';
 
 describe('CodeNotUniqueError', () => {
   it('should create error with code property', () => {

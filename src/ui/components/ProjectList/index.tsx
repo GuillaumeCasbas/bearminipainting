@@ -1,23 +1,23 @@
-import { useProjetStore } from '../stores/projetStore';
-import { Projet } from '../../adapters/ui/projet';
+import { useProjectStore } from '../../stores/projectStore';
+import { Project } from '../../../adapters/ui/project';
 
-export default function ProjetList() {
-  const { projets, isLoading } = useProjetStore();
+export default function ProjectList() {
+  const { projects, isLoading } = useProjectStore();
 
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-500">Chargement des projets...</p>
+        <p className="text-gray-500">Loading projects...</p>
       </div>
     );
   }
 
-  if (projets.length === 0) {
+  if (projects.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Mes projets</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">My Projects</h2>
         <p className="text-gray-500 text-center py-8">
-          Aucun projet créé pour le moment.
+          No projects created yet.
         </p>
       </div>
     );
@@ -25,13 +25,13 @@ export default function ProjetList() {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Mes projets</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">My Projects</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nom
+                Name
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Code
@@ -40,25 +40,25 @@ export default function ProjetList() {
                 ID
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Taux d'avancement
+                Completion Rate
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {projets.map((projet: Projet) => (
-              <tr key={projet.id} className="hover:bg-gray-50 transition-colors">
+            {projects.map((project: Project) => (
+              <tr key={project.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {projet.nom}
+                  {project.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {projet.code}
+                  {project.code}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {projet.id.substring(0, 8)}...
+                  {project.id.substring(0, 8)}...
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {projet.getCompletionRate()}%
+                    {project.getCompletionRate()}%
                   </span>
                 </td>
               </tr>
