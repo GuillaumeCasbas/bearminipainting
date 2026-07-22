@@ -1,0 +1,36 @@
+import { useEffect } from 'react';
+import ProjectForm from './components/ProjectForm';
+import ProjectList from './components/ProjectList';
+import ToastContainer from './components/Toast';
+import { useProjectStore } from './stores/projectStore';
+
+function App() {
+  const { loadProjects } = useProjectStore();
+
+  // Load projects on mount
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
+          <p className="text-gray-600 mt-1">
+            Track your Warhammer army progress
+          </p>
+        </header>
+
+        <main>
+          <ProjectForm />
+          <ProjectList />
+        </main>
+
+        <ToastContainer />
+      </div>
+    </div>
+  );
+}
+
+export default App;

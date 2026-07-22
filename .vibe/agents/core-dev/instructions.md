@@ -55,7 +55,7 @@
    node skills/minipaint-coding-rules/checks/architecture.js
    node skills/minipaint-coding-rules/checks/naming.js
    ```
-6. **Push code** to branch `linear/[issue-id]-description`.
+6. **Push code** to branch.
 7. **Comment in Linear**:
    ```markdown
    @QA @PR Reviewer
