@@ -330,6 +330,45 @@ curl -H "Authorization: $LINEAR_KEY" \
 
 ---
 
+### **📝 How to Create a Linear Ticket**
+To create a new Linear ticket (issue), use the GraphQL mutation:
+
+#### **1. Prerequisites**
+- Ensure the `LINEAR_KEY` is set in the `.env` file.
+- Team ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5` (BearMiniPaint)
+- **Ticket title must be in English**
+
+#### **2. GraphQL Mutation**
+```bash
+curl -H "Authorization: $LINEAR_KEY" \
+  -H "Content-Type: application/json" \
+  "https://api.linear.app/graphql" \
+  -d '{
+    "query": "mutation IssueCreate($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title identifier url } } }",
+    "variables": {
+      "input": {
+        "title": "Your ticket title",
+        "description": "Ticket description in markdown",
+        "teamId": "030f63ca-5a0e-4803-89e9-4676d56a08e5",
+        "priority": 2
+      }
+    }
+  }'
+```
+
+#### **3. Priority Values**
+- `0`: Urgent
+- `1`: High
+- `2`: Medium
+- `3`: Low
+- `4`: None
+
+#### **4. Notes**
+- Labels must use `labelIds` (UUIDs) instead of names.
+- Omit labels if not critical or use the Linear UI to add them after creation.
+
+---
+
 ### **Linear Project References**
 - **Team**: `BearMiniPaint` (ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5`).
 - **Project**: `MiniPaint MVP` (ID: `4da01f1e-f5a9-484b-b3c4-03682868a3f8`).
