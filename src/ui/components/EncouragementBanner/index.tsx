@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
 import { EncouragementMessage } from '../../../core/entities/EncouragementMessage';
 import { GetRandomEncouragementMessageUseCase } from '../../../core/usecases/get-random-encouragement-message.usecase';
-import LocalStorageEncouragementRepository from '../../../adapters/persistence/localstorage/encouragement.repository';
 
 // Props type
 interface EncouragementBannerProps {
-  getRandomMessageUseCase?: GetRandomEncouragementMessageUseCase;
+  getRandomMessageUseCase: GetRandomEncouragementMessageUseCase;
 }
 
-// Default use case for production
-const defaultUseCase = new GetRandomEncouragementMessageUseCase(
-  new LocalStorageEncouragementRepository()
-);
-
 export const EncouragementBanner = ({
-  getRandomMessageUseCase = defaultUseCase,
+  getRandomMessageUseCase,
 }: EncouragementBannerProps) => {
   const [message, setMessage] = useState<EncouragementMessage | null>(null);
 
@@ -39,7 +33,7 @@ export const EncouragementBanner = ({
         className="ml-2 bg-transparent border-none cursor-pointer text-xl"
         aria-label="Get another encouragement message"
       >
-        ↻
+        &gt;&gt;&gt;
       </button>
     </div>
   );

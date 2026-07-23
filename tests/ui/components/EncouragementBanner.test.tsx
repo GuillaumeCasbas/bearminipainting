@@ -3,16 +3,6 @@ import '@testing-library/jest-dom';
 import { EncouragementBanner } from '../../../src/ui/components/EncouragementBanner';
 import { GetRandomEncouragementMessageUseCase } from '../../../src/core/usecases/get-random-encouragement-message.usecase';
 import { EncouragementMessage } from '../../../src/core/entities/EncouragementMessage';
-import { EncouragementRepository } from '../../../src/core/ports/encouragement.repository';
-
-// Mock repository for testing with proper typing
-const mockRepository: EncouragementRepository = {
-  getRecentlyDisplayed: jest.fn().mockResolvedValue([]),
-  markAsDisplayed: jest.fn().mockResolvedValue(undefined),
-  cleanOldMessages: jest.fn().mockResolvedValue(undefined),
-};
-
-const mockUseCase = new GetRandomEncouragementMessageUseCase(mockRepository);
 
 // Mock messages for testing
 const testMessage1 = new EncouragementMessage('test-1', 'Test message 1');
@@ -88,21 +78,6 @@ describe('EncouragementBanner', () => {
 
     await waitFor(() => {
       expect(container.firstChild).toBeNull();
-    });
-  });
-
-  it('should use default use case when no prop is provided', async () => {
-    // Clear the mock to test the default behavior
-    // This test verifies that the component can be rendered with default use case
-    // Note: This may require localStorage to be mocked properly
-    render(<EncouragementBanner />);
-
-    // Just verify it doesn't crash and renders something or null
-    // The exact behavior depends on the default use case implementation
-    await waitFor(() => {
-      // Either renders a message or nothing
-      const banner = screen.queryByRole('banner');
-      expect(banner === null || banner !== null).toBe(true);
     });
   });
 });

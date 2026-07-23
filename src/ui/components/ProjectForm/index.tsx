@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useProjectStore } from '../../stores/projectStore';
 
-export default function ProjectForm() {
+export function ProjectForm() {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const { addProject, isLoading } = useProjectStore();

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ProjectForm from '../../../src/ui/components/ProjectForm';
+import { ProjectForm } from '../../../src/ui/components/ProjectForm';
 
 // Mock the useProjectStore
 const mockAddProject = jest.fn();
