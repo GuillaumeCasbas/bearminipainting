@@ -176,24 +176,25 @@ src/
 
 ## 📝 Technical TODOs
 
-### 🎫 UI Testing Setup (New Ticket Required)
+### ✅ UI Testing Setup (Completed)
 **Context**: The EncouragementBanner component (and future UI components) requires testing libraries that are not currently installed in the project.
 
-**Missing Dependencies**:
+**Missing Dependencies** (NOW INSTALLED):
 ```bash
-npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event
+npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event jest-environment-jsdom
 ```
 
-**Required Jest Configuration** (`jest.config.cjs`):
+**Jest Configuration** (`jest.config.cjs` - NOW CONFIGURED):
 ```javascript
 module.exports = {
   // ... existing config
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'jsdom', // or keep 'node' and mock localStorage globally
+  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx'],
 };
 ```
 
-**Required Setup File** (`jest.setup.js`):
+**Setup File** (`jest.setup.js` - NOW CREATED):
 ```javascript
 // Mock localStorage for Node.js environment
 const localStorageMock = {
@@ -207,13 +208,18 @@ const localStorageMock = {
 Object.defineProperty(global, 'localStorage', { value: localStorageMock });
 ```
 
-**Example Test Pattern** (for future reference):
+**Test Pattern** (for future reference):
 ```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { EncouragementBanner } from '../../../src/ui/components/EncouragementBanner';
 
 // Use dependency injection via props
-const mockRepository: EncouragementRepository = { /* ... */ };
+const mockRepository: EncouragementRepository = {
+  getRecentlyDisplayed: jest.fn().mockResolvedValue([]),
+  markAsDisplayed: jest.fn().mockResolvedValue(undefined),
+  cleanOldMessages: jest.fn().mockResolvedValue(undefined),
+};
 const mockUseCase = new GetRandomEncouragementMessageUseCase(mockRepository);
 
 it('should render with a message', async () => {
@@ -222,11 +228,19 @@ it('should render with a message', async () => {
 });
 ```
 
-**Action**: Create a Linear ticket to:
-1. Install testing libraries
-2. Configure Jest for UI testing
-3. Add UI tests for existing components (ProjectForm, ProjectList, Toast, EncouragementBanner)
-4. Document the testing pattern in CONTEXT.md
+**UI Test Files Created**:
+- `tests/ui/components/ProjectForm.test.tsx` (6 tests)
+- `tests/ui/components/ProjectList.test.tsx` (7 tests)
+- `tests/ui/components/ToastContainer.test.tsx` (8 tests)
+- `tests/ui/components/EncouragementBanner.test.tsx` (5 tests)
+
+**Note**: For components using Zustand stores, mock the store using `jest.mock`:
+```typescript
+const mockUseProjectStore = jest.fn();
+jest.mock('../../../src/ui/stores/projectStore', () => ({
+  useProjectStore: () => mockUseProjectStore(),
+}));
+```
 3. **Future Improvements**:
    - Backend migration (if MVP is validated).
    - Reordering todos (via `ReorderTodosUseCase`).
