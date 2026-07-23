@@ -74,7 +74,7 @@ description: Validates code quality and correctness for MiniPaint project. Focus
 - [ ] Integration with Core tested.
 
 ### **UI Layer**
-- [ ] No direct imports to Core (only usecases and entities alowed)
+- [ ] No direct imports to Core (only usecases and entities allowed)
 - [ ] React components follow naming conventions.
 - [ ] Zustand stores are clean and simple.
 
