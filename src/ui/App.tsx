@@ -4,15 +4,10 @@ import ProjectList from './components/ProjectList';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
 import { EncouragementBanner } from './components/EncouragementBanner';
-import { GetRandomEncouragementMessageUseCase } from '../core/usecases/get-random-encouragement-message.usecase';
-import LocalStorageEncouragementRepository from '../adapters/persistence/localstorage/encouragement.repository';
-
-// Initialize use case with its adapter
-const encouragementUseCase = new GetRandomEncouragementMessageUseCase(
-  new LocalStorageEncouragementRepository()
-);
+import { useEncouragementUseCase } from './contexts/EncouragementContext';
 
 export function App() {
+  const encouragementUseCase = useEncouragementUseCase();
   const { loadProjects } = useProjectStore();
 
   // Load projects on mount

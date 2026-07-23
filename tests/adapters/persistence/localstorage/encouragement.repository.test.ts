@@ -1,34 +1,5 @@
 import LocalStorageEncouragementRepository from '../../../../src/adapters/persistence/localstorage/encouragement.repository';
 
-// TODO: This mock is duplicated in project.repository.test.ts.
-// If a third test file needs localStorage mocking, refactor into a global Jest setup file
-// (e.g., jest.setup.js + setupFilesAfterEnv in jest.config.cjs).
-// Mock localStorage for Node.js environment
-interface LocalStorageMock {
-  store: Record<string, string>;
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-  removeItem: (key: string) => void;
-  clear: () => void;
-}
-
-const localStorageMock: LocalStorageMock = {
-  store: {},
-  getItem: jest.fn((key: string): string | null => localStorageMock.store[key] || null),
-  setItem: jest.fn((key: string, value: string): void => {
-    localStorageMock.store[key] = value;
-  }),
-  removeItem: jest.fn((key: string): void => {
-    delete localStorageMock.store[key];
-  }),
-  clear: jest.fn((): void => {
-    localStorageMock.store = {};
-  }),
-};
-
-Object.defineProperty(globalThis, 'localStorage', {
-  value: localStorageMock,
-});
 
 describe('LocalStorageEncouragementRepository', () => {
   let repository: LocalStorageEncouragementRepository;
