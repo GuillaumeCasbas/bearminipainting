@@ -3,6 +3,13 @@ import '@testing-library/jest-dom';
 import ProjectList from '../../../src/ui/components/ProjectList';
 import { Project } from '../../../src/core/entities/Project';
 
+// Mock react-router-dom
+jest.mock('react-router-dom', () => ({
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 // Mock the useProjectStore
 const mockProjects: Project[] = [];
 const mockIsLoading = false;

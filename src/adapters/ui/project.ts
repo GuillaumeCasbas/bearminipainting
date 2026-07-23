@@ -8,6 +8,7 @@ import { Project } from '../../core/entities/Project';
 import { ProjectRepository } from '../../core/ports/project.repository';
 import LocalStorageProjectRepository from '../persistence/localstorage/project.repository';
 import { CreateProjectUseCase } from '../../core/usecases/create-project.usecase';
+import { GetProjectByIdUseCase } from '../../core/usecases/get-project-by-id.usecase';
 import { CodeNotUniqueError } from '../../core/errors/project.errors';
 
 // Export types
@@ -26,5 +27,13 @@ export function createProjectUseCaseWithRepository(
   return new CreateProjectUseCase(repository);
 }
 
-// Export the use case class for advanced usage
+// Factory function to create get project by id use case with repository
+export function createGetProjectByIdUseCaseWithRepository(
+  repository: ProjectRepository = new LocalStorageProjectRepository()
+): GetProjectByIdUseCase {
+  return new GetProjectByIdUseCase(repository);
+}
+
+// Export the use case classes for advanced usage
 export { CreateProjectUseCase };
+export { GetProjectByIdUseCase };

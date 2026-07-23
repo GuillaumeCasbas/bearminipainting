@@ -5,6 +5,7 @@ import { CodeNotUniqueError } from "../../../src/core/errors/project.errors";
 
 describe("CreateProjectUseCase", () => {
   const mockRepository: ProjectRepository = {
+    findById: jest.fn(),
     findByCode: jest.fn(),
     save: jest.fn(),
     findAll: jest.fn(),

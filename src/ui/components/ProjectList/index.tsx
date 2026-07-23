@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useProjectStore } from '../../stores/projectStore';
 import { Project } from '../../../adapters/ui/project';
 
@@ -47,8 +48,13 @@ export default function ProjectList() {
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.map((project: Project) => (
               <tr key={project.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {project.name}
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <Link
+                    to={`/projects/${project.id}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    {project.name}
+                  </Link>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {project.code}
