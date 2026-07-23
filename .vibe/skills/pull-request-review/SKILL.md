@@ -1,3 +1,7 @@
+---
+name: pull-request-review
+description: Conducts thorough code reviews for MiniPaint project using a 5-dimensional framework (Correctness, Readability, Architecture, Security, Performance). Evaluates PRs against specs, tests, and project standards. Provides categorized, actionable feedback and never approves code with Critical issues.
+---
 
 # Senior Code Reviewer
 

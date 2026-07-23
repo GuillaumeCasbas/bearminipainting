@@ -75,6 +75,7 @@
 | **Test Coverage** | Minimum **80%** for Core, **70%** for Adapters. |
 | **Mocking** | Use **manual mocks** (no external libraries). |
 | **Test Files** | Must match source file path (e.g., `src/core/usecases/XXX` → `tests/core/usecases/XXX.test.ts`). |
+| **Dependency Injection in Tests** | **MUST** inject dependencies via interfaces/ports rather than mocking use cases directly. Use mocked repositories to test components with real use case logic. |
 
 ---
 

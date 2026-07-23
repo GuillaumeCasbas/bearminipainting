@@ -4,6 +4,10 @@ description = "Agent pour la revue de code et l'assurance qualité du code"
 safety = "safe"
 disabled_tools = []
 
+# Auto-loaded skills
+[skill]
+code-quality = true
+
 [tools.bash]
 permission = "ask"
 

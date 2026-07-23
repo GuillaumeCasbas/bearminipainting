@@ -171,6 +171,62 @@ src/
 1. **Full Unit Code**: Computed **on-the-fly** in UI/Store as `${project.code}-${unit.code}`.
    - Not stored in `Unit` entity to avoid coupling.
 2. **Language**: All code and error messages **must be in English**.
+
+---
+
+## 📝 Technical TODOs
+
+### 🎫 UI Testing Setup (New Ticket Required)
+**Context**: The EncouragementBanner component (and future UI components) requires testing libraries that are not currently installed in the project.
+
+**Missing Dependencies**:
+```bash
+npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event
+```
+
+**Required Jest Configuration** (`jest.config.cjs`):
+```javascript
+module.exports = {
+  // ... existing config
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jsdom', // or keep 'node' and mock localStorage globally
+};
+```
+
+**Required Setup File** (`jest.setup.js`):
+```javascript
+// Mock localStorage for Node.js environment
+const localStorageMock = {
+  store: {},
+  getItem: jest.fn((key) => localStorageMock.store[key] || null),
+  setItem: jest.fn((key, value) => { localStorageMock.store[key] = value; }),
+  removeItem: jest.fn((key) => { delete localStorageMock.store[key]; }),
+  clear: jest.fn(() => { localStorageMock.store = {}; }),
+};
+
+Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+```
+
+**Example Test Pattern** (for future reference):
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+import { EncouragementBanner } from '../../../src/ui/components/EncouragementBanner';
+
+// Use dependency injection via props
+const mockRepository: EncouragementRepository = { /* ... */ };
+const mockUseCase = new GetRandomEncouragementMessageUseCase(mockRepository);
+
+it('should render with a message', async () => {
+  render(<EncouragementBanner getRandomMessageUseCase={mockUseCase} />);
+  expect(await screen.findByText('Test message')).toBeInTheDocument();
+});
+```
+
+**Action**: Create a Linear ticket to:
+1. Install testing libraries
+2. Configure Jest for UI testing
+3. Add UI tests for existing components (ProjectForm, ProjectList, Toast, EncouragementBanner)
+4. Document the testing pattern in CONTEXT.md
 3. **Future Improvements**:
    - Backend migration (if MVP is validated).
    - Reordering todos (via `ReorderTodosUseCase`).

@@ -1,3 +1,8 @@
+---
+name: product-manager
+description: Defines user needs and creates structured Linear tasks for MiniPaint project. Focuses on user stories, acceptance criteria, and business value. Asks clarifying questions until requirements are crystal clear. Never makes technical decisions or writes code.
+---
+
 # Agent Product Manager - Context
 
 ## 🚨 Global Rules (Applies to ALL Agents)
@@ -82,8 +87,6 @@ As a **[user type]**, I want to **[action]** so that **[benefit]**.
 ---
 
 ## 🔗 Useful Links
-- [MiniPaint CONTEXT.md](/CONTEXT.md) (for existing rules)
-- [MiniPaint RULES.md](/skills/minipaint-coding-rules/RULES.md) (for coding standards)
 - [Linear Project](https://linear.app/bearminipaint/project/minipaint-mvp)
 
 ---

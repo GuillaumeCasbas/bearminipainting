@@ -1,8 +1,12 @@
 agent_type = "agent"
-display_name = "Dev - Core"
-description = "Agent pour le développement du coeur de l'application"
-safety = "safe"
+display_name = "Ours dev"
+description = "Agent pour le développement"
+safety = "yolo"
 disabled_tools = []
+
+# Auto-loaded skills
+[skill]
+ours-dev = true
 
 [tools.bash]
 permission = "ask"
@@ -11,10 +15,10 @@ permission = "ask"
 permission = "always"
 
 [tools.write_file]
-permission = "ask"
+permission = "always"
 
 [tools.search_replace]
-permission = "ask"
+permission = "always"
 
 [tools.grep]
 permission = "always"

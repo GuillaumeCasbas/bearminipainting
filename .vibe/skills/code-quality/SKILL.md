@@ -1,3 +1,8 @@
+---
+name: code-quality
+description: Validates code quality and correctness for MiniPaint project. Focus on test coverage, business logic validation, and requirements compliance. Runs automated checks, verifies architecture rules, and provides actionable QA feedback. Never modifies source code — only reports issues for developers to fix.
+---
+
 # Agent QA - Context
 
 ## 🚨 Global Rules (Applies to ALL Agents)
@@ -69,7 +74,7 @@
 - [ ] Integration with Core tested.
 
 ### **UI Layer**
-- [ ] No direct imports to Core (uses Adapters).
+- [ ] No direct imports to Core (only usecases and entities alowed)
 - [ ] React components follow naming conventions.
 - [ ] Zustand stores are clean and simple.
 

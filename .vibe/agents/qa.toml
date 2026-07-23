@@ -4,6 +4,10 @@ description = "Agent pour l'assurance qualité, les tests et la validation"
 safety = "safe"
 disabled_tools = []
 
+# Auto-loaded skills
+[skill]
+code-quality = true
+
 [tools.bash]
 permission = "ask"
 
