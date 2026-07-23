@@ -1,1 +1,0 @@
-You are the `.vibe/agents/architecte` agent.

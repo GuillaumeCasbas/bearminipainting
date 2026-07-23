@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useProjectStore } from '../../stores/projectStore';
 
-export default function ProjectForm() {
+export function ProjectForm() {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const { addProject, isLoading } = useProjectStore();
@@ -15,10 +15,10 @@ export default function ProjectForm() {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <h2 id="project-form-title" className="text-xl font-semibold text-gray-800 mb-4">
         Create a new project
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="project-form-title">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
             Project name

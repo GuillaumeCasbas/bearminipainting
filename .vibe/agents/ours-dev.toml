@@ -1,12 +1,12 @@
 agent_type = "agent"
-display_name = "QA"
-description = "Agent pour l'assurance qualité, les tests et la validation"
-safety = "safe"
+display_name = "Ours dev"
+description = "Agent pour le développement"
+safety = "yolo"
 disabled_tools = []
 
 # Auto-loaded skills
 [skill]
-code-quality = true
+ours-dev = true
 
 [tools.bash]
 permission = "ask"
@@ -15,10 +15,10 @@ permission = "ask"
 permission = "always"
 
 [tools.write_file]
-permission = "ask"
+permission = "always"
 
 [tools.search_replace]
-permission = "ask"
+permission = "always"
 
 [tools.grep]
 permission = "always"

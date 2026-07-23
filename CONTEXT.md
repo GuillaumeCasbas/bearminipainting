@@ -171,22 +171,6 @@ src/
 1. **Full Unit Code**: Computed **on-the-fly** in UI/Store as `${project.code}-${unit.code}`.
    - Not stored in `Unit` entity to avoid coupling.
 2. **Language**: All code and error messages **must be in English**.
-3. **Future Improvements**:
-   - Backend migration (if MVP is validated).
-   - Reordering todos (via `ReorderTodosUseCase`).
-   - Global unit search (requires `UnitRepository.findAll()`).
-   - Avoid duplicating `DEFAULT_TODOS` in tests (extract to `core/constants/default-todos.ts`).
-
----
-
-## 🚀 Current Progress (TDD)
-- [x] Project requirements validated.
-- [x] Architecture decisions finalized (Hexagonal + Use Cases + Ports).
-- [x] Folder structure created (`core/entities/`, `core/ports/`, `core/usecases/`, `tests/core/usecases/`).
-- [x] First test written: `CreateProjectUseCase` (checks code uniqueness).
-- [x] Implement `Project` entity.
-- [x] Implement `ProjectRepository` port.
-- [x] Implement `CreateProjectUseCase` to pass the test.
 
 ---
 
@@ -260,6 +244,45 @@ curl -H "Authorization: $LINEAR_KEY" \
 
 ---
 
+### **📝 How to Create a Linear Ticket**
+To create a new Linear ticket (issue), use the GraphQL mutation:
+
+#### **1. Prerequisites**
+- Ensure the `LINEAR_KEY` is set in the `.env` file.
+- Team ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5` (BearMiniPaint)
+- **Ticket title must be in English**
+
+#### **2. GraphQL Mutation**
+```bash
+curl -H "Authorization: $LINEAR_KEY" \
+  -H "Content-Type: application/json" \
+  "https://api.linear.app/graphql" \
+  -d '{
+    "query": "mutation IssueCreate($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title identifier url } } }",
+    "variables": {
+      "input": {
+        "title": "Your ticket title",
+        "description": "Ticket description in markdown",
+        "teamId": "030f63ca-5a0e-4803-89e9-4676d56a08e5",
+        "priority": 2
+      }
+    }
+  }'
+```
+
+#### **3. Priority Values**
+- `0`: Urgent
+- `1`: High
+- `2`: Medium
+- `3`: Low
+- `4`: None
+
+#### **4. Notes**
+- Labels must use `labelIds` (UUIDs) instead of names.
+- Omit labels if not critical or use the Linear UI to add them after creation.
+
+---
+
 ### **Linear Project References**
 - **Team**: `BearMiniPaint` (ID: `030f63ca-5a0e-4803-89e9-4676d56a08e5`).
 - **Project**: `MiniPaint MVP` (ID: `4da01f1e-f5a9-484b-b3c4-03682868a3f8`).
@@ -267,16 +290,3 @@ curl -H "Authorization: $LINEAR_KEY" \
 ### **GitHub Integration**
 - The project repository is expected to be linked to Linear for issue tracking.
 - Use **environment variables** for sensitive data (e.g., `.env` file in `.gitignore`).
-
----
-
-## 📅 Next Steps (Suggested)
-1. Implement `Unit` entity (simple class with `id`, `name`, `code`, `projectId`, `todos`).
-2. Define `UnitRepository` interface (see [Ports](#🔌-ports-interfaces)).
-3. Implement unit-related use cases (`CreateUnitUseCase`, `AddTodoToUnitUseCase`, etc.).
-4. Add more tests for unit-related features.
-
----
-
-**Last Updated**: 2024-XX-XX
-**Validated By**: User + Agent

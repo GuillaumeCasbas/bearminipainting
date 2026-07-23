@@ -4,6 +4,10 @@ description = "Agent pour la gestion de produit et la planification"
 safety = "safe"
 disabled_tools = []
 
+# Auto-loaded skills
+[skill]
+product-manager = true
+
 [tools.bash]
 permission = "ask"
 

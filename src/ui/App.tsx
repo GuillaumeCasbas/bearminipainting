@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
-import ProjectForm from './components/ProjectForm';
+import { ProjectForm } from './components/ProjectForm';
 import ProjectList from './components/ProjectList';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
+import { EncouragementBanner } from './components/EncouragementBanner';
+import { useEncouragementUseCase } from './contexts/EncouragementContext';
 
-function App() {
+export function App() {
+  const encouragementUseCase = useEncouragementUseCase();
   const { loadProjects } = useProjectStore();
 
   // Load projects on mount
@@ -14,6 +17,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <EncouragementBanner getRandomMessageUseCase={encouragementUseCase} />
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
@@ -32,5 +36,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
