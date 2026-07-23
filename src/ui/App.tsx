@@ -3,6 +3,7 @@ import ProjectForm from './components/ProjectForm';
 import ProjectList from './components/ProjectList';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
+import { EncouragementBanner } from './components/EncouragementBanner';
 
 function App() {
   const { loadProjects } = useProjectStore();
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <EncouragementBanner />
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
