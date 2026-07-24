@@ -3,7 +3,7 @@ import { Project } from '../../../core/entities/Project';
 import { Unit } from '../../../core/entities/Unit';
 import { Todo } from '../../../core/entities/Todo';
 
-export default class LocalStorageProjectRepository implements ProjectRepository {
+export class LocalStorageProjectRepository implements ProjectRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
 
   async save(project: Project): Promise<void> {

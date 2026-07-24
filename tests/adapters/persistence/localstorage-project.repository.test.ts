@@ -1,4 +1,4 @@
-import LocalStorageProjectRepository from '../../../src/adapters/persistence/localstorage/project.repository';
+import { LocalStorageProjectRepository } from '../../../src/adapters/persistence/localstorage/project.repository';
 import { Project } from '../../../src/core/entities/Project';
 import { Unit } from '../../../src/core/entities/Unit';
 import { CreateProjectUseCase } from '../../../src/core/usecases/create-project.usecase';
@@ -37,7 +37,7 @@ describe('LocalStorageProjectRepository Integration', () => {
   });
 
   it('should integrate with CreateProjectUseCase for unique code', async () => {
-    const result = await useCase.execute('New Project', 'UNIQUE-001');
+    const result = await useCase.execute('test-id-2', 'New Project', 'UNIQUE-001');
     
     expect(result).toBeInstanceOf(Project);
     expect(result.name).toBe('New Project');
@@ -52,10 +52,10 @@ describe('LocalStorageProjectRepository Integration', () => {
 
   it('should integrate with CreateProjectUseCase and throw on duplicate code', async () => {
     // Create first project
-    await useCase.execute('First Project', 'DUPLICATE-001');
+    await useCase.execute('test-id-3', 'First Project', 'DUPLICATE-001');
     
     // Try to create second project with same code
-    await expect(useCase.execute('Second Project', 'DUPLICATE-001'))
+    await expect(useCase.execute('test-id-4', 'Second Project', 'DUPLICATE-001'))
       .rejects
       .toThrow(CodeNotUniqueError);
   });

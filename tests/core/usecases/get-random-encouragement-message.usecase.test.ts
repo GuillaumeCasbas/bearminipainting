@@ -5,50 +5,60 @@ import { GetRandomEncouragementMessageUseCase } from '../../../src/core/usecases
 import { EncouragementRepository } from '../../../src/core/ports/encouragement.repository';
 
 describe('GetRandomEncouragementMessageUseCase', () => {
+  let getRecentlyDisplayedCalls = 0;
+  let cleanOldMessagesCalled = false;
+  let markAsDisplayedCalledWith: string | null = null;
+  let getRecentlyDisplayedReturnValues: string[][] = [];
+  let returnIndex = 0;
+
   const mockRepository: EncouragementRepository = {
-    getRecentlyDisplayed: jest.fn(),
-    markAsDisplayed: jest.fn(),
-    cleanOldMessages: jest.fn(),
+    getRecentlyDisplayed: async (): Promise<string[]> => {
+      getRecentlyDisplayedCalls++;
+      return getRecentlyDisplayedReturnValues[returnIndex++] ?? [];
+    },
+    markAsDisplayed: async (id: string): Promise<void> => {
+      markAsDisplayedCalledWith = id;
+    },
+    cleanOldMessages: async (): Promise<void> => {
+      cleanOldMessagesCalled = true;
+    },
   };
 
   const useCase = new GetRandomEncouragementMessageUseCase(mockRepository);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    getRecentlyDisplayedCalls = 0;
+    cleanOldMessagesCalled = false;
+    markAsDisplayedCalledWith = null;
+    getRecentlyDisplayedReturnValues = [];
+    returnIndex = 0;
   });
 
   it('should return a message not recently displayed', async () => {
-    (mockRepository.getRecentlyDisplayed as jest.Mock).mockResolvedValue(['enc-1']);
-    (mockRepository.markAsDisplayed as jest.Mock).mockResolvedValue(undefined);
+    getRecentlyDisplayedReturnValues = [['enc-1']];
 
     const result = await useCase.execute();
 
     expect(result.id).not.toBe('enc-1');
     expect(['enc-2', 'enc-3']).toContain(result.id);
-    expect(mockRepository.markAsDisplayed).toHaveBeenCalledWith(result.id);
+    expect(markAsDisplayedCalledWith).toBe(result.id);
   });
 
   it('should clean cache and retry if all messages were recently displayed', async () => {
-    (mockRepository.getRecentlyDisplayed as jest.Mock)
-      .mockResolvedValueOnce(['enc-1', 'enc-2', 'enc-3'])
-      .mockResolvedValueOnce([]);
-
-    (mockRepository.cleanOldMessages as jest.Mock).mockResolvedValue(undefined);
-    (mockRepository.markAsDisplayed as jest.Mock).mockResolvedValue(undefined);
+    getRecentlyDisplayedReturnValues = [['enc-1', 'enc-2', 'enc-3'], []];
 
     const result = await useCase.execute();
 
-    expect(mockRepository.cleanOldMessages).toHaveBeenCalled();
-    expect(mockRepository.getRecentlyDisplayed).toHaveBeenCalledTimes(2);
-    expect(mockRepository.markAsDisplayed).toHaveBeenCalled();
+    expect(cleanOldMessagesCalled).toBe(true);
+    expect(getRecentlyDisplayedCalls).toBe(2);
+    expect(markAsDisplayedCalledWith).toBe(result.id);
   });
 
   it('should mark the returned message as displayed', async () => {
-    (mockRepository.getRecentlyDisplayed as jest.Mock).mockResolvedValue([]);
-    (mockRepository.markAsDisplayed as jest.Mock).mockResolvedValue(undefined);
+    getRecentlyDisplayedReturnValues = [[]];
 
     await useCase.execute();
 
-    expect(mockRepository.markAsDisplayed).toHaveBeenCalled();
+    expect(markAsDisplayedCalledWith).not.toBeNull();
   });
 });

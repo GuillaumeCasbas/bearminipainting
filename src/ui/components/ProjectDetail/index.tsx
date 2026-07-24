@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Project, GetProjectByIdUseCase, LocalStorageProjectRepository } from '../../../adapters/ui/project';
+import { Project } from '../../../adapters/ui/project';
 import { Unit } from '../../../adapters/ui/unit';
+import { useProjectContext } from '../../contexts/project-context';
 
-export default function ProjectDetail() {
+export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
 
-  const getProjectByIdUseCase = new GetProjectByIdUseCase(new LocalStorageProjectRepository());
+  const { getProjectByIdUseCase } = useProjectContext();
 
   useEffect(() => {
     const loadProject = async () => {
