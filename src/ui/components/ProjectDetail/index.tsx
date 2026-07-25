@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Project } from '../../../adapters/ui/project';
-import { Unit } from '../../../adapters/ui/unit';
+import { Unit } from '../../../core/entities/Unit';
 import { useProjectContext } from '../../contexts/project-context';
 
 // Completion rate thresholds (from BEA-8 specifications)
