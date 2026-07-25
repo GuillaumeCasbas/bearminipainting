@@ -3,6 +3,29 @@ import { Project } from '../../../core/entities/Project';
 import { Unit } from '../../../core/entities/Unit';
 import { Todo } from '../../../core/entities/Todo';
 
+// Storage DTO interfaces for type-safe deserialization
+interface StoredTodo {
+  id: string;
+  label: string;
+  status: 'TODO' | 'DONE';
+  order: number;
+}
+
+interface StoredUnit {
+  id: string;
+  name: string;
+  code: string;
+  projectId: string;
+  todos: StoredTodo[];
+}
+
+interface StoredProject {
+  id: string;
+  name: string;
+  code: string;
+  units: StoredUnit[];
+}
+
 export class LocalStorageProjectRepository implements ProjectRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
 
@@ -35,11 +58,11 @@ export class LocalStorageProjectRepository implements ProjectRepository {
       return [];
     }
     try {
-      const parsed = JSON.parse(data);
-      return parsed.map((item: any) => {
+      const parsed = JSON.parse(data) as StoredProject[];
+      return parsed.map((item: StoredProject) => {
         const units = item.units
           ? item.units.map(
-              (unitItem: any) =>
+              (unitItem: StoredUnit) =>
                 new Unit(
                   unitItem.id,
                   unitItem.name,
@@ -47,7 +70,7 @@ export class LocalStorageProjectRepository implements ProjectRepository {
                   unitItem.projectId,
                   unitItem.todos
                     ? unitItem.todos.map(
-                        (todoItem: any) =>
+                        (todoItem: StoredTodo) =>
                           new Todo(
                             todoItem.id,
                             todoItem.label,

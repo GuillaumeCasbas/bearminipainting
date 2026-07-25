@@ -57,8 +57,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   // Create a new project
   addProject: async (name: string, code: string) => {
     try {
-      const id = crypto.randomUUID();
-      const newProject = await createProjectUseCase.execute(id, name, code);
+      const newProject = await createProjectUseCase.execute(name, code);
       
       // Reload the project list
       const projects = await projectRepository.findAll();

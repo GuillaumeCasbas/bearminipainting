@@ -28,7 +28,7 @@ describe("CreateProjectUseCase", () => {
       return existingProject;
     };
 
-    await expect(useCase.execute("1", "New Project", "NMS"))
+    await expect(useCase.execute("New Project", "NMS"))
       .rejects
       .toBeInstanceOf(CodeNotUniqueError);
   });
@@ -42,10 +42,10 @@ describe("CreateProjectUseCase", () => {
       saveCalled = true;
     };
 
-    const result = await useCase.execute("1", "New Project", "UNIQUE");
+    const result = await useCase.execute("New Project", "UNIQUE");
 
     expect(result).toBeInstanceOf(Project);
-    expect(result.id).toBe("1");
+    expect(result.id).toBeDefined();
     expect(result.name).toBe("New Project");
     expect(result.code).toBe("UNIQUE");
     expect(saveCalled).toBe(true);
