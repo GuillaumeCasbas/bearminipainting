@@ -36,3 +36,6 @@ export function createGetProjectByIdUseCaseWithRepository(
 // Export the use case classes for advanced usage
 export { CreateProjectUseCase };
 export { GetProjectByIdUseCase };
+
+// Default export for backward compatibility
+export default LocalStorageProjectRepository;
