@@ -9,8 +9,8 @@ describe('LocalStorageProjectRepository Integration', () => {
   let useCase: CreateProjectUseCase;
 
   beforeEach(() => {
-    // Clear and mock localStorage before each test
-    localStorage.clear();
+    // Clear only the storage key used by this repository to prevent side effects
+    localStorage.removeItem('minipaint_projects');
     jest.clearAllMocks();
     
     repository = new LocalStorageProjectRepository();
