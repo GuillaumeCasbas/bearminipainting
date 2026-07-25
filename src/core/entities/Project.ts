@@ -21,6 +21,9 @@ export class Project {
       (sum, unit) => sum + unit.todos.length,
       0
     );
+    if (totalTodos === 0) {
+      return 100;
+    }
     const totalDoneTodos = this.units.reduce(
       (sum, unit) => sum + unit.todos.filter((todo) => todo.status === 'DONE').length,
       0

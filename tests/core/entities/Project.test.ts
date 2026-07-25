@@ -71,4 +71,11 @@ describe("Project", () => {
 
     expect(project.getCompletionRate()).toBe(100);
   });
+
+  it("should return 100% completion rate if units exist but have no todos", () => {
+    const unit = new Unit("unit-1", "Intercessor", "IA-01", "1", []);
+    const project = new Project("1", "Space Marines", "NMS", [unit]);
+
+    expect(project.getCompletionRate()).toBe(100);
+  });
 });
