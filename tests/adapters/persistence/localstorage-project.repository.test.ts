@@ -85,9 +85,9 @@ describe('LocalStorageProjectRepository Integration', () => {
     const allProjects = await repository.findAll();
     
     expect(allProjects).toHaveLength(3);
-    expect(allProjects.map(p => p.id)).toContain('id-1');
-    expect(allProjects.map(p => p.id)).toContain('id-2');
-    expect(allProjects.map(p => p.id)).toContain('id-3');
+    expect(allProjects).toContainEqual(project1);
+    expect(allProjects).toContainEqual(project2);
+    expect(allProjects).toContainEqual(project3);
   });
 
   it('should return empty array when no projects exist', async () => {
