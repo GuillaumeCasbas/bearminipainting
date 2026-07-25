@@ -4,6 +4,10 @@ import { Project } from '../../../adapters/ui/project';
 import { Unit } from '../../../adapters/ui/unit';
 import { useProjectContext } from '../../contexts/project-context';
 
+// Completion rate thresholds (from BEA-8 specifications)
+const COMPLETION_RATE_RED_THRESHOLD = 20;
+const COMPLETION_RATE_GREEN_THRESHOLD = 80;
+
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -40,13 +44,9 @@ export function ProjectDetail() {
   }, [id]);
 
   const getCompletionRateColor = (rate: number): string => {
-    if (rate < 20) {
-      return 'bg-red-500';
-    } else if (rate >= 20 && rate < 80) {
-      return 'bg-orange-500';
-    } else {
-      return 'bg-green-500';
-    }
+    if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
+    if (rate < COMPLETION_RATE_GREEN_THRESHOLD) return 'bg-orange-500';
+    return 'bg-green-500';
   };
 
   if (isLoading) {
