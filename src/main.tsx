@@ -2,18 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './ui/App';
 import './ui/index.css';
-import { EncouragementContext } from './ui/contexts/EncouragementContext';
-import { GetRandomEncouragementMessageUseCase } from './core/usecases/get-random-encouragement-message.usecase';
-import LocalStorageEncouragementRepository from './adapters/persistence/localstorage/encouragement.repository';
+import {LocalStorageProjectRepository} from "@/adapters/persistence/localstorage/project.repository";
+import {CreateProjectUseCase} from "@/core/usecases/create-project.usecase";
+import {GetProjectByIdUseCase} from "@/core/usecases/get-project-by-id.usecase";
+import {ProjectProvider} from "@/ui/contexts/projectContext";
 
-const encouragementUseCase = new GetRandomEncouragementMessageUseCase(
-  new LocalStorageEncouragementRepository()
-);
+const localStorageProjectRepo = new LocalStorageProjectRepository();
+const createProjectUseCase = new CreateProjectUseCase(localStorageProjectRepo);
+const getProjectByIdUseCase = new GetProjectByIdUseCase(localStorageProjectRepo)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <EncouragementContext.Provider value={encouragementUseCase}>
-      <App />
-    </EncouragementContext.Provider>
+      <ProjectProvider
+          getProjectByIdUseCase={getProjectByIdUseCase}
+          createProjectUseCase={createProjectUseCase}
+      >
+        <App />
+      </ProjectProvider>
   </React.StrictMode>,
 );

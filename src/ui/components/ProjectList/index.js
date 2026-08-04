@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = ProjectList;
+const jsx_runtime_1 = require("react/jsx-runtime");
+const react_router_dom_1 = require("react-router-dom");
+const projectStore_1 = require("@/ui/stores/projectStore");
+function ProjectList() {
+    const { projects, isLoading } = (0, projectStore_1.useProjectStore)();
+    if (isLoading) {
+        return ((0, jsx_runtime_1.jsx)("div", { className: "bg-white rounded-lg shadow-md p-6", children: (0, jsx_runtime_1.jsx)("p", { className: "text-gray-500", children: "Loading projects..." }) }));
+    }
+    if (projects.length === 0) {
+        return ((0, jsx_runtime_1.jsxs)("div", { className: "bg-white rounded-lg shadow-md p-6", children: [(0, jsx_runtime_1.jsx)("h2", { className: "text-xl font-semibold text-gray-800 mb-4", children: "My Projects" }), (0, jsx_runtime_1.jsx)("p", { className: "text-gray-500 text-center py-8", children: "No projects created yet." })] }));
+    }
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "bg-white rounded-lg shadow-md p-6", children: [(0, jsx_runtime_1.jsx)("h2", { className: "text-xl font-semibold text-gray-800 mb-4", children: "My Projects" }), (0, jsx_runtime_1.jsx)("div", { className: "overflow-x-auto", children: (0, jsx_runtime_1.jsxs)("table", { className: "min-w-full divide-y divide-gray-200", children: [(0, jsx_runtime_1.jsx)("thead", { className: "bg-gray-50", children: (0, jsx_runtime_1.jsxs)("tr", { children: [(0, jsx_runtime_1.jsx)("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Name" }), (0, jsx_runtime_1.jsx)("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Code" }), (0, jsx_runtime_1.jsx)("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "ID" }), (0, jsx_runtime_1.jsx)("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "Completion Rate" })] }) }), (0, jsx_runtime_1.jsx)("tbody", { className: "bg-white divide-y divide-gray-200", children: projects.map((project) => ((0, jsx_runtime_1.jsxs)("tr", { className: "hover:bg-gray-50 transition-colors", children: [(0, jsx_runtime_1.jsx)("td", { className: "px-6 py-4 whitespace-nowrap text-sm", children: (0, jsx_runtime_1.jsx)(react_router_dom_1.Link, { to: `/projects/${project.id}`, className: "text-blue-600 hover:text-blue-800 font-medium", children: project.name }) }), (0, jsx_runtime_1.jsx)("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500", children: project.code }), (0, jsx_runtime_1.jsxs)("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500", children: [project.id.substring(0, 8), "..."] }), (0, jsx_runtime_1.jsx)("td", { className: "px-6 py-4 whitespace-nowrap text-sm", children: (0, jsx_runtime_1.jsxs)("span", { className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800", children: [project.getCompletionRate(), "%"] }) })] }, project.id))) })] }) })] }));
+}

@@ -1,8 +1,10 @@
 import { createContext, useContext, ReactNode } from 'react';
-import { GetProjectByIdUseCase } from '../../core/usecases/get-project-by-id.usecase';
+import { GetProjectByIdUseCase } from '@/core/usecases/get-project-by-id.usecase';
+import {CreateProjectUseCase} from "@/core/usecases/create-project.usecase";
 
 interface ProjectContextType {
   getProjectByIdUseCase: GetProjectByIdUseCase;
+  createProjectUseCase: CreateProjectUseCase;
 }
 
 const ProjectContext = createContext<ProjectContextType | null>(null);
@@ -18,12 +20,14 @@ export const useProjectContext = () => {
 export const ProjectProvider = ({
   children,
   getProjectByIdUseCase,
+  createProjectUseCase,
 }: {
   children: ReactNode;
   getProjectByIdUseCase: GetProjectByIdUseCase;
+  createProjectUseCase: CreateProjectUseCase;
 }) => {
   return (
-    <ProjectContext.Provider value={{ getProjectByIdUseCase }}>
+    <ProjectContext.Provider value={{ getProjectByIdUseCase, createProjectUseCase }}>
       {children}
     </ProjectContext.Provider>
   );
