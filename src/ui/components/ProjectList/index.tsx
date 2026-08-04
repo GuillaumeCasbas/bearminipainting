@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useProjectStore } from '../../stores/projectStore';
-import { Project } from '../../../adapters/ui/project';
+import { useProjectStore } from '@/ui/stores/projectStore';
+import {Project} from "@/core/entities/Project";
 
 export default function ProjectList() {
   const { projects, isLoading } = useProjectStore();

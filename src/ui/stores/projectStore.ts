@@ -1,10 +1,8 @@
 import { create } from 'zustand';
-import {
-  Project,
-  LocalStorageProjectRepository,
-  CreateProjectUseCase,
-  CodeNotUniqueError,
-} from '../../adapters/ui/project';
+import {Project} from "@/core/entities/Project";
+import {LocalStorageProjectRepository} from "@/adapters/persistence/localstorage/project.repository";
+import {CreateProjectUseCase} from "@/core/usecases/create-project.usecase";
+import {CodeNotUniqueError} from "@/core/errors";
 
 // Types for toast notifications
 export type ToastType = 'success' | 'error' | 'info';
@@ -20,7 +18,7 @@ interface ProjectStore {
   projects: Project[];
   isLoading: boolean;
   toasts: ToastNotification[];
-  
+
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
   loadProjects: () => Promise<void>;
@@ -37,7 +35,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   projects: [],
   isLoading: false,
   toasts: [],
-  
+
   // Load projects from repository
   loadProjects: async () => {
     set({ isLoading: true });
@@ -53,16 +51,16 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }] });
     }
   },
-  
+
   // Create a new project
   addProject: async (name: string, code: string) => {
     try {
       const newProject = await createProjectUseCase.execute(name, code);
-      
+
       // Reload the project list
       const projects = await projectRepository.findAll();
       set({ projects });
-      
+
       // Show success toast
       set({ toasts: [...useProjectStore.getState().toasts, {
         id: Date.now().toString(),
@@ -86,7 +84,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }
     }
   },
-  
+
   // Toast management
   addToast: (type, message) => {
     set({ toasts: [...useProjectStore.getState().toasts, {
@@ -95,7 +93,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       message
     }] });
   },
-  
+
   removeToast: (id) => {
     set({ toasts: useProjectStore.getState().toasts.filter(t => t.id !== id) });
   }
