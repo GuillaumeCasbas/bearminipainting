@@ -20,6 +20,4 @@ export class Unit {
     this.projectId = projectId;
     this.todos = todos;
   }
-
-
 }

@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
-import {LocalStorageProjectRepository} from "@/adapters/persistence/localstorage/project.repository";
-import {CreateProjectUseCase} from "@/core/usecases/create-project.usecase";
 import {CodeNotUniqueError} from "@/core/errors";
+import {useProjectContext} from "@/ui/contexts/projectContext";
 
 // Types for toast notifications
 export type ToastType = 'success' | 'error' | 'info';
@@ -26,10 +25,6 @@ interface ProjectStore {
   removeToast: (id: string) => void;
 }
 
-// Initialize use case and repository
-const projectRepository = new LocalStorageProjectRepository();
-const createProjectUseCase = new CreateProjectUseCase(projectRepository);
-
 export const useProjectStore = create<ProjectStore>((set) => ({
   // Initial state
   projects: [],
@@ -40,7 +35,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   loadProjects: async () => {
     set({ isLoading: true });
     try {
-      const projects = await projectRepository.findAll();
+      const projects = await useProjectContext().getAllProjectsUseCase.execute();
       set({ projects, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -55,10 +50,11 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   // Create a new project
   addProject: async (name: string, code: string) => {
     try {
-      const newProject = await createProjectUseCase.execute(name, code);
+      const projectUseCases = useProjectContext();
+      const newProject = await projectUseCases.createProjectUseCase.execute(name, code);
 
       // Reload the project list
-      const projects = await projectRepository.findAll();
+      const projects = await projectUseCases.getAllProjectsUseCase.execute();
       set({ projects });
 
       // Show success toast

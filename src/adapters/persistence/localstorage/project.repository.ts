@@ -1,7 +1,7 @@
-import { ProjectRepository } from '../../../core/ports/project.repository';
-import { Project } from '../../../core/entities/Project';
-import { Unit } from '../../../core/entities/Unit';
-import { Todo } from '../../../core/entities/Todo';
+import { ProjectRepository } from '@/core/ports/project.repository';
+import { Project } from '@/core/entities/Project';
+import { Unit } from '@/core/entities/Unit';
+import { Todo } from '@/core/entities/Todo';
 
 // Storage DTO interfaces for type-safe deserialization
 interface StoredTodo {

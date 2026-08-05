@@ -1,6 +1,6 @@
 import { Project } from '../entities/Project';
 import { ProjectRepository } from '../ports/project.repository';
-import { CodeNotUniqueError } from '../errors/project.errors';
+import { CodeNotUniqueError } from '@/core/errors';
 
 export class CreateProjectUseCase {
   constructor(private readonly projectRepository: ProjectRepository) {}

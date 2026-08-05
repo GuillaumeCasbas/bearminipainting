@@ -1,7 +1,7 @@
-import { GetProjectByIdUseCase } from "../../../src/core/usecases/get-project-by-id.usecase";
-import { ProjectRepository } from "../../../src/core/ports/project.repository";
-import { Project } from "../../../src/core/entities/Project";
-import { Unit } from "../../../src/core/entities/Unit";
+import { GetProjectByIdUseCase } from "@/core/usecases/get-project-by-id.usecase";
+import { ProjectRepository } from "@/core/ports/project.repository";
+import { Project } from "@/core/entities/Project";
+import { Unit } from "@/core/entities/Unit";
 
 describe("GetProjectByIdUseCase", () => {
   // Track calls for manual verification
@@ -54,7 +54,7 @@ describe("GetProjectByIdUseCase", () => {
   it("should return a project with units", async () => {
     const mockUnit = new Unit("unit-1", "Intercessor", "IA-01", "1");
     const mockProject = new Project("1", "Space Marines", "NMS", [mockUnit]);
-    
+
     mockRepository.findById = async (id: string) => {
       lastFindByIdCall = id;
       return mockProject;
