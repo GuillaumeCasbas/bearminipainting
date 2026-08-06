@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
 import {CodeNotUniqueError} from "@/core/errors";
-import {useProjectContext} from "@/ui/contexts/projectContext";
+// Import from DI container
+import {
+  getAllProjectsUseCase,
+  createProjectUseCase,
+} from '@/di/container';
 
 // Types for toast notifications
 export type ToastType = 'success' | 'error' | 'info';
@@ -35,7 +39,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   loadProjects: async () => {
     set({ isLoading: true });
     try {
-      const projects = await useProjectContext().getAllProjectsUseCase.execute();
+      const projects = await getAllProjectsUseCase.execute();
       set({ projects, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -50,11 +54,10 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   // Create a new project
   addProject: async (name: string, code: string) => {
     try {
-      const projectUseCases = useProjectContext();
-      const newProject = await projectUseCases.createProjectUseCase.execute(name, code);
+      const newProject = await createProjectUseCase.execute(name, code);
 
       // Reload the project list
-      const projects = await projectUseCases.getAllProjectsUseCase.execute();
+      const projects = await getAllProjectsUseCase.execute();
       set({ projects });
 
       // Show success toast
