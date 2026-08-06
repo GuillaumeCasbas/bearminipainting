@@ -1,7 +1,32 @@
-import { ProjectRepository } from '../../../core/ports/project.repository';
-import { Project } from '../../../core/entities/Project';
+import { ProjectRepository } from '@/core/ports/project.repository';
+import { Project } from '@/core/entities/Project';
+import { Unit } from '@/core/entities/Unit';
+import { Todo } from '@/core/entities/Todo';
 
-export default class LocalStorageProjectRepository implements ProjectRepository {
+// Storage DTO interfaces for type-safe deserialization
+interface StoredTodo {
+  id: string;
+  label: string;
+  status: 'TODO' | 'DONE';
+  order: number;
+}
+
+interface StoredUnit {
+  id: string;
+  name: string;
+  code: string;
+  projectId: string;
+  todos: StoredTodo[];
+}
+
+interface StoredProject {
+  id: string;
+  name: string;
+  code: string;
+  units: StoredUnit[];
+}
+
+export class LocalStorageProjectRepository implements ProjectRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
 
   async save(project: Project): Promise<void> {
@@ -11,6 +36,11 @@ export default class LocalStorageProjectRepository implements ProjectRepository 
       project,
     ];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedProjects));
+  }
+
+  async findById(id: string): Promise<Project | null> {
+    const projects = this.getAllFromStorage();
+    return projects.find((p) => p.id === id) ?? null;
   }
 
   async findByCode(code: string): Promise<Project | null> {
@@ -28,11 +58,32 @@ export default class LocalStorageProjectRepository implements ProjectRepository 
       return [];
     }
     try {
-      const parsed = JSON.parse(data);
-      return parsed.map(
-        (item: { id: string; name: string; code: string; units: unknown[] }) =>
-          new Project(item.id, item.name, item.code, item.units ?? [])
-      );
+      const parsed = JSON.parse(data) as StoredProject[];
+      return parsed.map((item: StoredProject) => {
+        const units = item.units
+          ? item.units.map(
+              (unitItem: StoredUnit) =>
+                new Unit(
+                  unitItem.id,
+                  unitItem.name,
+                  unitItem.code,
+                  unitItem.projectId,
+                  unitItem.todos
+                    ? unitItem.todos.map(
+                        (todoItem: StoredTodo) =>
+                          new Todo(
+                            todoItem.id,
+                            todoItem.label,
+                            todoItem.status as 'TODO' | 'DONE',
+                            todoItem.order
+                          )
+                      )
+                    : []
+                )
+            )
+          : [];
+        return new Project(item.id, item.name, item.code, units);
+      });
     } catch {
       return [];
     }

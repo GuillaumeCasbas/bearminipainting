@@ -2,18 +2,25 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './ui/App';
 import './ui/index.css';
-import { EncouragementContext } from './ui/contexts/EncouragementContext';
-import { GetRandomEncouragementMessageUseCase } from './core/usecases/get-random-encouragement-message.usecase';
-import LocalStorageEncouragementRepository from './adapters/persistence/localstorage/encouragement.repository';
+import {LocalStorageProjectRepository} from "@/adapters/persistence/localstorage/project.repository";
+import {CreateProjectUseCase} from "@/core/usecases/create-project.usecase";
+import {GetProjectByIdUseCase} from "@/core/usecases/get-project-by-id.usecase"; // Error: The requested module 'http://localhost:5173/src/core/usecases/get-project-by-id.usecase.js' doesn't provide an export named: 'GetProjectByIdUseCase'
+import {ProjectProvider} from "@/ui/contexts/projectContext";
+import {GetAllProjectsUseCase} from "@/core/usecases/get-all-projects.usecase";
 
-const encouragementUseCase = new GetRandomEncouragementMessageUseCase(
-  new LocalStorageEncouragementRepository()
-);
+const localStorageProjectRepo = new LocalStorageProjectRepository();
+const getAllProjectUseCase = new GetAllProjectsUseCase(localStorageProjectRepo);
+const createProjectUseCase = new CreateProjectUseCase(localStorageProjectRepo);
+const getProjectByIdUseCase = new GetProjectByIdUseCase(localStorageProjectRepo)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <EncouragementContext.Provider value={encouragementUseCase}>
-      <App />
-    </EncouragementContext.Provider>
+      <ProjectProvider
+          getAllProjectsUseCase={getAllProjectUseCase}
+          getProjectByIdUseCase={getProjectByIdUseCase}
+          createProjectUseCase={createProjectUseCase}
+      >
+        <App />
+      </ProjectProvider>
   </React.StrictMode>,
 );

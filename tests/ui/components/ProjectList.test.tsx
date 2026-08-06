@@ -1,7 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ProjectList from '../../../src/ui/components/ProjectList';
-import { Project } from '../../../src/core/entities/Project';
+import { Project } from '@/core/entities/Project';
+
+// Mock react-router-dom
+jest.mock('react-router-dom', () => ({
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
 
 // Mock the useProjectStore
 const mockProjects: Project[] = [];
@@ -15,10 +22,7 @@ jest.mock('../../../src/ui/stores/projectStore', () => ({
 // Helper to create a test project
 const createTestProject = (overrides = {}): Project => {
   return {
-    id: 'test-id-1',
-    name: 'Test Project',
-    code: 'TEST-001',
-    units: [],
+    ...new Project('test-id-1', 'Test Project', 'TEST-001', []),
     getCompletionRate: () => 0,
     ...overrides,
   };

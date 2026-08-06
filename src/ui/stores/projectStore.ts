@@ -1,10 +1,7 @@
 import { create } from 'zustand';
-import {
-  Project,
-  LocalStorageProjectRepository,
-  CreateProjectUseCase,
-  CodeNotUniqueError,
-} from '../../adapters/ui/project';
+import {Project} from "@/core/entities/Project";
+import {CodeNotUniqueError} from "@/core/errors";
+import {useProjectContext} from "@/ui/contexts/projectContext";
 
 // Types for toast notifications
 export type ToastType = 'success' | 'error' | 'info';
@@ -20,7 +17,7 @@ interface ProjectStore {
   projects: Project[];
   isLoading: boolean;
   toasts: ToastNotification[];
-  
+
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
   loadProjects: () => Promise<void>;
@@ -28,21 +25,17 @@ interface ProjectStore {
   removeToast: (id: string) => void;
 }
 
-// Initialize use case and repository
-const projectRepository = new LocalStorageProjectRepository();
-const createProjectUseCase = new CreateProjectUseCase(projectRepository);
-
 export const useProjectStore = create<ProjectStore>((set) => ({
   // Initial state
   projects: [],
   isLoading: false,
   toasts: [],
-  
+
   // Load projects from repository
   loadProjects: async () => {
     set({ isLoading: true });
     try {
-      const projects = await projectRepository.findAll();
+      const projects = await useProjectContext().getAllProjectsUseCase.execute();
       set({ projects, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -53,16 +46,17 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }] });
     }
   },
-  
+
   // Create a new project
   addProject: async (name: string, code: string) => {
     try {
-      const newProject = await createProjectUseCase.execute(name, code);
-      
+      const projectUseCases = useProjectContext();
+      const newProject = await projectUseCases.createProjectUseCase.execute(name, code);
+
       // Reload the project list
-      const projects = await projectRepository.findAll();
+      const projects = await projectUseCases.getAllProjectsUseCase.execute();
       set({ projects });
-      
+
       // Show success toast
       set({ toasts: [...useProjectStore.getState().toasts, {
         id: Date.now().toString(),
@@ -86,7 +80,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }
     }
   },
-  
+
   // Toast management
   addToast: (type, message) => {
     set({ toasts: [...useProjectStore.getState().toasts, {
@@ -95,7 +89,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       message
     }] });
   },
-  
+
   removeToast: (id) => {
     set({ toasts: useProjectStore.getState().toasts.filter(t => t.id !== id) });
   }

@@ -1,6 +1,6 @@
 import { Project } from '../entities/Project';
 import { ProjectRepository } from '../ports/project.repository';
-import { CodeNotUniqueError } from '../errors/project.errors';
+import { CodeNotUniqueError } from '@/core/errors';
 
 export class CreateProjectUseCase {
   constructor(private readonly projectRepository: ProjectRepository) {}
@@ -12,10 +12,8 @@ export class CreateProjectUseCase {
       throw new CodeNotUniqueError(code);
     }
 
-    // Generate UUID for the new project
-    const id = crypto.randomUUID();
-
     // Create and save the new project
+    const id = crypto.randomUUID();
     const newProject = new Project(id, name, code);
     await this.projectRepository.save(newProject);
 
