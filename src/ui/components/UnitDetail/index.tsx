@@ -3,46 +3,57 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
-import { UnitForm } from '@/ui/components/UnitForm';
-import { useProjectStore } from '@/ui/stores/projectStore';
+import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
 import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
 
-export function ProjectDetail() {
-  const { id } = useParams<{ id: string }>();
+export function UnitDetail() {
+  const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
+  const [unit, setUnit] = useState<Unit | null>(null);
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
-  const [showUnitForm, setShowUnitForm] = useState<boolean>(false);
 
-  const { getProjectByIdUseCase } = useProjectContext();
-  const { addUnit, loadProjects } = useProjectStore();
+  const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
 
   useEffect(() => {
-    const loadProject = async () => {
-      if (!id) {
-        setError({ code: 404, message: 'Project not found.' });
+    const loadUnitDetails = async () => {
+      if (!unitId) {
+        setError({ code: 404, message: 'Unit not found.' });
         setIsLoading(false);
         return;
       }
 
       try {
         setIsLoading(true);
-        const project = await getProjectByIdUseCase.execute(id);
-        if (!project) {
-          setError({ code: 404, message: 'Project not found.' });
+        
+        // Load unit
+        const unitData = await getUnitByIdUseCase.execute(unitId);
+        
+        // Load parent project for full code and name display
+        const projectData = await getProjectByIdUseCase.execute(unitData.projectId);
+        
+        if (!projectData) {
+          // Parent project no longer exists (BEA-20 basic handling)
+          const orphanedError = new OrphanedUnitError(unitData.id, unitData.projectId);
+          setError({ code: 404, message: orphanedError.message });
         } else {
-          setProject(project);
+          setUnit(unitData);
+          setProject(projectData);
         }
       } catch (err) {
-        setError({ code: 500, message: 'Failed to load project details. Please try again.' });
+        if (err instanceof UnitNotFoundError) {
+          setError({ code: 404, message: err.message });
+        } else {
+          setError({ code: 500, message: 'Failed to load unit details. Please try again.' });
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadProject();
-  }, [id]);
+    loadUnitDetails();
+  }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase]);
 
   const getCompletionRateColor = (rate: number): string => {
     if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
@@ -53,7 +64,7 @@ export function ProjectDetail() {
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-500">Loading project details...</p>
+        <p className="text-gray-500">Loading unit details...</p>
       </div>
     );
   }
@@ -87,25 +98,29 @@ export function ProjectDetail() {
           to="/"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
         >
-          Back to Projects
+          Back to Home
         </Link>
       </div>
     );
   }
 
-  if (!project) {
+  if (!unit || !project) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-500">Project not found.</p>
+        <p className="text-gray-500">Unit details not available.</p>
         <Link
           to="/"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 mt-4"
         >
-          Back to Projects
+          Back to Home
         </Link>
       </div>
     );
   }
+
+  // Sort todos by order (ascending) for display
+  const sortedTodos = [...unit.todos].sort((a, b) => a.order - b.order);
+  const completionRate = unit.getCompletionRate();
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -118,18 +133,31 @@ export function ProjectDetail() {
             </Link>
             <span className="mx-2 text-gray-400">{'>'}</span>
           </li>
+          <li className="flex items-center">
+            <Link to={`/projects/${project.id}`} className="text-blue-600 hover:text-blue-800">
+              {project.name}
+            </Link>
+            <span className="mx-2 text-gray-400">{'>'}</span>
+          </li>
           <li>
-            <span className="text-gray-600">{project.name}</span>
+            <span className="text-gray-600">{unit.name}</span>
           </li>
         </ol>
       </nav>
 
-      {/* Project Header */}
+      {/* Unit Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{project.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{unit.name}</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500">Code: {project.code}</span>
-          <span className="text-sm text-gray-500">ID: {project.id.substring(0, 8)}...</span>
+          <span className="text-sm text-gray-500">
+            Full Code: {project.code}-{unit.code}
+          </span>
+          <span className="text-sm text-gray-500">
+            Project: {project.name}
+          </span>
+          <span className="text-sm text-gray-500">
+            ID: {unit.id.substring(0, 8)}...
+          </span>
         </div>
       </div>
 
@@ -138,35 +166,38 @@ export function ProjectDetail() {
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Completion Rate</h2>
         <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
           <div
-            className={`h-4 rounded-full ${getCompletionRateColor(project.getCompletionRate())}`}
-            style={{ width: `${project.getCompletionRate()}%` }}
+            className={`h-4 rounded-full ${getCompletionRateColor(completionRate)}`}
+            style={{ width: `${completionRate}%` }}
+            role="progressbar"
+            aria-valuenow={completionRate}
+            aria-valuemin={0}
+            aria-valuemax={100}
           ></div>
         </div>
         <p className="text-sm text-gray-600">
-          {project.getCompletionRate()}% complete
+          {completionRate}% complete
         </p>
       </div>
 
-      {/* Total Units */}
+      {/* Total Todos */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Total Units</h2>
-        <p className="text-sm text-gray-600">{project.units.length}</p>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
+        <p className="text-sm text-gray-600">
+          {sortedTodos.length} total, 
+          {sortedTodos.filter(t => t.status === 'DONE').length} completed
+        </p>
       </div>
 
-      {/* Units List */}
+      {/* Todos List - Read-only, prepared for future drag-and-drop */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold text-gray-800">Units</h2>
-          <button
-            onClick={() => setShowUnitForm(true)}
-            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Add Unit
-          </button>
+          <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
+          <span className="text-sm text-gray-500">Read-only</span>
         </div>
-        {project.units.length === 0 ? (
+        
+        {sortedTodos.length === 0 ? (
           <p className="text-sm text-gray-500 italic">
-            No units, please add new one to start your wonderful painting journey!
+            No todos for this unit.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -174,33 +205,41 @@ export function ProjectDetail() {
               <thead className="bg-gray-50">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
+                    État
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Unit Code
+                    Label
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Completion Rate
+                    Status
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {project.units.map((unit: Unit) => (
+                {sortedTodos.map((todo) => (
                   <tr 
-                    key={unit.id} 
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/units/${unit.id}`)}
-                    aria-label={`View details for ${unit.name}`}
+                    key={todo.id} 
+                    className="hover:bg-gray-50 transition-colors"
+                    data-order={todo.order} // For future drag-and-drop
+                    data-todo-id={todo.id} // For future drag-and-drop
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {unit.name}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <input
+                        type="checkbox"
+                        checked={todo.status === 'DONE'}
+                        disabled
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        aria-label={`Todo ${todo.label} ${todo.status === 'DONE' ? 'completed' : 'not completed'}`}
+                      />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {project.code}-{unit.code}
+                      {todo.label}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(unit.getCompletionRate())}`}>
-                        {unit.getCompletionRate()}%
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        todo.status === 'DONE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {todo.status}
                       </span>
                     </td>
                   </tr>
@@ -214,28 +253,18 @@ export function ProjectDetail() {
       {/* Back Button */}
       <div className="mt-6">
         <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          onClick={() => navigate(`/projects/${project.id}`)}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 mr-3"
         >
-          Back to Projects
+          Back to Project
+        </button>
+        <button
+          onClick={() => navigate('/')}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Back to Home
         </button>
       </div>
-
-      {/* Add Unit Modal */}
-      {showUnitForm && id && (
-        <UnitForm
-          projectId={id}
-          onClose={() => setShowUnitForm(false)}
-          onSubmit={async (name: string, code: string) => {
-            await addUnit(id, name, code);
-            // Refresh the project after adding a unit
-            const updatedProject = await getProjectByIdUseCase.execute(id);
-            if (updatedProject) {
-              setProject(updatedProject);
-            }
-          }}
-        />
-      )}
     </div>
   );
 }

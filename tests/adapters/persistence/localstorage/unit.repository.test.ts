@@ -4,7 +4,7 @@ import { CreateUnitUseCase } from '@/core/usecases/create-unit.usecase';
 import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
 import { Todo } from '@/core/entities/Todo';
-import { UnitCodeNotUniqueError } from '@/core/errors';
+import { UnitCodeNotUniqueError, ProjectNotFoundError } from '@/core/errors';
 
 describe('LocalStorageUnitRepository Integration', () => {
   let projectRepository: LocalStorageProjectRepository;
@@ -90,7 +90,7 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(project?.units[0].code).toBe('UNIT-001');
   });
 
-  it('should throw error when saving unit with nonexistent project', async () => {
+  it('should throw ProjectNotFoundError when saving unit with nonexistent project', async () => {
     const unit = new Unit(
       'unit-1',
       'Test Unit',
@@ -99,7 +99,8 @@ describe('LocalStorageUnitRepository Integration', () => {
       []
     );
 
-    await expect(unitRepository.save(unit)).rejects.toThrow('Project not found');
+    await expect(unitRepository.save(unit)).rejects.toThrow(ProjectNotFoundError);
+    await expect(unitRepository.save(unit)).rejects.toThrow("Project with id 'nonexistent-project-id' not found");
   });
 
   // === Integration with CreateUnitUseCase ===
@@ -193,5 +194,79 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(result.todos[4].order).toBe(50);
     expect(result.todos[5].label).toBe('Varnish');
     expect(result.todos[5].order).toBe(60);
+  });
+
+  // === findById Method Tests ===
+
+  it('should find a unit by its id', async () => {
+    // Create a unit first
+    const unit = new Unit(
+      'find-by-id-test-unit',
+      'Find By ID Test Unit',
+      'FIND-001',
+      PROJECT_ID,
+      []
+    );
+
+    // Save the unit via repository
+    await unitRepository.save(unit);
+
+    // Find the unit by its id
+    const found = await unitRepository.findById('find-by-id-test-unit');
+
+    expect(found).not.toBeNull();
+    expect(found?.id).toBe('find-by-id-test-unit');
+    expect(found?.name).toBe('Find By ID Test Unit');
+    expect(found?.code).toBe('FIND-001');
+    expect(found?.projectId).toBe(PROJECT_ID);
+  });
+
+  it('should return null when unit with given id does not exist', async () => {
+    const found = await unitRepository.findById('nonexistent-unit-id');
+
+    expect(found).toBeNull();
+  });
+
+  it('should find unit by id across different projects', async () => {
+    // Create second project
+    const project2 = new Project('project-2', 'Second Project', 'PROJ-002', []);
+    await projectRepository.save(project2);
+
+    // Create unit in first project
+    const unit1 = new Unit(
+      'unit-in-project-1',
+      'Unit in Project 1',
+      'UNIT-P1',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.save(unit1);
+
+    // Create unit in second project
+    const unit2 = new Unit(
+      'unit-in-project-2',
+      'Unit in Project 2',
+      'UNIT-P2',
+      'project-2',
+      []
+    );
+    // Manually add to second project (simulating save)
+    const updatedProject2 = new Project(
+      project2.id,
+      project2.name,
+      project2.code,
+      [unit2]
+    );
+    await projectRepository.save(updatedProject2);
+
+    // Should find unit in first project
+    const foundUnit1 = await unitRepository.findById('unit-in-project-1');
+    expect(foundUnit1).not.toBeNull();
+    expect(foundUnit1?.projectId).toBe(PROJECT_ID);
+
+    // Should find unit in second project
+    const foundUnit2 = await unitRepository.findById('unit-in-project-2');
+    expect(foundUnit2).not.toBeNull();
+    expect(foundUnit2?.projectId).toBe('project-2');
   });
 });

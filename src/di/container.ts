@@ -9,6 +9,7 @@ import { GetAllProjectsUseCase } from '../core/usecases/get-all-projects.usecase
 import { CreateProjectUseCase } from '../core/usecases/create-project.usecase';
 import { GetProjectByIdUseCase } from '../core/usecases/get-project-by-id.usecase';
 import { CreateUnitUseCase } from '../core/usecases/create-unit.usecase';
+import { GetUnitByIdUseCase } from '../core/usecases/get-unit-by-id.usecase';
 
 // Singleton instances
 // Repositories
@@ -20,6 +21,7 @@ const getAllProjectsUseCase = new GetAllProjectsUseCase(projectRepository);
 const createProjectUseCase = new CreateProjectUseCase(projectRepository);
 const getProjectByIdUseCase = new GetProjectByIdUseCase(projectRepository);
 const createUnitUseCase = new CreateUnitUseCase(unitRepository);
+const getUnitByIdUseCase = new GetUnitByIdUseCase(unitRepository);
 
 // Export everything
 export {
@@ -31,4 +33,5 @@ export {
   createProjectUseCase,
   getProjectByIdUseCase,
   createUnitUseCase,
+  getUnitByIdUseCase,
 };

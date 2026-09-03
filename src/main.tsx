@@ -8,6 +8,7 @@ import {
   getAllProjectsUseCase,
   createProjectUseCase,
   getProjectByIdUseCase,
+  getUnitByIdUseCase,
 } from '@/di/container';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           getAllProjectsUseCase={getAllProjectsUseCase}
           getProjectByIdUseCase={getProjectByIdUseCase}
           createProjectUseCase={createProjectUseCase}
+          getUnitByIdUseCase={getUnitByIdUseCase}
       >
         <App />
       </ProjectProvider>
