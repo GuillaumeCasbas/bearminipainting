@@ -30,6 +30,7 @@ describe("CreateUnitUseCase", () => {
 
   beforeEach(() => {
     mockRepository = {
+      findById: async (): Promise<Unit | null> => null,
       findByProjectIdAndCode: async (): Promise<Unit | null> => null,
       save: async (): Promise<void> => {},
     };

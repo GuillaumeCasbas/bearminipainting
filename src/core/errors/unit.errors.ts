@@ -17,3 +17,9 @@ export class UnitCodeInvalidCharactersError extends BaseError {
     super(`Unit code '${code}' contains invalid characters. Only letters, numbers and hyphens are allowed.`);
   }
 }
+
+export class UnitNotFoundError extends BaseError {
+  constructor(id: string) {
+    super(`Unit with id '${id}' not found`);
+  }
+}
