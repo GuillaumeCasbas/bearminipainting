@@ -3,10 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
-
-// Completion rate thresholds (consistent with ProjectDetail)
-const COMPLETION_RATE_RED_THRESHOLD = 20;
-const COMPLETION_RATE_GREEN_THRESHOLD = 80;
+import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();

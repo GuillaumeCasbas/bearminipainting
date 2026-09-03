@@ -5,10 +5,7 @@ import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
-
-// Completion rate thresholds (from BEA-8 specifications)
-const COMPLETION_RATE_RED_THRESHOLD = 20;
-const COMPLETION_RATE_GREEN_THRESHOLD = 80;
+import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
