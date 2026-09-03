@@ -23,3 +23,9 @@ export class UnitNotFoundError extends BaseError {
     super(`Unit with id '${id}' not found`);
   }
 }
+
+export class OrphanedUnitError extends BaseError {
+  constructor(unitId: string, projectId: string) {
+    super(`Unit with id '${unitId}' has no parent project (project '${projectId}' not found)`);
+  }
+}

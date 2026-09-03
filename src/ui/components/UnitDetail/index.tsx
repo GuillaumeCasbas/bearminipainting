@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
+import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
 import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
 
 export function UnitDetail() {
@@ -34,13 +35,18 @@ export function UnitDetail() {
         
         if (!projectData) {
           // Parent project no longer exists (BEA-20 basic handling)
-          setError({ code: 404, message: 'Parent project not found.' });
+          const orphanedError = new OrphanedUnitError(unitData.id, unitData.projectId);
+          setError({ code: 404, message: orphanedError.message });
         } else {
           setUnit(unitData);
           setProject(projectData);
         }
       } catch (err) {
-        setError({ code: 404, message: 'Unit not found.' });
+        if (err instanceof UnitNotFoundError) {
+          setError({ code: 404, message: err.message });
+        } else {
+          setError({ code: 500, message: 'Failed to load unit details. Please try again.' });
+        }
       } finally {
         setIsLoading(false);
       }
