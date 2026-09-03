@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
+import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
-import {Project} from "@/core/entities/Project";
+import { UnitForm } from '@/ui/components/UnitForm';
+import { useProjectStore } from '@/ui/stores/projectStore';
 
 // Completion rate thresholds (from BEA-8 specifications)
 const COMPLETION_RATE_RED_THRESHOLD = 20;
@@ -14,8 +16,10 @@ export function ProjectDetail() {
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
+  const [showUnitForm, setShowUnitForm] = useState<boolean>(false);
 
   const { getProjectByIdUseCase } = useProjectContext();
+  const { addUnit, loadProjects } = useProjectStore();
 
   useEffect(() => {
     const loadProject = async () => {
@@ -154,19 +158,54 @@ export function ProjectDetail() {
 
       {/* Units List */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Units</h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-semibold text-gray-800">Units</h2>
+          <button
+            onClick={() => setShowUnitForm(true)}
+            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Add Unit
+          </button>
+        </div>
         {project.units.length === 0 ? (
           <p className="text-sm text-gray-500 italic">
             No units, please add new one to start your wonderful painting journey!
           </p>
         ) : (
-          <ul className="list-disc list-inside space-y-1">
-            {project.units.map((unit: Unit) => (
-              <li key={unit.id} className="text-sm text-gray-700">
-                {unit.name}
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit Code
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Completion Rate
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {project.units.map((unit: Unit) => (
+                  <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {unit.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {project.code}-{unit.code}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(unit.getCompletionRate())}`}>
+                        {unit.getCompletionRate()}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
@@ -179,6 +218,22 @@ export function ProjectDetail() {
           Back to Projects
         </button>
       </div>
+
+      {/* Add Unit Modal */}
+      {showUnitForm && id && (
+        <UnitForm
+          projectId={id}
+          onClose={() => setShowUnitForm(false)}
+          onSubmit={async (name: string, code: string) => {
+            await addUnit(id, name, code);
+            // Refresh the project after adding a unit
+            const updatedProject = await getProjectByIdUseCase.execute(id);
+            if (updatedProject) {
+              setProject(updatedProject);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

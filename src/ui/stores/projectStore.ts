@@ -1,10 +1,17 @@
 import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
 import {CodeNotUniqueError} from "@/core/errors";
+import {
+  UnitNameEmptyError,
+  UnitCodeInvalidCharactersError,
+  UnitCodeNotUniqueError,
+} from "@/core/errors";
 // Import from DI container
 import {
   getAllProjectsUseCase,
   createProjectUseCase,
+  createUnitUseCase,
+  getProjectByIdUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -24,6 +31,7 @@ interface ProjectStore {
 
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
+  addUnit: (projectId: string, name: string, code: string) => Promise<void>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
   removeToast: (id: string) => void;
@@ -79,6 +87,60 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           id: Date.now().toString(),
           type: 'error',
           message: 'Failed to create project'
+        }] });
+      }
+    }
+  },
+
+  // Add a unit to a project
+  addUnit: async (projectId: string, name: string, code: string) => {
+    try {
+      const newUnit = await createUnitUseCase.execute(name, code, projectId);
+
+      // Reload the project to get updated units
+      const updatedProject = await getProjectByIdUseCase.execute(projectId);
+      if (!updatedProject) {
+        throw new Error('Project not found');
+      }
+
+      // Update the project in the store
+      const projects = useProjectStore.getState().projects;
+      const updatedProjects = projects.map((p) =>
+        p.id === projectId ? updatedProject : p
+      );
+      set({ projects: updatedProjects });
+
+      // Show success toast
+      set({ toasts: [...useProjectStore.getState().toasts, {
+        id: Date.now().toString(),
+        type: 'success',
+        message: `Unit "${newUnit.name}" added successfully!`,
+      }] });
+    } catch (error) {
+      // Handle specific errors with user-friendly messages
+      if (error instanceof UnitNameEmptyError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else if (error instanceof UnitCodeInvalidCharactersError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else if (error instanceof UnitCodeNotUniqueError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to create unit',
         }] });
       }
     }
