@@ -4,7 +4,7 @@ import { CreateUnitUseCase } from '@/core/usecases/create-unit.usecase';
 import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
 import { Todo } from '@/core/entities/Todo';
-import { UnitCodeNotUniqueError } from '@/core/errors';
+import { UnitCodeNotUniqueError, ProjectNotFoundError } from '@/core/errors';
 
 describe('LocalStorageUnitRepository Integration', () => {
   let projectRepository: LocalStorageProjectRepository;
@@ -90,7 +90,7 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(project?.units[0].code).toBe('UNIT-001');
   });
 
-  it('should throw error when saving unit with nonexistent project', async () => {
+  it('should throw ProjectNotFoundError when saving unit with nonexistent project', async () => {
     const unit = new Unit(
       'unit-1',
       'Test Unit',
@@ -99,7 +99,8 @@ describe('LocalStorageUnitRepository Integration', () => {
       []
     );
 
-    await expect(unitRepository.save(unit)).rejects.toThrow('Project not found');
+    await expect(unitRepository.save(unit)).rejects.toThrow(ProjectNotFoundError);
+    await expect(unitRepository.save(unit)).rejects.toThrow("Project with id 'nonexistent-project-id' not found");
   });
 
   // === Integration with CreateUnitUseCase ===
