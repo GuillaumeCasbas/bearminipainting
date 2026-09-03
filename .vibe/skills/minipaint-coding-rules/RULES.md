@@ -79,6 +79,60 @@
 
 ---
 
+## 🐞 Bug Fix Methodology (TDD Strict)
+
+### **Principle: Red-Green-Refactor for Bugs**
+When fixing a bug, **ALWAYS** follow this strict TDD workflow:
+
+1. **🔴 REPRODUCE**: Write a failing test that reproduces the bug
+   - The test **MUST** fail with the exact error message from the bug report
+   - Example: If `unit.getCompletionRate is not a function`, write a test calling `unit.getCompletionRate()`
+   
+2. **✅ FIX**: Write the minimal code to make the test pass
+   - Only modify the **source of the bug** (entity, use case, etc.)
+   - Do **NOT** modify the test to make it pass
+   
+3. **🔄 REFACTOR**: Improve the code while keeping tests green
+   - Ensure all existing tests still pass
+   - Verify the bug is fixed in the application
+
+### **Why This Matters**
+- Prevents regression: The test acts as a safeguard
+- Documents the expected behavior
+- Ensures the fix addresses the root cause
+
+### **Example (BEA-14 Issue)**
+**Bug**: `unit.getCompletionRate is not a function` in ProjectDetail component
+
+**Correct Approach:**
+```typescript
+// 1. ✅ First: Write the failing test in Unit.test.ts
+describe("getCompletionRate", () => {
+  it("should return 100 when unit has no todos", () => {
+    const unit = new Unit("unit-1", "Intercessor", "IA-01", "1");
+    // This will fail: getCompletionRate doesn't exist yet
+    expect(unit.getCompletionRate()).toBe(100);
+  });
+});
+
+// 2. ✅ Then: Implement the method in Unit entity
+getCompletionRate(): number {
+  if (this.todos.length === 0) return 100;
+  const doneTodos = this.todos.filter(t => t.status === 'DONE').length;
+  return Math.round((doneTodos / this.todos.length) * 100);
+}
+
+// 3. ✅ Finally: Verify all tests pass
+```
+
+**Incorrect Approach (What NOT to do):**
+```typescript
+// ❌ NEVER: Implement the fix without a test first
+// This leads to untested code and potential regressions
+```
+
+---
+
 ## 🔍 Code Quality Rules
 | Check | Tool/Method | Description |
 |-------|-------------|-------------|

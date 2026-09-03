@@ -20,4 +20,14 @@ export class Unit {
     this.projectId = projectId;
     this.todos = todos;
   }
+
+  getCompletionRate(): number {
+    if (this.todos.length === 0) {
+      return 100;
+    }
+    const totalTodos = this.todos.length;
+    const doneTodos = this.todos.filter((todo) => todo.status === 'DONE').length;
+    const rate = (doneTodos / totalTodos) * 100;
+    return Math.round(rate);
+  }
 }
