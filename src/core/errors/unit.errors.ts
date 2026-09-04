@@ -24,6 +24,15 @@ export class UnitNotFoundError extends BaseError {
   }
 }
 
+export class TodoNotFoundError extends BaseError {
+  constructor(todoId: string, unitId?: string) {
+    const message = unitId
+      ? `Todo with id '${todoId}' not found in unit '${unitId}'`
+      : `Todo with id '${todoId}' not found`;
+    super(message);
+  }
+}
+
 export class OrphanedUnitError extends BaseError {
   constructor(unitId: string, projectId: string) {
     super(`Unit with id '${unitId}' has no parent project (project '${projectId}' not found)`);

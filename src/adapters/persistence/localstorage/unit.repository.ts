@@ -2,7 +2,7 @@ import { UnitRepository } from '@/core/ports/unit.repository';
 import { Unit } from '@/core/entities/Unit';
 import { ProjectRepository } from '@/core/ports/project.repository';
 import { Project } from '@/core/entities/Project';
-import { ProjectNotFoundError } from '@/core/errors';
+import { ProjectNotFoundError, UnitNotFoundError } from '@/core/errors';
 
 export class LocalStorageUnitRepository implements UnitRepository {
   constructor(private readonly projectRepository: ProjectRepository) {}
@@ -24,7 +24,7 @@ export class LocalStorageUnitRepository implements UnitRepository {
     return project.units.find((u) => u.code === code) ?? null;
   }
 
-  async save(unit: Unit): Promise<void> {
+  async create(unit: Unit): Promise<void> {
     const project = await this.projectRepository.findById(unit.projectId);
     if (!project) {
       throw new ProjectNotFoundError(unit.projectId);
@@ -35,6 +35,28 @@ export class LocalStorageUnitRepository implements UnitRepository {
       project.name,
       project.code,
       [...project.units, unit]
+    );
+
+    await this.projectRepository.save(updatedProject);
+  }
+
+  async update(unit: Unit): Promise<void> {
+    const project = await this.projectRepository.findById(unit.projectId);
+    if (!project) {
+      throw new ProjectNotFoundError(unit.projectId);
+    }
+
+    const existingUnit = project.units.find((u) => u.id === unit.id);
+    if (!existingUnit) {
+      throw new UnitNotFoundError(unit.id);
+    }
+
+    const updatedUnits = project.units.map((u) => (u.id === unit.id ? unit : u));
+    const updatedProject = new Project(
+      project.id,
+      project.name,
+      project.code,
+      updatedUnits
     );
 
     await this.projectRepository.save(updatedProject);
