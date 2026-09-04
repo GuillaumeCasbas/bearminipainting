@@ -54,7 +54,7 @@ export class CreateUnitUseCase {
         )
     );
 
-    // Create and save unit
+    // Create and persist unit
     const unit = new Unit(
       crypto.randomUUID(),
       name,
@@ -63,7 +63,7 @@ export class CreateUnitUseCase {
       todos
     );
 
-    await this.unitRepository.save(unit);
+    await this.unitRepository.create(unit);
 
     return unit;
   }

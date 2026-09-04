@@ -13,7 +13,8 @@ describe("GetUnitByIdUseCase", () => {
       return null;
     },
     findByProjectIdAndCode: async (_projectId: string, _code: string): Promise<Unit | null> => null,
-    save: async (_unit: Unit): Promise<void> => {},
+    create: async (_unit: Unit): Promise<void> => {},
+    update: async (_unit: Unit): Promise<void> => {},
   };
 
   const useCase = new GetUnitByIdUseCase(mockUnitRepository);

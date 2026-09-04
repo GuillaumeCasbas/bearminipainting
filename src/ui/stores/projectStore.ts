@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
+import {Unit} from "@/core/entities/Unit";
+import {Todo, TodoStatus} from "@/core/entities/Todo";
 import {CodeNotUniqueError} from "@/core/errors";
 import {
   UnitNameEmptyError,
@@ -12,6 +14,7 @@ import {
   createProjectUseCase,
   createUnitUseCase,
   getProjectByIdUseCase,
+  toggleTodoStatusUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -32,6 +35,7 @@ interface ProjectStore {
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
+  toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
   removeToast: (id: string) => void;
@@ -143,6 +147,117 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           message: 'Failed to create unit',
         }] });
       }
+    }
+  },
+
+  // Toggle todo status with optimistic updates
+  toggleTodoStatus: async (unitId: string, todoId: string) => {
+    let previousTodoStatus: TodoStatus = 'TODO';
+    
+    try {
+      const projects = useProjectStore.getState().projects;
+      
+      // Find the unit and its parent project
+      let targetProject: Project | null = null;
+      let targetUnitIndex = -1;
+      let targetTodoIndex = -1;
+      let targetUnit: Unit | null = null;
+      
+      for (const project of projects) {
+        targetUnitIndex = project.units.findIndex(u => u.id === unitId);
+        if (targetUnitIndex !== -1) {
+          targetProject = project;
+          targetUnit = project.units[targetUnitIndex];
+          targetTodoIndex = targetUnit.todos.findIndex(t => t.id === todoId);
+          break;
+        }
+      }
+      
+      if (!targetUnit) {
+        throw new UnitNotFoundError(unitId);
+      }
+      if (targetTodoIndex === -1) {
+        throw new TodoNotFoundError(todoId);
+      }
+      
+      // Save the previous state for rollback
+      previousTodoStatus = targetUnit.todos[targetTodoIndex].status;
+      
+      // Optimistic update: toggle the todo status locally
+      const updatedTodos = [...targetUnit.todos];
+      const todoToUpdate = updatedTodos[targetTodoIndex];
+      const newStatus = todoToUpdate.status === 'TODO' ? 'DONE' : 'TODO';
+      updatedTodos[targetTodoIndex] = new Todo(
+        todoToUpdate.id,
+        todoToUpdate.label,
+        newStatus,
+        todoToUpdate.order
+      );
+      
+      const updatedUnit = new Unit(
+        targetUnit.id,
+        targetUnit.name,
+        targetUnit.code,
+        targetUnit.projectId,
+        updatedTodos
+      );
+      
+      // Update the store optimistically
+      const updatedProjects = projects.map(p => {
+        if (p.id === targetProject.id) {
+          const updatedUnits = [...p.units];
+          updatedUnits[targetUnitIndex] = updatedUnit;
+          return new Project(
+            p.id,
+            p.name,
+            p.code,
+            updatedUnits
+          );
+        }
+        return p;
+      });
+      set({ projects: updatedProjects });
+      
+      // Call the use case
+      await toggleTodoStatusUseCase.execute(unitId, todoId);
+      
+    } catch (error) {
+      // Rollback optimistic update
+      const projects = useProjectStore.getState().projects;
+      const updatedProjects = projects.map(p => {
+        const unitIndex = p.units.findIndex(u => u.id === unitId);
+        if (unitIndex !== -1) {
+          const unit = p.units[unitIndex];
+          const todoIndex = unit.todos.findIndex(t => t.id === todoId);
+          if (todoIndex !== -1) {
+            const todos = unit.todos.map(t => {
+              if (t.id === todoId) {
+                return new Todo(t.id, t.label, previousTodoStatus, t.order);
+              }
+              return t;
+            });
+            const revertedUnit = new Unit(
+              unit.id,
+              unit.name,
+              unit.code,
+              unit.projectId,
+              todos
+            );
+            const updatedUnits = [...p.units];
+            updatedUnits[unitIndex] = revertedUnit;
+            return new Project(p.id, p.name, p.code, updatedUnits);
+          }
+        }
+        return p;
+      });
+      set({ projects: updatedProjects });
+      
+      // Error toast
+      set({ toasts: [...useProjectStore.getState().toasts, {
+        id: Date.now().toString(),
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to toggle todo status',
+      }] });
     }
   },
 

@@ -80,13 +80,16 @@ interface ProjectRepository {
 ### **UnitRepository**
 ```typescript
 interface UnitRepository {
-  save(unit: Unit): Promise<void>;
+  create(unit: Unit): Promise<void>;
+  update(unit: Unit): Promise<void>;
   findById(id: string): Promise<Unit | null>;
   findByCode(code: string): Promise<Unit | null>;
   findByProjectId(projectId: string): Promise<Unit[]>;
   delete(id: string): Promise<void>;
 }
 ```
+
+> **Note**: The `save()` method has been refactored into `create()` and `update()` for explicit separation of concerns (BEA-23).
 
 ---
 

@@ -9,6 +9,7 @@ description: Versatile agent for structured MiniPaint feature development, from 
 **Core principles**:
 - **Hexagonal/Clean Architecture** (Core → Adapters → UI).
 - **TDD**: Validation after code AND after tests.
+- **YAGNI**: You Aren't Gonna Need It — only implement what is necessary now.
 - **Strict rules**: No deletion/modification without approval, simple code > smart code.
 - **Transparency**: Structured communication format with checkpoints.
 

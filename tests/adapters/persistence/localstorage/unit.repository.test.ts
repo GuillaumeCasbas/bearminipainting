@@ -4,7 +4,7 @@ import { CreateUnitUseCase } from '@/core/usecases/create-unit.usecase';
 import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
 import { Todo } from '@/core/entities/Todo';
-import { UnitCodeNotUniqueError, ProjectNotFoundError } from '@/core/errors';
+import { UnitCodeNotUniqueError, ProjectNotFoundError, UnitNotFoundError } from '@/core/errors';
 
 describe('LocalStorageUnitRepository Integration', () => {
   let projectRepository: LocalStorageProjectRepository;
@@ -70,7 +70,7 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(found).toBeNull();
   });
 
-  it('should save a unit and add it to the project', async () => {
+  it('should create a unit and add it to the project', async () => {
     const unit = new Unit(
       'unit-1',
       'Test Unit',
@@ -79,9 +79,9 @@ describe('LocalStorageUnitRepository Integration', () => {
       []
     );
 
-    await unitRepository.save(unit);
+    await unitRepository.create(unit);
 
-    // Verify unit was saved by fetching the project
+    // Verify unit was created by fetching the project
     const project = await projectRepository.findById(PROJECT_ID);
     expect(project).not.toBeNull();
     expect(project?.units.length).toBe(1);
@@ -90,7 +90,7 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(project?.units[0].code).toBe('UNIT-001');
   });
 
-  it('should throw ProjectNotFoundError when saving unit with nonexistent project', async () => {
+  it('should throw ProjectNotFoundError when creating unit with nonexistent project', async () => {
     const unit = new Unit(
       'unit-1',
       'Test Unit',
@@ -99,8 +99,90 @@ describe('LocalStorageUnitRepository Integration', () => {
       []
     );
 
-    await expect(unitRepository.save(unit)).rejects.toThrow(ProjectNotFoundError);
-    await expect(unitRepository.save(unit)).rejects.toThrow("Project with id 'nonexistent-project-id' not found");
+    await expect(unitRepository.create(unit)).rejects.toThrow(ProjectNotFoundError);
+    await expect(unitRepository.create(unit)).rejects.toThrow("Project with id 'nonexistent-project-id' not found");
+  });
+
+  // === Update Method Tests ===
+
+  it('should update an existing unit and replace it in the project', async () => {
+    // First create a unit
+    const originalUnit = new Unit(
+      'unit-to-update',
+      'Original Name',
+      'ORIG-001',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.create(originalUnit);
+
+    // Now update it
+    const updatedUnit = new Unit(
+      'unit-to-update',
+      'Updated Name',
+      'UPDATED-001',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.update(updatedUnit);
+
+    // Verify the unit was updated
+    const project = await projectRepository.findById(PROJECT_ID);
+    expect(project).not.toBeNull();
+    expect(project?.units.length).toBe(1);
+    expect(project?.units[0].name).toBe('Updated Name');
+    expect(project?.units[0].code).toBe('UPDATED-001');
+  });
+
+  it('should not duplicate unit when updating existing unit', async () => {
+    // First create a unit
+    const originalUnit = new Unit(
+      'unit-no-duplicate',
+      'Original Name',
+      'NODUP-001',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.create(originalUnit);
+
+    // Update the same unit
+    const updatedUnit = new Unit(
+      'unit-no-duplicate',
+      'Updated Name',
+      'NODUP-001',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.update(updatedUnit);
+
+    // Verify there is still only ONE unit (not duplicated)
+    const project = await projectRepository.findById(PROJECT_ID);
+    expect(project?.units.length).toBe(1);
+    expect(project?.units[0].name).toBe('Updated Name');
+  });
+
+  it('should throw UnitNotFoundError when updating unit that does not exist', async () => {
+    const nonExistentUnit = new Unit(
+      'nonexistent-unit-id',
+      'Non Existent',
+      'NONEX-001',
+      PROJECT_ID,
+      []
+    );
+
+    await expect(unitRepository.update(nonExistentUnit)).rejects.toThrow(UnitNotFoundError);
+  });
+
+  it('should throw ProjectNotFoundError when updating unit with nonexistent project', async () => {
+    const unit = new Unit(
+      'unit-1',
+      'Test Unit',
+      'UNIT-001',
+      'nonexistent-project-id',
+      []
+    );
+
+    await expect(unitRepository.update(unit)).rejects.toThrow(ProjectNotFoundError);
   });
 
   // === Integration with CreateUnitUseCase ===
@@ -208,8 +290,8 @@ describe('LocalStorageUnitRepository Integration', () => {
       []
     );
 
-    // Save the unit via repository
-    await unitRepository.save(unit);
+    // Create the unit via repository
+    await unitRepository.create(unit);
 
     // Find the unit by its id
     const found = await unitRepository.findById('find-by-id-test-unit');
@@ -240,7 +322,7 @@ describe('LocalStorageUnitRepository Integration', () => {
       PROJECT_ID,
       []
     );
-    await unitRepository.save(unit1);
+    await unitRepository.create(unit1);
 
     // Create unit in second project
     const unit2 = new Unit(

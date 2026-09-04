@@ -32,7 +32,8 @@ describe("CreateUnitUseCase", () => {
     mockRepository = {
       findById: async (): Promise<Unit | null> => null,
       findByProjectIdAndCode: async (): Promise<Unit | null> => null,
-      save: async (): Promise<void> => {},
+      create: async (): Promise<void> => {},
+      update: async (): Promise<void> => {},
     };
     useCase = new CreateUnitUseCase(mockRepository);
   });
@@ -153,19 +154,19 @@ describe("CreateUnitUseCase", () => {
     });
   });
 
-  it("should call save with the created unit", async () => {
-    let savedUnit: Unit | null = null;
+  it("should call create with the created unit", async () => {
+    let createdUnit: Unit | null = null;
 
-    mockRepository.save = async (unit: Unit): Promise<void> => {
-      savedUnit = unit;
+    mockRepository.create = async (unit: Unit): Promise<void> => {
+      createdUnit = unit;
     };
 
     await useCase.execute(VALID_NAME, VALID_CODE, PROJECT_ID);
 
-    expect(savedUnit).not.toBeNull();
-    expect(savedUnit!.name).toBe(VALID_NAME);
-    expect(savedUnit!.code).toBe(VALID_CODE);
-    expect(savedUnit!.projectId).toBe(PROJECT_ID);
+    expect(createdUnit).not.toBeNull();
+    expect(createdUnit!.name).toBe(VALID_NAME);
+    expect(createdUnit!.code).toBe(VALID_CODE);
+    expect(createdUnit!.projectId).toBe(PROJECT_ID);
   });
 
   it("should call findByProjectIdAndCode with uppercase code", async () => {
