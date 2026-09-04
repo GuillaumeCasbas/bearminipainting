@@ -7,19 +7,19 @@ export class ToggleTodoStatusUseCase {
   constructor(private readonly unitRepository: UnitRepository) {}
 
   async execute(unitId: string, todoId: string): Promise<Unit> {
-    // 1. Find the unit
+    // Find the unit by ID
     const unit = await this.unitRepository.findById(unitId);
     if (!unit) {
       throw new UnitNotFoundError(unitId);
     }
 
-    // 2. Find the todo in the unit
+    // Locate the todo within the unit
     const todoIndex = unit.todos.findIndex((todo) => todo.id === todoId);
     if (todoIndex === -1) {
-      throw new TodoNotFoundError(todoId, unitId);
+      throw new TodoNotFoundError(todoId);
     }
 
-    // 3. Toggle the todo status
+    // Toggle the todo status between TODO and DONE
     const updatedTodos = [...unit.todos];
     const todoToUpdate = updatedTodos[todoIndex];
     const newStatus: TodoStatus = todoToUpdate.status === 'TODO' ? 'DONE' : 'TODO';
@@ -30,7 +30,7 @@ export class ToggleTodoStatusUseCase {
       todoToUpdate.order
     );
 
-    // 4. Create updated unit with new todos
+    // Create a new unit instance with the updated todos
     const updatedUnit = new Unit(
       unit.id,
       unit.name,
@@ -39,10 +39,10 @@ export class ToggleTodoStatusUseCase {
       updatedTodos
     );
 
-    // 5. Persist the update
+    // Persist the changes via repository
     await this.unitRepository.update(updatedUnit);
 
-    // 6. Return the updated unit
+    // Return the updated unit
     return updatedUnit;
   }
 }

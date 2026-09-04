@@ -173,8 +173,11 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         }
       }
       
-      if (!targetProject || !targetUnit || targetTodoIndex === -1) {
-        throw new Error('Unit or todo not found');
+      if (!targetUnit) {
+        throw new UnitNotFoundError(unitId);
+      }
+      if (targetTodoIndex === -1) {
+        throw new TodoNotFoundError(todoId);
       }
       
       // Save the previous state for rollback

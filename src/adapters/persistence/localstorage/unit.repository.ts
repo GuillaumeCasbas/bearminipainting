@@ -46,6 +46,8 @@ export class LocalStorageUnitRepository implements UnitRepository {
       throw new ProjectNotFoundError(unit.projectId);
     }
 
+    // Validate data integrity: unit must exist in the project
+    // (protects against cases where unit.projectId is valid but unit doesn't belong to the project)
     const existingUnit = project.units.find((u) => u.id === unit.id);
     if (!existingUnit) {
       throw new UnitNotFoundError(unit.id);

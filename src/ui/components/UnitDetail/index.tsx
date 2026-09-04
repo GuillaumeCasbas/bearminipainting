@@ -17,7 +17,7 @@ export function UnitDetail() {
   const { projects, toggleTodoStatus } = useProjectStore();
   
   // Find unit and project from store
-  const unit = useMemo(() => {
+  const memoizedUnit = useMemo(() => {
     if (!unitId) return null;
     for (const project of projects) {
       const foundUnit = project.units.find(u => u.id === unitId);
@@ -27,9 +27,9 @@ export function UnitDetail() {
   }, [unitId, projects]);
   
   const project = useMemo(() => {
-    if (!unit) return null;
-    return projects.find(p => p.id === unit.projectId) ?? null;
-  }, [unit, projects]);
+    if (!memoizedUnit) return null;
+    return projects.find(p => p.id === memoizedUnit.projectId) ?? null;
+  }, [memoizedUnit, projects]);
 
   useEffect(() => {
     const loadUnitDetails = async () => {
@@ -40,7 +40,7 @@ export function UnitDetail() {
       }
 
       // If unit is already in store, no need to load
-      if (unit) {
+      if (memoizedUnit) {
         setIsLoading(false);
         return;
       }
@@ -71,7 +71,7 @@ export function UnitDetail() {
     };
 
     loadUnitDetails();
-  }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase, unit]);
+  }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase, memoizedUnit]);
 
   const getCompletionRateColor = (rate: number): string => {
     if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
@@ -122,7 +122,7 @@ export function UnitDetail() {
     );
   }
 
-  if (!unit || !project) {
+  if (!memoizedUnit || !project) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <p className="text-gray-500">Unit details not available.</p>
@@ -137,8 +137,8 @@ export function UnitDetail() {
   }
 
   // Sort todos by order (ascending) for display
-  const sortedTodos = [...unit.todos].sort((a, b) => a.order - b.order);
-  const completionRate = unit.getCompletionRate();
+  const sortedTodos = [...memoizedUnit.todos].sort((a, b) => a.order - b.order);
+  const completionRate = memoizedUnit.getCompletionRate();
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -158,23 +158,23 @@ export function UnitDetail() {
             <span className="mx-2 text-gray-400">{'>'}</span>
           </li>
           <li>
-            <span className="text-gray-600">{unit.name}</span>
+            <span className="text-gray-600">{memoizedUnit.name}</span>
           </li>
         </ol>
       </nav>
 
       {/* Unit Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{unit.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{memoizedUnit.name}</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-500">
-            Full Code: {project.code}-{unit.code}
+            Full Code: {project.code}-{memoizedUnit.code}
           </span>
           <span className="text-sm text-gray-500">
             Project: {project.name}
           </span>
           <span className="text-sm text-gray-500">
-            ID: {unit.id.substring(0, 8)}...
+            ID: {memoizedUnit.id.substring(0, 8)}...
           </span>
         </div>
       </div>
@@ -244,7 +244,7 @@ export function UnitDetail() {
                       <input
                         type="checkbox"
                         checked={todo.status === 'DONE'}
-                        onChange={() => toggleTodoStatus(unit.id, todo.id)}
+                        onChange={() => toggleTodoStatus(memoizedUnit.id, todo.id)}
                         className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         aria-label={`Todo ${todo.label} ${todo.status === 'DONE' ? 'completed' : 'not completed'}`}
                       />
