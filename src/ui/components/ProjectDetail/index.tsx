@@ -186,14 +186,14 @@ export function ProjectDetail() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {project.units.map((unit: Unit) => (
-                  <tr 
-                    key={unit.id} 
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/units/${unit.id}`)}
-                    aria-label={`View details for ${unit.name}`}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {unit.name}
+                  <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <Link
+                        to={`/units/${unit.id}`}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        {unit.name}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {project.code}-{unit.code}
