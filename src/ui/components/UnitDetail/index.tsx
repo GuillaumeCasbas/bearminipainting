@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
@@ -14,7 +14,9 @@ export function UnitDetail() {
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus } = useProjectStore();
+  const { projects, toggleTodoStatus, addTodo } = useProjectStore();
+  const [newTodoLabel, setNewTodoLabel] = useState('');
+  const newTodoInputRef = useRef<HTMLInputElement>(null);
   
   // Find unit and project from store
   const memoizedUnit = useMemo(() => {
@@ -30,6 +32,20 @@ export function UnitDetail() {
     if (!memoizedUnit) return null;
     return projects.find(p => p.id === memoizedUnit.projectId) ?? null;
   }, [memoizedUnit, projects]);
+
+  const handleAddTodo = async () => {
+    if (!newTodoLabel.trim() || !memoizedUnit) return;
+    
+    await addTodo(memoizedUnit.id, newTodoLabel);
+    setNewTodoLabel('');
+    
+    // Auto-focus the input for quick addition of multiple todos
+    setTimeout(() => {
+      if (newTodoInputRef.current) {
+        newTodoInputRef.current.focus();
+      }
+    }, 0);
+  };
 
   useEffect(() => {
     const loadUnitDetails = async () => {
@@ -265,6 +281,33 @@ export function UnitDetail() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Add Custom Todo Input */}
+      <div className="mt-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newTodoLabel}
+            onChange={(e) => setNewTodoLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleAddTodo();
+              }
+            }}
+            ref={newTodoInputRef}
+            placeholder="Add a custom todo..."
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            aria-label="Add custom todo"
+          />
+          <button
+            onClick={handleAddTodo}
+            disabled={!newTodoLabel.trim()}
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
+        </div>
       </div>
 
       {/* Back Button */}

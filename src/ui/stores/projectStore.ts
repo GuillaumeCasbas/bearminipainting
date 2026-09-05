@@ -7,6 +7,8 @@ import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
   UnitCodeNotUniqueError,
+  TodoLabelEmptyError,
+  UnitNotFoundError,
 } from "@/core/errors";
 // Import from DI container
 import {
@@ -15,6 +17,7 @@ import {
   createUnitUseCase,
   getProjectByIdUseCase,
   toggleTodoStatusUseCase,
+  addTodoToUnitUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -35,6 +38,7 @@ interface ProjectStore {
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
+  addTodo: (unitId: string, label: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
@@ -145,6 +149,52 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           id: Date.now().toString(),
           type: 'error',
           message: 'Failed to create unit',
+        }] });
+      }
+    }
+  },
+
+  // Add a todo to a unit
+  addTodo: async (unitId: string, label: string) => {
+    try {
+      // Call use case to add the todo
+      const updatedUnit = await addTodoToUnitUseCase.execute(unitId, label);
+
+      // Update the unit in the store
+      const projects = useProjectStore.getState().projects;
+      const updatedProjects = projects.map((project) => {
+        const updatedUnits = project.units.map((unit) =>
+          unit.id === updatedUnit.id ? updatedUnit : unit
+        );
+        if (updatedUnits !== project.units) {
+          return new Project(
+            project.id,
+            project.name,
+            project.code,
+            updatedUnits
+          );
+        }
+        return project;
+      });
+      set({ projects: updatedProjects });
+
+    } catch (error) {
+      // Catch TodoLabelEmptyError in silence (UI handles this)
+      if (error instanceof TodoLabelEmptyError) {
+        return;
+      }
+      // Other errors: show toast
+      if (error instanceof UnitNotFoundError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to add todo',
         }] });
       }
     }

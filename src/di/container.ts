@@ -11,6 +11,7 @@ import { GetProjectByIdUseCase } from '../core/usecases/get-project-by-id.usecas
 import { CreateUnitUseCase } from '../core/usecases/create-unit.usecase';
 import { GetUnitByIdUseCase } from '../core/usecases/get-unit-by-id.usecase';
 import { ToggleTodoStatusUseCase } from '../core/usecases/toggle-todo-status.usecase';
+import { AddTodoToUnitUseCase } from '../core/usecases/add-todo-to-unit.usecase';
 
 // Singleton instances
 // Repositories
@@ -24,6 +25,7 @@ const getProjectByIdUseCase = new GetProjectByIdUseCase(projectRepository);
 const createUnitUseCase = new CreateUnitUseCase(unitRepository);
 const getUnitByIdUseCase = new GetUnitByIdUseCase(unitRepository);
 const toggleTodoStatusUseCase = new ToggleTodoStatusUseCase(unitRepository);
+const addTodoToUnitUseCase = new AddTodoToUnitUseCase(unitRepository);
 
 // Export everything
 export {
@@ -37,4 +39,5 @@ export {
   createUnitUseCase,
   getUnitByIdUseCase,
   toggleTodoStatusUseCase,
+  addTodoToUnitUseCase,
 };

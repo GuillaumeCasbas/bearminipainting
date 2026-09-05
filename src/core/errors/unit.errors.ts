@@ -35,3 +35,9 @@ export class OrphanedUnitError extends BaseError {
     super(`Unit with id '${unitId}' has no parent project (project '${projectId}' not found)`);
   }
 }
+
+export class TodoLabelEmptyError extends BaseError {
+  constructor() {
+    super('Todo label cannot be empty');
+  }
+}
