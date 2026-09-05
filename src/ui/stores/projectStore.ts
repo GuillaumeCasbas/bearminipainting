@@ -7,6 +7,9 @@ import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
   UnitCodeNotUniqueError,
+  TodoLabelEmptyError,
+  UnitNotFoundError,
+  TodoNotFoundError,
 } from "@/core/errors";
 // Import from DI container
 import {
@@ -15,6 +18,7 @@ import {
   createUnitUseCase,
   getProjectByIdUseCase,
   toggleTodoStatusUseCase,
+  addTodoToUnitUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -35,6 +39,7 @@ interface ProjectStore {
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
+  addTodo: (unitId: string, label: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
@@ -150,19 +155,68 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     }
   },
 
+  // Add a todo to a unit
+  addTodo: async (unitId: string, label: string) => {
+    try {
+      // Call use case to add the todo
+      const updatedUnit = await addTodoToUnitUseCase.execute(unitId, label);
+
+      // Update the unit in the store
+      const projects = useProjectStore.getState().projects;
+      const updatedProjects = projects.map((project) => {
+        const updatedUnits = project.units.map((unit) =>
+          unit.id === updatedUnit.id ? updatedUnit : unit
+        );
+        if (updatedUnits !== project.units) {
+          return new Project(
+            project.id,
+            project.name,
+            project.code,
+            updatedUnits
+          );
+        }
+        return project;
+      });
+      set({ projects: updatedProjects });
+
+    } catch (error) {
+      // Catch TodoLabelEmptyError in silence (UI handles this)
+      if (error instanceof TodoLabelEmptyError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('TodoLabelEmptyError: Attempted to add empty todo');
+        }
+        return;
+      }
+      // Other errors: show toast
+      if (error instanceof UnitNotFoundError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to add todo',
+        }] });
+      }
+    }
+  },
+
   // Toggle todo status with optimistic updates
   toggleTodoStatus: async (unitId: string, todoId: string) => {
     let previousTodoStatus: TodoStatus = 'TODO';
-    
+
     try {
       const projects = useProjectStore.getState().projects;
-      
+
       // Find the unit and its parent project
       let targetProject: Project | null = null;
       let targetUnitIndex = -1;
       let targetTodoIndex = -1;
       let targetUnit: Unit | null = null;
-      
+
       for (const project of projects) {
         targetUnitIndex = project.units.findIndex(u => u.id === unitId);
         if (targetUnitIndex !== -1) {
@@ -172,17 +226,17 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           break;
         }
       }
-      
+
       if (!targetUnit) {
         throw new UnitNotFoundError(unitId);
       }
       if (targetTodoIndex === -1) {
         throw new TodoNotFoundError(todoId);
       }
-      
+
       // Save the previous state for rollback
       previousTodoStatus = targetUnit.todos[targetTodoIndex].status;
-      
+
       // Optimistic update: toggle the todo status locally
       const updatedTodos = [...targetUnit.todos];
       const todoToUpdate = updatedTodos[targetTodoIndex];
@@ -193,7 +247,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         newStatus,
         todoToUpdate.order
       );
-      
+
       const updatedUnit = new Unit(
         targetUnit.id,
         targetUnit.name,
@@ -201,10 +255,10 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.projectId,
         updatedTodos
       );
-      
+
       // Update the store optimistically
       const updatedProjects = projects.map(p => {
-        if (p.id === targetProject.id) {
+        if (targetProject && p.id === targetProject.id) {
           const updatedUnits = [...p.units];
           updatedUnits[targetUnitIndex] = updatedUnit;
           return new Project(
@@ -217,10 +271,10 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         return p;
       });
       set({ projects: updatedProjects });
-      
+
       // Call the use case
       await toggleTodoStatusUseCase.execute(unitId, todoId);
-      
+
     } catch (error) {
       // Rollback optimistic update
       const projects = useProjectStore.getState().projects;
@@ -251,7 +305,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         return p;
       });
       set({ projects: updatedProjects });
-      
+
       // Error toast
       set({ toasts: [...useProjectStore.getState().toasts, {
         id: Date.now().toString(),

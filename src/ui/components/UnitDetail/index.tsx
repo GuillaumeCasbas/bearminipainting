@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
@@ -14,10 +14,12 @@ export function UnitDetail() {
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus } = useProjectStore();
+  const { projects, toggleTodoStatus, addTodo } = useProjectStore();
+  const [newTodoLabel, setNewTodoLabel] = useState('');
+  const newTodoInputRef = useRef<HTMLInputElement>(null);
   
   // Find unit and project from store
-  const memoizedUnit = useMemo(() => {
+  const unit = useMemo(() => {
     if (!unitId) return null;
     for (const project of projects) {
       const foundUnit = project.units.find(u => u.id === unitId);
@@ -27,9 +29,23 @@ export function UnitDetail() {
   }, [unitId, projects]);
   
   const project = useMemo(() => {
-    if (!memoizedUnit) return null;
-    return projects.find(p => p.id === memoizedUnit.projectId) ?? null;
-  }, [memoizedUnit, projects]);
+    if (!unit) return null;
+    return projects.find(p => p.id === unit.projectId) ?? null;
+  }, [unit, projects]);
+
+  const handleAddTodo = async () => {
+    if (!newTodoLabel.trim() || !unit) return;
+    
+    await addTodo(unit.id, newTodoLabel);
+    setNewTodoLabel('');
+    
+    // Auto-focus the input for quick addition of multiple todos
+    setTimeout(() => {
+      if (newTodoInputRef.current) {
+        newTodoInputRef.current.focus();
+      }
+    }, 0);
+  };
 
   useEffect(() => {
     const loadUnitDetails = async () => {
@@ -40,7 +56,7 @@ export function UnitDetail() {
       }
 
       // If unit is already in store, no need to load
-      if (memoizedUnit) {
+      if (unit) {
         setIsLoading(false);
         return;
       }
@@ -71,7 +87,7 @@ export function UnitDetail() {
     };
 
     loadUnitDetails();
-  }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase, memoizedUnit]);
+  }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase, unit]);
 
   const getCompletionRateColor = (rate: number): string => {
     if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
@@ -122,7 +138,7 @@ export function UnitDetail() {
     );
   }
 
-  if (!memoizedUnit || !project) {
+  if (!unit || !project) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <p className="text-gray-500">Unit details not available.</p>
@@ -137,8 +153,8 @@ export function UnitDetail() {
   }
 
   // Sort todos by order (ascending) for display
-  const sortedTodos = [...memoizedUnit.todos].sort((a, b) => a.order - b.order);
-  const completionRate = memoizedUnit.getCompletionRate();
+  const sortedTodos = [...unit.todos].sort((a, b) => a.order - b.order);
+  const completionRate = unit.getCompletionRate();
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -158,23 +174,23 @@ export function UnitDetail() {
             <span className="mx-2 text-gray-400">{'>'}</span>
           </li>
           <li>
-            <span className="text-gray-600">{memoizedUnit.name}</span>
+            <span className="text-gray-600">{unit.name}</span>
           </li>
         </ol>
       </nav>
 
       {/* Unit Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{memoizedUnit.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{unit.name}</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-500">
-            Full Code: {project.code}-{memoizedUnit.code}
+            Full Code: {project.code}-{unit.code}
           </span>
           <span className="text-sm text-gray-500">
             Project: {project.name}
           </span>
           <span className="text-sm text-gray-500">
-            ID: {memoizedUnit.id.substring(0, 8)}...
+            ID: {unit.id.substring(0, 8)}...
           </span>
         </div>
       </div>
@@ -244,7 +260,7 @@ export function UnitDetail() {
                       <input
                         type="checkbox"
                         checked={todo.status === 'DONE'}
-                        onChange={() => toggleTodoStatus(memoizedUnit.id, todo.id)}
+                        onChange={() => toggleTodoStatus(unit.id, todo.id)}
                         className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         aria-label={`Todo ${todo.label} ${todo.status === 'DONE' ? 'completed' : 'not completed'}`}
                       />
@@ -265,6 +281,34 @@ export function UnitDetail() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Add Custom Todo Input */}
+      <div className="mt-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newTodoLabel}
+            onChange={(e) => setNewTodoLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleAddTodo();
+              }
+            }}
+            ref={newTodoInputRef}
+            placeholder="Add a custom todo..."
+            autoComplete="off"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            aria-label="Add custom todo"
+          />
+          <button
+            onClick={handleAddTodo}
+            disabled={!newTodoLabel.trim()}
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
+        </div>
       </div>
 
       {/* Back Button */}
