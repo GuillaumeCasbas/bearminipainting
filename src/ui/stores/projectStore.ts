@@ -19,6 +19,7 @@ import {
   getProjectByIdUseCase,
   toggleTodoStatusUseCase,
   addTodoToUnitUseCase,
+  deleteTodoUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -40,6 +41,7 @@ interface ProjectStore {
   addProject: (name: string, code: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
   addTodo: (unitId: string, label: string) => Promise<void>;
+  deleteTodo: (unitId: string, todoId: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
@@ -205,6 +207,54 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           id: Date.now().toString(),
           type: 'error',
           message: 'Failed to add todo',
+        }] });
+      }
+    }
+  },
+
+  // Delete a todo from a unit
+  deleteTodo: async (unitId: string, todoId: string) => {
+    try {
+      // Call use case to delete the todo
+      const updatedUnit = await deleteTodoUseCase.execute(unitId, todoId);
+
+      // Update the unit in the store
+      const projects = useProjectStore.getState().projects;
+      const updatedProjects = projects.map((project) => {
+        const updatedUnits = project.units.map((unit) =>
+          unit.id === updatedUnit.id ? updatedUnit : unit
+        );
+        if (updatedUnits !== project.units) {
+          return new Project(
+            project.id,
+            project.name,
+            project.code,
+            updatedUnits
+          );
+        }
+        return project;
+      });
+      set({ projects: updatedProjects });
+
+    } catch (error) {
+      // Handle specific errors with user-friendly messages
+      if (error instanceof TodoNotFoundError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else if (error instanceof UnitNotFoundError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to delete todo',
         }] });
       }
     }

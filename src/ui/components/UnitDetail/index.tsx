@@ -6,6 +6,7 @@ import { useProjectContext } from '@/ui/contexts/projectContext';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
 import { getCompletionRateColor } from '@/ui/utils/completionColors';
+import { Dropdown, DropdownItem } from '@/ui/components/Dropdown';
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -14,10 +15,10 @@ export function UnitDetail() {
   const [error, setError] = useState<{ code: number; message: string } | null>(null);
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus, addTodo } = useProjectStore();
+  const { projects, toggleTodoStatus, addTodo, deleteTodo } = useProjectStore();
   const [newTodoLabel, setNewTodoLabel] = useState('');
   const newTodoInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Find unit and project from store
   const unit = useMemo(() => {
     if (!unitId) return null;
@@ -27,7 +28,7 @@ export function UnitDetail() {
     }
     return null;
   }, [unitId, projects]);
-  
+
   const project = useMemo(() => {
     if (!unit) return null;
     return projects.find(p => p.id === unit.projectId) ?? null;
@@ -35,10 +36,10 @@ export function UnitDetail() {
 
   const handleAddTodo = async () => {
     if (!newTodoLabel.trim() || !unit) return;
-    
+
     await addTodo(unit.id, newTodoLabel);
     setNewTodoLabel('');
-    
+
     // Auto-focus the input for quick addition of multiple todos
     setTimeout(() => {
       if (newTodoInputRef.current) {
@@ -63,13 +64,13 @@ export function UnitDetail() {
 
       try {
         setIsLoading(true);
-        
+
         // Load unit
         const unitData = await getUnitByIdUseCase.execute(unitId);
-        
+
         // Load parent project for full code and name display
         const projectData = await getProjectByIdUseCase.execute(unitData.projectId);
-        
+
         if (!projectData) {
           // Parent project no longer exists (BEA-20 basic handling)
           const orphanedError = new OrphanedUnitError(unitData.id, unitData.projectId);
@@ -211,7 +212,7 @@ export function UnitDetail() {
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
         <p className="text-sm text-gray-600">
-          {sortedTodos.length} total, 
+          {sortedTodos.length} total,
           {sortedTodos.filter(t => t.status === 'DONE').length} completed
         </p>
       </div>
@@ -221,7 +222,7 @@ export function UnitDetail() {
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
         </div>
-        
+
         {sortedTodos.length === 0 ? (
           <p className="text-sm text-gray-500 italic">
             No todos for this unit.
@@ -237,15 +238,12 @@ export function UnitDetail() {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Label
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {sortedTodos.map((todo) => (
-                  <tr 
-                    key={todo.id} 
+                  <tr
+                    key={todo.id}
                     className="hover:bg-gray-50 transition-colors"
                     data-order={todo.order} // For future drag-and-drop
                     data-todo-id={todo.id} // For future drag-and-drop
@@ -259,15 +257,44 @@ export function UnitDetail() {
                         aria-label={`Todo ${todo.label} ${todo.status === 'DONE' ? 'completed' : 'not completed'}`}
                       />
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${todo.status === 'DONE' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-                      {todo.label}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        todo.status === 'DONE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {todo.status}
-                      </span>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm relative">
+                      <div className="flex items-center justify-between">
+                        <span className={todo.status === 'DONE' ? 'line-through text-gray-400' : 'text-gray-900'}>
+                          {todo.label}
+                        </span>
+                        <Dropdown
+                          position="left"
+                          trigger={
+                            <button
+                              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                              aria-label="Delete todo"
+                              title="Delete todo"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          }
+                        >
+                          <DropdownItem
+                            danger
+                            onClick={() => deleteTodo(unit.id, todo.id)}
+                          >
+                            Delete this todo
+                          </DropdownItem>
+                        </Dropdown>
+                      </div>
                     </td>
                   </tr>
                 ))}
