@@ -5,7 +5,7 @@ import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
-import { getCompletionRateColor } from '@/ui/utils/completionColors';
+import {ProgressBar} from "@/ui/components/ProgressBar";
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -120,36 +120,19 @@ export function ProjectDetail() {
 
       {/* Project Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{project.name}</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{project.name}</h1>
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500">Code: {project.code}</span>
-          <span className="text-sm text-gray-500">ID: {project.id.substring(0, 8)}...</span>
+          <span className="text-sm text-gray-600">{project.code}</span>
         </div>
-      </div>
-
-      {/* Completion Rate */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Completion Rate</h2>
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-          <div
-            className={`h-4 rounded-full ${getCompletionRateColor(project.getCompletionRate())}`}
-            style={{ width: `${project.getCompletionRate()}%` }}
-          ></div>
+        <div className="flex items-center space-x-4">
+          <span className="text-lg font-semibold text-gray-800">{project.getCompletionRate()}%</span>
+          <ProgressBar completionRate={project.getCompletionRate()} />
         </div>
-        <p className="text-sm text-gray-600">
-          {project.getCompletionRate()}% complete
-        </p>
-      </div>
-
-      {/* Total Units */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Total Units</h2>
-        <p className="text-sm text-gray-600">{project.units.length}</p>
       </div>
 
       {/* Units List */}
       <div>
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Units</h2>
           <button
             onClick={() => setShowUnitForm(true)}
@@ -163,56 +146,38 @@ export function ProjectDetail() {
             No units, please add new one to start your wonderful painting journey!
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Unit Code
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Completion Rate
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {project.units.map((unit: Unit) => (
-                  <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Link
-                        to={`/units/${unit.id}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        {unit.name}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {project.code}-{unit.code}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(unit.getCompletionRate())}`}>
-                        {unit.getCompletionRate()}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-4">
+            {[...project.units]
+              .sort((a, b) => {
+                const rateDiff = b.getCompletionRate() - a.getCompletionRate();
+                if (rateDiff !== 0) return rateDiff;
+                return a.name.localeCompare(b.name);
+              })
+              .map((unit: Unit) => (
+                <div
+                  key={unit.id}
+                  className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <Link
+                      to={`/units/${unit.id}`}
+                      className="text-lg font-semibold text-blue-600 hover:text-blue-800"
+                    >
+                      {unit.name}
+                    </Link>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{project.code}-{unit.code}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-40">
+                        <ProgressBar completionRate={unit.getCompletionRate()} withLabel />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
           </div>
         )}
-      </div>
-
-      {/* Back Button */}
-      <div className="mt-6">
-        <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-        >
-          Back to Projects
-        </button>
       </div>
 
       {/* Add Unit Modal */}

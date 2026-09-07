@@ -1,6 +1,6 @@
 /**
  * Completion rate color utilities for MiniPaint application
- * 
+ *
  * Color rules (BEA-26):
  * - Red: rate < 20%
  * - Orange: 20% <= rate < 80%
@@ -31,6 +31,9 @@ export const getCompletionRateColor = (rate: number): string => {
   }
   return 'bg-green-500';
 };
+
+// Needed to force tailwind classes generation.
+const textColors= "text-red-500 text-yellow-500 text-green-500 text-orange-500";
 
 /**
  * Returns the Tailwind CSS text color class for badge text based on completion rate
