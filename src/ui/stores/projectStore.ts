@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
 import {Unit} from "@/core/entities/Unit";
 import {Todo, TodoStatus} from "@/core/entities/Todo";
-import {CodeNotUniqueError} from "@/core/errors";
+import {CodeNotUniqueError, ProjectNameRequiredError} from "@/core/errors";
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -84,8 +84,14 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         message: `Project "${newProject.name}" created successfully!`
       }] });
     } catch (error) {
-      // Handle CodeNotUniqueError
-      if (error instanceof CodeNotUniqueError) {
+      // Handle ProjectNameRequiredError
+      if (error instanceof ProjectNameRequiredError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else if (error instanceof CodeNotUniqueError) {
         set({ toasts: [...useProjectStore.getState().toasts, {
           id: Date.now().toString(),
           type: 'error',

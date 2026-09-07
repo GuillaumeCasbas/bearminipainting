@@ -4,13 +4,39 @@ import { useProjectStore } from '../../stores/projectStore';
 export function ProjectForm() {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
+  const [nameError, setNameError] = useState('');
   const { addProject, isLoading } = useProjectStore();
+
+  const validateName = (value: string): string => {
+    if (!value || value.trim() === '') {
+      return 'Project name is required';
+    }
+    return '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Client-side validation
+    const nameValidationError = validateName(name);
+    if (nameValidationError) {
+      setNameError(nameValidationError);
+      return;
+    }
+    
+    setNameError('');
     await addProject(name, code);
     setName('');
     setCode('');
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setName(value);
+    // Clear error when user starts typing
+    if (value.trim() !== '') {
+      setNameError('');
+    }
   };
 
   return (
@@ -27,11 +53,20 @@ export function ProjectForm() {
             type="text"
             id="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={handleNameChange}
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              nameError ? 'border-red-500' : 'border-gray-300'
+            }`}
             placeholder="e.g. Orks Army"
             disabled={isLoading}
+            aria-invalid={!!nameError}
+            aria-describedby={nameError ? 'name-error' : undefined}
           />
+          {nameError && (
+            <p id="name-error" className="mt-1 text-sm text-red-600">
+              {nameError}
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">

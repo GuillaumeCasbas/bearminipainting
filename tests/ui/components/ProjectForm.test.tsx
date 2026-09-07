@@ -99,4 +99,87 @@ describe('ProjectForm', () => {
 
     expect(screen.getByRole('button', { name: 'Create Project' })).toBeInTheDocument();
   });
+
+  describe('Name validation (BEA-18)', () => {
+    it('should display error message when name is empty on submit', async () => {
+      render(<ProjectForm />);
+
+      const nameInput = screen.getByLabelText('Project name');
+      const codeInput = screen.getByLabelText('Unique code');
+
+      // Enter only code, leave name empty
+      fireEvent.change(codeInput, { target: { value: 'TEST-001' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Create Project' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Project name is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should display error message when name is whitespace-only on submit', async () => {
+      render(<ProjectForm />);
+
+      const nameInput = screen.getByLabelText('Project name');
+      const codeInput = screen.getByLabelText('Unique code');
+
+      // Enter only whitespace for name
+      fireEvent.change(nameInput, { target: { value: '   ' } });
+      fireEvent.change(codeInput, { target: { value: 'TEST-001' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Create Project' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Project name is required')).toBeInTheDocument();
+      });
+    });
+
+    it('should not display error when name is valid', async () => {
+      render(<ProjectForm />);
+
+      const nameInput = screen.getByLabelText('Project name');
+      const codeInput = screen.getByLabelText('Unique code');
+
+      fireEvent.change(nameInput, { target: { value: 'Valid Project' } });
+      fireEvent.change(codeInput, { target: { value: 'TEST-001' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Create Project' }));
+
+      await waitFor(() => {
+        expect(screen.queryByText('Project name is required')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should clear error when user starts typing in name field', async () => {
+      render(<ProjectForm />);
+
+      const nameInput = screen.getByLabelText('Project name');
+      const codeInput = screen.getByLabelText('Unique code');
+
+      // Submit with empty name to show error
+      fireEvent.change(codeInput, { target: { value: 'TEST-001' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Create Project' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Project name is required')).toBeInTheDocument();
+      });
+
+      // Start typing in name field
+      fireEvent.change(nameInput, { target: { value: 'A' } });
+
+      await waitFor(() => {
+        expect(screen.queryByText('Project name is required')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should not call addProject when name is empty', async () => {
+      render(<ProjectForm />);
+
+      const codeInput = screen.getByLabelText('Unique code');
+
+      fireEvent.change(codeInput, { target: { value: 'TEST-001' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Create Project' }));
+
+      await waitFor(() => {
+        expect(mockAddProject).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
