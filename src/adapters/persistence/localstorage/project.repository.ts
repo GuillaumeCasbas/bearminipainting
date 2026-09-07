@@ -52,6 +52,12 @@ export class LocalStorageProjectRepository implements ProjectRepository {
     return this.getAllFromStorage();
   }
 
+  async delete(id: string): Promise<void> {
+    const projects = this.getAllFromStorage();
+    const updatedProjects = projects.filter((p) => p.id !== id);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedProjects));
+  }
+
   private getAllFromStorage(): Project[] {
     const data = localStorage.getItem(this.STORAGE_KEY);
     if (!data) {

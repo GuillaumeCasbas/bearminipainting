@@ -20,6 +20,7 @@ import {
   toggleTodoStatusUseCase,
   addTodoToUnitUseCase,
   deleteTodoUseCase,
+  deleteProjectUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -39,6 +40,7 @@ interface ProjectStore {
 
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
+  deleteProject: (projectId: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
   addTodo: (unitId: string, label: string) => Promise<void>;
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
@@ -106,6 +108,32 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           message: 'Failed to create project'
         }] });
       }
+    }
+  },
+
+  // Delete a project
+  deleteProject: async (projectId: string) => {
+    try {
+      await deleteProjectUseCase.execute(projectId);
+
+      // Reload the project list
+      const projects = await getAllProjectsUseCase.execute();
+      set({ projects });
+
+      // Show success toast
+      set({ toasts: [...useProjectStore.getState().toasts, {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Project deleted successfully',
+      }] });
+    } catch (error) {
+      // Show error toast
+      set({ toasts: [...useProjectStore.getState().toasts, {
+        id: Date.now().toString(),
+        type: 'error',
+        message: 'Failed to delete project',
+      }] });
+      throw error; // Re-throw to allow UI to handle redirect
     }
   },
 
