@@ -21,3 +21,9 @@ export class ProjectCodeNotFoundError extends BaseError {
     super(`Project with code '${code}' not found`);
   }
 }
+
+export class ProjectNameRequiredError extends BaseError {
+  constructor() {
+    super('Project name is required');
+  }
+}

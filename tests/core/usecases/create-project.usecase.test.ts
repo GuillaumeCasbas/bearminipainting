@@ -1,7 +1,7 @@
 import { CreateProjectUseCase } from "../../../src/core/usecases/create-project.usecase";
 import { ProjectRepository } from "../../../src/core/ports/project.repository";
 import { Project } from "../../../src/core/entities/Project";
-import { CodeNotUniqueError } from "../../../src/core/errors/project.errors";
+import { CodeNotUniqueError, ProjectNameRequiredError } from "../../../src/core/errors/project.errors";
 
 describe("CreateProjectUseCase", () => {
   let lastFindByCodeCall: string | null = null;
@@ -49,5 +49,49 @@ describe("CreateProjectUseCase", () => {
     expect(result.name).toBe("New Project");
     expect(result.code).toBe("UNIQUE");
     expect(saveCalled).toBe(true);
+  });
+
+  describe("Project name validation (BEA-18)", () => {
+    it("should throw ProjectNameRequiredError if name is empty string", async () => {
+      await expect(useCase.execute("", "UNIQUE"))
+        .rejects
+        .toBeInstanceOf(ProjectNameRequiredError);
+    });
+
+    it("should throw ProjectNameRequiredError if name is whitespace-only", async () => {
+      await expect(useCase.execute("   ", "UNIQUE"))
+        .rejects
+        .toBeInstanceOf(ProjectNameRequiredError);
+    });
+
+    it("should throw ProjectNameRequiredError if name is null", async () => {
+      // @ts-expect-error - Testing null input
+      await expect(useCase.execute(null, "UNIQUE"))
+        .rejects
+        .toBeInstanceOf(ProjectNameRequiredError);
+    });
+
+    it("should throw ProjectNameRequiredError if name is undefined", async () => {
+      // @ts-expect-error - Testing undefined input
+      await expect(useCase.execute(undefined, "UNIQUE"))
+        .rejects
+        .toBeInstanceOf(ProjectNameRequiredError);
+    });
+
+    it("should create project successfully with valid name", async () => {
+      mockRepository.findByCode = async (code: string) => {
+        lastFindByCodeCall = code;
+        return null;
+      };
+      mockRepository.save = async (_project: Project) => {
+        saveCalled = true;
+      };
+
+      const result = await useCase.execute("Valid Project", "UNIQUE");
+
+      expect(result).toBeInstanceOf(Project);
+      expect(result.name).toBe("Valid Project");
+      expect(saveCalled).toBe(true);
+    });
   });
 });
