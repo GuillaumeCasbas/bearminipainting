@@ -5,7 +5,7 @@ import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
-import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
+import { getCompletionRateColor } from '@/ui/utils/completionColors';
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -88,12 +88,6 @@ export function UnitDetail() {
 
     loadUnitDetails();
   }, [unitId, getUnitByIdUseCase, getProjectByIdUseCase, unit]);
-
-  const getCompletionRateColor = (rate: number): string => {
-    if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
-    if (rate < COMPLETION_RATE_GREEN_THRESHOLD) return 'bg-orange-500';
-    return 'bg-green-500';
-  };
 
   if (isLoading) {
     return (
