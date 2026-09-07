@@ -12,7 +12,7 @@ import { useState, useRef, useEffect, ReactElement, cloneElement, ReactNode } fr
 
 interface DropdownProps {
   /** Element that triggers the dropdown (should accept onClick) */
-  trigger: ReactElement;
+  trigger: ReactElement<{ onClick?: (e: React.MouseEvent) => void; 'aria-haspopup'?: string; 'aria-expanded'?: boolean }>;
   /** Dropdown menu items */
   children: ReactNode;
   /** Position of dropdown relative to trigger */
@@ -74,7 +74,7 @@ export function Dropdown({
   const getPositionClasses = () => {
     switch (position) {
       case 'left':
-        return 'right-0 mr-2';
+        return 'right-full mr-2';
       case 'bottom':
         return 'top-full mt-2';
       case 'right':
@@ -84,14 +84,13 @@ export function Dropdown({
   };
 
   // Clone trigger element and add onClick handler
-  // Use any type for props to allow adding onClick to any element
   const triggerWithHandler = cloneElement(
     trigger,
     {
       onClick: toggleDropdown,
       'aria-haspopup': 'true' as const,
       'aria-expanded': isOpen,
-    } as any
+    }
   );
 
   return (

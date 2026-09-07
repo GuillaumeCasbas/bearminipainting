@@ -1,29 +1,31 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Unit } from '@/core/entities/Unit';
-import { Project } from '@/core/entities/Project';
-import { useProjectContext } from '@/ui/contexts/projectContext';
-import { useProjectStore } from '@/ui/stores/projectStore';
-import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
-import { getCompletionRateColor } from '@/ui/utils/completionColors';
-import { Dropdown, DropdownItem } from '@/ui/components/Dropdown';
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Unit } from "@/core/entities/Unit";
+import { Project } from "@/core/entities/Project";
+import { useProjectContext } from "@/ui/contexts/projectContext";
+import { useProjectStore } from "@/ui/stores/projectStore";
+import { UnitNotFoundError, OrphanedUnitError } from "@/core/errors";
+import { getCompletionRateColor } from "@/ui/utils/completionColors";
+import { Dropdown, DropdownItem } from "@/ui/components/Dropdown";
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<{ code: number; message: string } | null>(null);
+  const [error, setError] = useState<{ code: number; message: string } | null>(
+    null,
+  );
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
   const { projects, toggleTodoStatus, addTodo, deleteTodo } = useProjectStore();
-  const [newTodoLabel, setNewTodoLabel] = useState('');
+  const [newTodoLabel, setNewTodoLabel] = useState("");
   const newTodoInputRef = useRef<HTMLInputElement>(null);
 
   // Find unit and project from store
   const unit = useMemo(() => {
     if (!unitId) return null;
     for (const project of projects) {
-      const foundUnit = project.units.find(u => u.id === unitId);
+      const foundUnit = project.units.find((u) => u.id === unitId);
       if (foundUnit) return foundUnit;
     }
     return null;
@@ -31,14 +33,14 @@ export function UnitDetail() {
 
   const project = useMemo(() => {
     if (!unit) return null;
-    return projects.find(p => p.id === unit.projectId) ?? null;
+    return projects.find((p) => p.id === unit.projectId) ?? null;
   }, [unit, projects]);
 
   const handleAddTodo = async () => {
     if (!newTodoLabel.trim() || !unit) return;
 
     await addTodo(unit.id, newTodoLabel);
-    setNewTodoLabel('');
+    setNewTodoLabel("");
 
     // Auto-focus the input for quick addition of multiple todos
     setTimeout(() => {
@@ -51,7 +53,7 @@ export function UnitDetail() {
   useEffect(() => {
     const loadUnitDetails = async () => {
       if (!unitId) {
-        setError({ code: 404, message: 'Unit not found.' });
+        setError({ code: 404, message: "Unit not found." });
         setIsLoading(false);
         return;
       }
@@ -69,18 +71,26 @@ export function UnitDetail() {
         const unitData = await getUnitByIdUseCase.execute(unitId);
 
         // Load parent project for full code and name display
-        const projectData = await getProjectByIdUseCase.execute(unitData.projectId);
+        const projectData = await getProjectByIdUseCase.execute(
+          unitData.projectId,
+        );
 
         if (!projectData) {
           // Parent project no longer exists (BEA-20 basic handling)
-          const orphanedError = new OrphanedUnitError(unitData.id, unitData.projectId);
+          const orphanedError = new OrphanedUnitError(
+            unitData.id,
+            unitData.projectId,
+          );
           setError({ code: 404, message: orphanedError.message });
         }
       } catch (err) {
         if (err instanceof UnitNotFoundError) {
           setError({ code: 404, message: err.message });
         } else {
-          setError({ code: 500, message: 'Failed to load unit details. Please try again.' });
+          setError({
+            code: 500,
+            message: "Failed to load unit details. Please try again.",
+          });
         }
       } finally {
         setIsLoading(false);
@@ -160,13 +170,16 @@ export function UnitDetail() {
             <Link to="/" className="text-blue-600 hover:text-blue-800">
               Projects
             </Link>
-            <span className="mx-2 text-gray-400">{'>'}</span>
+            <span className="mx-2 text-gray-400">{">"}</span>
           </li>
           <li className="flex items-center">
-            <Link to={`/projects/${project.id}`} className="text-blue-600 hover:text-blue-800">
+            <Link
+              to={`/projects/${project.id}`}
+              className="text-blue-600 hover:text-blue-800"
+            >
               {project.name}
             </Link>
-            <span className="mx-2 text-gray-400">{'>'}</span>
+            <span className="mx-2 text-gray-400">{">"}</span>
           </li>
           <li>
             <span className="text-gray-600">{unit.name}</span>
@@ -181,9 +194,7 @@ export function UnitDetail() {
           <span className="text-sm text-gray-500">
             Full Code: {project.code}-{unit.code}
           </span>
-          <span className="text-sm text-gray-500">
-            Project: {project.name}
-          </span>
+          <span className="text-sm text-gray-500">Project: {project.name}</span>
           <span className="text-sm text-gray-500">
             ID: {unit.id.substring(0, 8)}...
           </span>
@@ -192,7 +203,9 @@ export function UnitDetail() {
 
       {/* Completion Rate */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Completion Rate</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+          Completion Rate
+        </h2>
         <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
           <div
             className={`h-4 rounded-full ${getCompletionRateColor(completionRate)}`}
@@ -203,9 +216,7 @@ export function UnitDetail() {
             aria-valuemax={100}
           ></div>
         </div>
-        <p className="text-sm text-gray-600">
-          {completionRate}% complete
-        </p>
+        <p className="text-sm text-gray-600">{completionRate}% complete</p>
       </div>
 
       {/* Total Todos */}
@@ -213,7 +224,7 @@ export function UnitDetail() {
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
         <p className="text-sm text-gray-600">
           {sortedTodos.length} total,
-          {sortedTodos.filter(t => t.status === 'DONE').length} completed
+          {sortedTodos.filter((t) => t.status === "DONE").length} completed
         </p>
       </div>
 
@@ -232,10 +243,16 @@ export function UnitDetail() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     État
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Label
                   </th>
                 </tr>
@@ -251,15 +268,21 @@ export function UnitDetail() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <input
                         type="checkbox"
-                        checked={todo.status === 'DONE'}
+                        checked={todo.status === "DONE"}
                         onChange={() => toggleTodoStatus(unit.id, todo.id)}
                         className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                        aria-label={`Todo ${todo.label} ${todo.status === 'DONE' ? 'completed' : 'not completed'}`}
+                        aria-label={`Todo ${todo.label} ${todo.status === "DONE" ? "completed" : "not completed"}`}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm relative">
                       <div className="flex items-center justify-between">
-                        <span className={todo.status === 'DONE' ? 'line-through text-gray-400' : 'text-gray-900'}>
+                        <span
+                          className={
+                            todo.status === "DONE"
+                              ? "line-through text-gray-400"
+                              : "text-gray-900"
+                          }
+                        >
                           {todo.label}
                         </span>
                         <Dropdown
@@ -312,7 +335,7 @@ export function UnitDetail() {
             value={newTodoLabel}
             onChange={(e) => setNewTodoLabel(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleAddTodo();
               }
             }}
@@ -341,7 +364,7 @@ export function UnitDetail() {
           Back to Project
         </button>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           Back to Home
