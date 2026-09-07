@@ -5,7 +5,7 @@ import { Project } from '@/core/entities/Project';
 import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
-import { COMPLETION_RATE_RED_THRESHOLD, COMPLETION_RATE_GREEN_THRESHOLD } from '@/ui/constants';
+import { getCompletionRateColor } from '@/ui/utils/completionColors';
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -43,12 +43,6 @@ export function ProjectDetail() {
 
     loadProject();
   }, [id]);
-
-  const getCompletionRateColor = (rate: number): string => {
-    if (rate < COMPLETION_RATE_RED_THRESHOLD) return 'bg-red-500';
-    if (rate < COMPLETION_RATE_GREEN_THRESHOLD) return 'bg-orange-500';
-    return 'bg-green-500';
-  };
 
   if (isLoading) {
     return (

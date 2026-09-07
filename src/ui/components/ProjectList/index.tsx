@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useProjectStore } from '@/ui/stores/projectStore';
-import {Project} from "@/core/entities/Project";
+import { Project } from '@/core/entities/Project';
+import { getCompletionRateColor, getCompletionRateTextColor } from '@/ui/utils/completionColors';
 
 export default function ProjectList() {
   const { projects, isLoading } = useProjectStore();
@@ -63,7 +64,7 @@ export default function ProjectList() {
                   {project.id.substring(0, 8)}...
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(project.getCompletionRate())} ${getCompletionRateTextColor(project.getCompletionRate())}`}>
                     {project.getCompletionRate()}%
                   </span>
                 </td>

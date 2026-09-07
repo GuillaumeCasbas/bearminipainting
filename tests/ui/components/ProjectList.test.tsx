@@ -152,4 +152,90 @@ describe('ProjectList', () => {
     // Should display first 8 characters + "..." (very-lon + ...)
     expect(screen.getByText('very-lon...')).toBeInTheDocument();
   });
+
+  describe('Completion rate badge colors (BEA-26)', () => {
+    it('should display red badge for completion rate < 20%', () => {
+      const project = createTestProject({
+        id: 'proj-1',
+        name: 'Test Project',
+        code: 'TEST',
+        getCompletionRate: () => 10,
+      });
+
+      mockUseProjectStore.mockReturnValue({
+        projects: [project],
+        isLoading: false,
+      });
+
+      render(<ProjectList />);
+
+      const badge = screen.getByText('10%');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('bg-red-500');
+      expect(badge).toHaveClass('text-white');
+    });
+
+    it('should display orange badge for completion rate >= 20% and < 80%', () => {
+      const project = createTestProject({
+        id: 'proj-1',
+        name: 'Test Project',
+        code: 'TEST',
+        getCompletionRate: () => 50,
+      });
+
+      mockUseProjectStore.mockReturnValue({
+        projects: [project],
+        isLoading: false,
+      });
+
+      render(<ProjectList />);
+
+      const badge = screen.getByText('50%');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('bg-orange-500');
+      expect(badge).toHaveClass('text-white');
+    });
+
+    it('should display yellow badge for completion rate >= 80% and < 100%', () => {
+      const project = createTestProject({
+        id: 'proj-1',
+        name: 'Test Project',
+        code: 'TEST',
+        getCompletionRate: () => 90,
+      });
+
+      mockUseProjectStore.mockReturnValue({
+        projects: [project],
+        isLoading: false,
+      });
+
+      render(<ProjectList />);
+
+      const badge = screen.getByText('90%');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('bg-yellow-500');
+      expect(badge).toHaveClass('text-gray-800');
+    });
+
+    it('should display green badge for completion rate = 100%', () => {
+      const project = createTestProject({
+        id: 'proj-1',
+        name: 'Test Project',
+        code: 'TEST',
+        getCompletionRate: () => 100,
+      });
+
+      mockUseProjectStore.mockReturnValue({
+        projects: [project],
+        isLoading: false,
+      });
+
+      render(<ProjectList />);
+
+      const badge = screen.getByText('100%');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('bg-green-500');
+      expect(badge).toHaveClass('text-white');
+    });
+  });
 });
