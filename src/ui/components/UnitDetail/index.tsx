@@ -7,6 +7,7 @@ import { useProjectStore } from "@/ui/stores/projectStore";
 import { UnitNotFoundError, OrphanedUnitError } from "@/core/errors";
 import { getCompletionRateColor } from "@/ui/utils/completionColors";
 import { Dropdown, DropdownItem } from "@/ui/components/Dropdown";
+import {ProgressBar} from "@/ui/components/ProgressBar";
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -189,34 +190,17 @@ export function UnitDetail() {
 
       {/* Unit Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{unit.name}</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{unit.name}</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-500">
-            Full Code: {project.code}-{unit.code}
-          </span>
-          <span className="text-sm text-gray-500">Project: {project.name}</span>
-          <span className="text-sm text-gray-500">
-            ID: {unit.id.substring(0, 8)}...
+            {project.code}-{unit.code}
           </span>
         </div>
       </div>
 
       {/* Completion Rate */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">
-          Completion Rate
-        </h2>
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-          <div
-            className={`h-4 rounded-full ${getCompletionRateColor(completionRate)}`}
-            style={{ width: `${completionRate}%` }}
-            role="progressbar"
-            aria-valuenow={completionRate}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          ></div>
-        </div>
-        <p className="text-sm text-gray-600">{completionRate}% complete</p>
+        <ProgressBar completionRate={completionRate}  withLabel />
       </div>
 
       {/* Total Todos */}
