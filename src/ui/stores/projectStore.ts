@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import {Project} from "@/core/entities/Project";
 import {Unit} from "@/core/entities/Unit";
 import {Todo, TodoStatus} from "@/core/entities/Todo";
-import {CodeNotUniqueError, ProjectNameRequiredError} from "@/core/errors";
+import {CodeNotUniqueError, ProjectNameRequiredError, ProjectNotFoundError} from "@/core/errors";
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -20,6 +20,7 @@ import {
   toggleTodoStatusUseCase,
   addTodoToUnitUseCase,
   deleteTodoUseCase,
+  deleteProjectUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -39,6 +40,7 @@ interface ProjectStore {
 
   // Actions
   addProject: (name: string, code: string) => Promise<void>;
+  deleteProject: (projectId: string) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
   addTodo: (unitId: string, label: string) => Promise<void>;
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
@@ -104,6 +106,46 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           id: Date.now().toString(),
           type: 'error',
           message: 'Failed to create project'
+        }] });
+      }
+    }
+  },
+
+  // Delete a project
+  deleteProject: async (projectId: string) => {
+    try {
+      await deleteProjectUseCase.execute(projectId);
+
+      // Optimistic update: remove project from state
+      const currentProjects = useProjectStore.getState().projects;
+      const updatedProjects = currentProjects.filter(p => p.id !== projectId);
+      set({ projects: updatedProjects });
+
+      // Show success toast
+      set({ toasts: [...useProjectStore.getState().toasts, {
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Project deleted successfully',
+      }] });
+    } catch (error) {
+      // Show error toast with specific message
+      if (error instanceof ProjectNotFoundError) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else if (error instanceof Error) {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: error.message,
+        }] });
+      } else {
+        set({ toasts: [...useProjectStore.getState().toasts, {
+          id: Date.now().toString(),
+          type: 'error',
+          message: 'Failed to delete project',
         }] });
       }
     }

@@ -5,4 +5,5 @@ export interface ProjectRepository {
   findById(id: string): Promise<Project | null>;
   findByCode(code: string): Promise<Project | null>;
   findAll(): Promise<Project[]>;
+  delete(id: string): Promise<void>;
 }

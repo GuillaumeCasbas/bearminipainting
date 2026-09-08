@@ -13,6 +13,7 @@ import { GetUnitByIdUseCase } from '../core/usecases/get-unit-by-id.usecase';
 import { ToggleTodoStatusUseCase } from '../core/usecases/toggle-todo-status.usecase';
 import { AddTodoToUnitUseCase } from '../core/usecases/add-todo-to-unit.usecase';
 import { DeleteTodoUseCase } from '../core/usecases/delete-todo.usecase';
+import { DeleteProjectUseCase } from '../core/usecases/delete-project.usecase';
 
 // Singleton instances
 // Repositories
@@ -23,6 +24,7 @@ const unitRepository = new LocalStorageUnitRepository(projectRepository);
 const getAllProjectsUseCase = new GetAllProjectsUseCase(projectRepository);
 const createProjectUseCase = new CreateProjectUseCase(projectRepository);
 const getProjectByIdUseCase = new GetProjectByIdUseCase(projectRepository);
+const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
 const createUnitUseCase = new CreateUnitUseCase(unitRepository);
 const getUnitByIdUseCase = new GetUnitByIdUseCase(unitRepository);
 const toggleTodoStatusUseCase = new ToggleTodoStatusUseCase(unitRepository);
@@ -38,6 +40,7 @@ export {
   getAllProjectsUseCase,
   createProjectUseCase,
   getProjectByIdUseCase,
+  deleteProjectUseCase,
   createUnitUseCase,
   getUnitByIdUseCase,
   toggleTodoStatusUseCase,

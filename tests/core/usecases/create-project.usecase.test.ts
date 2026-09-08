@@ -17,6 +17,7 @@ describe("CreateProjectUseCase", () => {
       saveCalled = true;
     },
     findAll: async (): Promise<Project[]> => [],
+    delete: async (_id: string): Promise<void> => {},
   };
 
   const useCase = new CreateProjectUseCase(mockRepository);
