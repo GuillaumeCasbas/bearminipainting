@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
+import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import {ProgressBar} from "@/ui/components/ProgressBar";
@@ -16,7 +17,8 @@ export function ProjectDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
 
-  const { addUnit, deleteProject, loadProjects, getProjectById } = useProjectStore();
+  const { getProjectByIdUseCase } = useProjectContext();
+  const { addUnit, deleteProject } = useProjectStore();
 
   useEffect(() => {
     const loadProject = async () => {
@@ -28,7 +30,7 @@ export function ProjectDetail() {
 
       try {
         setIsLoading(true);
-        const project = await getProjectById(id);
+        const project = await getProjectByIdUseCase.execute(id);
         if (!project) {
           setError({ code: 404, message: 'Project not found.' });
         } else {
@@ -42,7 +44,7 @@ export function ProjectDetail() {
     };
 
     loadProject();
-  }, [id, getProjectById]);
+  }, [id, getProjectByIdUseCase]);
 
   if (isLoading) {
     return (
