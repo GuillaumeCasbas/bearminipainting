@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Unit } from '@/core/entities/Unit';
 import { Project } from '@/core/entities/Project';
-import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import {ProgressBar} from "@/ui/components/ProgressBar";
@@ -17,20 +16,19 @@ export function ProjectDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
 
-  const { getProjectByIdUseCase } = useProjectContext();
-  const { addUnit, deleteProject, loadProjects } = useProjectStore();
+  const { addUnit, deleteProject, loadProjects, getProjectById } = useProjectStore();
 
   useEffect(() => {
     const loadProject = async () => {
       if (!id) {
-        setError({ code: 404, message: 'Project not found.' });
+        setError({ code: 404, message: 'Project ID is missing' });
         setIsLoading(false);
         return;
       }
 
       try {
         setIsLoading(true);
-        const project = await getProjectByIdUseCase.execute(id);
+        const project = await getProjectById(id);
         if (!project) {
           setError({ code: 404, message: 'Project not found.' });
         } else {
@@ -44,7 +42,7 @@ export function ProjectDetail() {
     };
 
     loadProject();
-  }, [id]);
+  }, [id, getProjectById]);
 
   if (isLoading) {
     return (
@@ -193,7 +191,7 @@ export function ProjectDetail() {
           onSubmit={async (name: string, code: string) => {
             await addUnit(id, name, code);
             // Refresh the project after adding a unit
-            const updatedProject = await getProjectByIdUseCase.execute(id);
+            const updatedProject = await getProjectById(id);
             if (updatedProject) {
               setProject(updatedProject);
             }
@@ -267,14 +265,17 @@ export function ProjectDetail() {
                 </button>
                 <button
                     onClick={async () => {
+                      if (!id) {
+                        return;
+                      }
                       try {
-                        if (id) {
-                          await deleteProject(id);
-                          navigate('/');
-                        }
+                        await deleteProject(id);
+                        navigate('/');
                       } catch (error) {
                         // Error is already handled by the store (toast shown)
-                        console.error('Failed to delete project:', error);
+                        if (process.env.NODE_ENV === 'development') {
+                          console.error('Failed to delete project:', error);
+                        }
                       }
                     }}
                     className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"

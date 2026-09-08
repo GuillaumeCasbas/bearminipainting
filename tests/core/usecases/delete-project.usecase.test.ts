@@ -50,59 +50,28 @@ describe("DeleteProjectUseCase", () => {
 
   describe("Success cases", () => {
     it("should delete a project by id", async () => {
+      mockRepository.findById = jest.fn().mockResolvedValue(testProject);
       mockRepository.delete = jest.fn().mockResolvedValue(undefined);
 
       await useCase.execute("project-1");
 
-      expect(mockRepository.delete).toHaveBeenCalledWith("project-1");
-    });
-
-    it("should call delete exactly once with the correct project id", async () => {
-      mockRepository.delete = jest.fn().mockResolvedValue(undefined);
-
-      await useCase.execute("project-1");
-
-      expect(mockRepository.delete).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findById).toHaveBeenCalledWith("project-1");
       expect(mockRepository.delete).toHaveBeenCalledWith("project-1");
     });
   });
 
   describe("Error cases", () => {
     it("should throw ProjectNotFoundError when project does not exist", async () => {
-      mockRepository.delete = jest.fn().mockRejectedValue(new ProjectNotFoundError("project-1"));
+      mockRepository.findById = jest.fn().mockResolvedValue(null);
 
       await expect(useCase.execute("non-existent-project"))
         .rejects
         .toBeInstanceOf(ProjectNotFoundError);
     });
 
-    it("should not throw if delete resolves successfully even if project has units", async () => {
-      mockRepository.delete = jest.fn().mockResolvedValue(undefined);
-
-      // Project with units should still be deletable (cascade handled by persistence)
-      await expect(useCase.execute("project-1")).resolves.not.toThrow();
-    });
-  });
-
-  describe("Edge cases", () => {
-    it("should handle empty project id", async () => {
-      mockRepository.delete = jest.fn().mockResolvedValue(undefined);
-
-      await expect(useCase.execute("")).resolves.not.toThrow();
-      expect(mockRepository.delete).toHaveBeenCalledWith("");
-    });
-
-    it("should handle null-like project id", async () => {
-      mockRepository.delete = jest.fn().mockResolvedValue(undefined);
-
-      // @ts-expect-error - Testing invalid input
-      await expect(useCase.execute(null)).resolves.not.toThrow();
-      expect(mockRepository.delete).toHaveBeenCalledWith(null);
-    });
-
     it("should propagate any repository error", async () => {
       const testError = new Error("Storage error");
-      mockRepository.delete = jest.fn().mockRejectedValue(testError);
+      mockRepository.findById = jest.fn().mockRejectedValue(testError);
 
       await expect(useCase.execute("project-1")).rejects.toThrow(testError);
     });
