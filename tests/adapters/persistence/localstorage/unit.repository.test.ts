@@ -268,11 +268,11 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(result.todos[0].order).toBe(10);
     expect(result.todos[1].label).toBe('Primer');
     expect(result.todos[1].order).toBe(20);
-    expect(result.todos[2].label).toBe('Base');
+    expect(result.todos[2].label).toBe('Basecoat');
     expect(result.todos[2].order).toBe(30);
     expect(result.todos[3].label).toBe('Effects');
     expect(result.todos[3].order).toBe(40);
-    expect(result.todos[4].label).toBe('Basecoat');
+    expect(result.todos[4].label).toBe('Base');
     expect(result.todos[4].order).toBe(50);
     expect(result.todos[5].label).toBe('Varnish');
     expect(result.todos[5].order).toBe(60);

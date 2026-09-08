@@ -12,9 +12,9 @@ export class CreateUnitUseCase {
   private static readonly DEFAULT_TODOS = [
     { label: 'Assembly', order: 10 },
     { label: 'Primer', order: 20 },
-    { label: 'Base', order: 30 },
+    { label: 'Basecoat', order: 30 },
     { label: 'Effects', order: 40 },
-    { label: 'Basecoat', order: 50 },
+    { label: 'Base', order: 50 },
     { label: 'Varnish', order: 60 },
   ];
 

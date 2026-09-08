@@ -43,9 +43,9 @@ Create a **front-end only** (MVP) application to **organize and track painting t
   |---------------|-------|----------|
   | "Assembly"    | 10    | TODO     |
   | "Primer"      | 20    | TODO     |
-  | "Base"        | 30    | TODO     |
+  | "Basecoat"    | 30    | TODO     |
   | "Effects"     | 40    | TODO     |
-  | "Basecoat"    | 50    | TODO     |
+  | "Base"        | 50    | TODO     |
   | "Varnish"     | 60    | TODO     |
 
 ### **Todo**
