@@ -34,6 +34,7 @@ describe("CreateUnitUseCase", () => {
       findByProjectIdAndCode: async (): Promise<Unit | null> => null,
       create: async (): Promise<void> => {},
       update: async (): Promise<void> => {},
+      delete: async (): Promise<void> => {},
     };
     useCase = new CreateUnitUseCase(mockRepository);
   });

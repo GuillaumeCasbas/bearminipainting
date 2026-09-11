@@ -5,4 +5,5 @@ export interface UnitRepository {
   findByProjectIdAndCode(projectId: string, code: string): Promise<Unit | null>;
   create(unit: Unit): Promise<void>;
   update(unit: Unit): Promise<void>;
+  delete(unitId: string): Promise<void>;
 }

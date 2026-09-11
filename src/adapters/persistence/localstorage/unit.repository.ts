@@ -63,4 +63,26 @@ export class LocalStorageUnitRepository implements UnitRepository {
 
     await this.projectRepository.save(updatedProject);
   }
+
+  async delete(unitId: string): Promise<void> {
+    let found = false;
+    const projects = await this.projectRepository.findAll();
+    for (const project of projects) {
+      const unitExists = project.units.some((u) => u.id === unitId);
+      if (unitExists) {
+        found = true;
+        const updatedProject = new Project(
+          project.id,
+          project.name,
+          project.code,
+          project.units.filter((u) => u.id !== unitId),
+        );
+        await this.projectRepository.save(updatedProject);
+        return;
+      }
+    }
+    if (!found) {
+      throw new UnitNotFoundError(unitId);
+    }
+  }
 }

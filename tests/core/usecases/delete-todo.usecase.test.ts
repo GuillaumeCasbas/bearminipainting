@@ -32,6 +32,7 @@ describe("DeleteTodoUseCase", () => {
       findByProjectIdAndCode: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     };
     useCase = new DeleteTodoUseCase(mockRepository);
   });

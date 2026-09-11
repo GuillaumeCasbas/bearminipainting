@@ -18,8 +18,10 @@ export function UnitDetail() {
   );
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus, addTodo, deleteTodo } = useProjectStore();
+  const { projects, toggleTodoStatus, addTodo, deleteTodo, deleteUnit } = useProjectStore();
   const [newTodoLabel, setNewTodoLabel] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
   const newTodoInputRef = useRef<HTMLInputElement>(null);
 
   // Find unit and project from store
@@ -163,6 +165,8 @@ export function UnitDetail() {
   const completionRate = unit.getCompletionRate();
 
   return (
+    <div>
+    {/* Main card */}
     <div className="bg-white rounded-lg shadow-md p-6">
       {/* Breadcrumb */}
       <nav className="text-sm mb-6" aria-label="Breadcrumb">
@@ -354,6 +358,96 @@ export function UnitDetail() {
           Back to Home
         </button>
       </div>
+    </div>
+
+      {/* Danger Zone - Delete Unit (Accordion) */}
+      <div className="mt-4 border-2 border-red-500 rounded-lg bg-red-50">
+        <button
+            onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
+            className="w-full p-4 flex justify-between items-center text-left"
+            aria-expanded={isDangerZoneOpen}
+            aria-controls="unit-danger-zone-content"
+        >
+          <h3 className="text-lg font-semibold text-red-700">Danger zone</h3>
+          <svg
+              className={`w-5 h-5 text-red-700 transition-transform ${isDangerZoneOpen ? 'rotate-180' : ''}`}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+          >
+            <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+            />
+          </svg>
+        </button>
+        {isDangerZoneOpen && (
+            <div id="unit-danger-zone-content" className="px-4 pb-4">
+              <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="flex items-center gap-2 text-red-600 hover:text-red-700 underline transition-colors"
+              >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                  <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Delete this unit
+              </button>
+            </div>
+        )
+        }
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && unit && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Deletion</h3>
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to delete this unit? This action cannot be undone.
+              </p>
+              <p className="text-sm text-red-600 mb-6">
+                Warning: All todos in this unit will also be deleted.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                    onClick={async () => {
+                      try {
+                        await deleteUnit(unit.id);
+                        navigate(`/projects/${project.id}`);
+                      } catch (error) {
+                        setShowDeleteModal(false);
+                        if (process.env.NODE_ENV === 'development') {
+                          console.error('Failed to delete unit:', error);
+                        }
+                      }
+                    }}
+                    className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+      )}
+
     </div>
   );
 }
