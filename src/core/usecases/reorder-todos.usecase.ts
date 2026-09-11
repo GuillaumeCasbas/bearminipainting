@@ -27,11 +27,7 @@ export class ReorderTodosUseCase {
     }
 
     const reorderedTodos: Todo[] = orderedTodoIds.map((todoId) => {
-      const todo = unit.todos.find((t) => t.id === todoId);
-      if (!todo) {
-        throw new TodoNotFoundError(todoId);
-      }
-      return todo;
+      return unit.todos.find((t) => t.id === todoId)!;
     });
 
     const updatedTodos = reorderedTodos.map(
