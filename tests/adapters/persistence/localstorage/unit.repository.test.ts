@@ -351,4 +351,126 @@ describe('LocalStorageUnitRepository Integration', () => {
     expect(foundUnit2).not.toBeNull();
     expect(foundUnit2?.projectId).toBe('project-2');
   });
+
+  // === Delete Method Tests ===
+
+  it('should delete a unit and remove it from its parent project', async () => {
+    // Create a unit with todos
+    const unit = new Unit(
+      'unit-to-delete',
+      'Unit To Delete',
+      'DEL-001',
+      PROJECT_ID,
+      [new Todo('todo-1', 'Assembly', 'TODO', 10)]
+    );
+    await unitRepository.create(unit);
+
+    // Verify it exists before deletion
+    const projectBefore = await projectRepository.findById(PROJECT_ID);
+    expect(projectBefore?.units.length).toBe(1);
+
+    // Delete the unit
+    await unitRepository.delete('unit-to-delete');
+
+    // Verify the unit is removed from the project
+    const projectAfter = await projectRepository.findById(PROJECT_ID);
+    expect(projectAfter?.units.length).toBe(0);
+
+    // Verify the unit can no longer be found
+    const found = await unitRepository.findById('unit-to-delete');
+    expect(found).toBeNull();
+  });
+
+  it('should delete only the targeted unit and keep other units intact', async () => {
+    const unit1 = new Unit(
+      'unit-keep',
+      'Unit To Keep',
+      'KEEP-001',
+      PROJECT_ID,
+      []
+    );
+    const unit2 = new Unit(
+      'unit-delete',
+      'Unit To Delete',
+      'DEL-002',
+      PROJECT_ID,
+      []
+    );
+    await unitRepository.create(unit1);
+    await unitRepository.create(unit2);
+
+    // Delete only the second unit
+    await unitRepository.delete('unit-delete');
+
+    const project = await projectRepository.findById(PROJECT_ID);
+    expect(project?.units.length).toBe(1);
+    expect(project?.units[0].id).toBe('unit-keep');
+
+    // Verify the deleted unit is gone
+    const found = await unitRepository.findById('unit-delete');
+    expect(found).toBeNull();
+  });
+
+  it('should delete a unit and its todos permanently', async () => {
+    const todos = [
+      new Todo('todo-1', 'Assembly', 'DONE', 10),
+      new Todo('todo-2', 'Primer', 'TODO', 20),
+    ];
+    const unit = new Unit(
+      'unit-with-todos',
+      'Unit With Todos',
+      'TODO-001',
+      PROJECT_ID,
+      todos
+    );
+    await unitRepository.create(unit);
+
+    await unitRepository.delete('unit-with-todos');
+
+    // Re-add a unit with the same id to confirm todos are gone (not restored)
+    const project = await projectRepository.findById(PROJECT_ID);
+    expect(project?.units.length).toBe(0);
+  });
+
+  it('should throw UnitNotFoundError when deleting a nonexistent unit', async () => {
+    await expect(unitRepository.delete('nonexistent-unit-id'))
+      .rejects.toThrow(UnitNotFoundError);
+    await expect(unitRepository.delete('nonexistent-unit-id'))
+      .rejects.toThrow("Unit with id 'nonexistent-unit-id' not found");
+  });
+
+  it('should not affect other projects when deleting a unit', async () => {
+    // Create second project with a unit
+    const project2 = new Project('project-2', 'Second Project', 'PROJ-002', []);
+    await projectRepository.save(project2);
+
+    const unitInProject1 = new Unit(
+      'unit-p1',
+      'Unit P1',
+      'U-P1',
+      PROJECT_ID,
+      []
+    );
+    const unitInProject2 = new Unit(
+      'unit-p2',
+      'Unit P2',
+      'U-P2',
+      'project-2',
+      []
+    );
+    await unitRepository.create(unitInProject1);
+    await unitRepository.create(unitInProject2);
+
+    // Delete unit from first project
+    await unitRepository.delete('unit-p1');
+
+    // First project should have no units
+    const project1After = await projectRepository.findById(PROJECT_ID);
+    expect(project1After?.units.length).toBe(0);
+
+    // Second project should be unaffected
+    const project2After = await projectRepository.findById('project-2');
+    expect(project2After?.units.length).toBe(1);
+    expect(project2After?.units[0].id).toBe('unit-p2');
+  });
 });
