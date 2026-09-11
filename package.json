@@ -1,7 +1,7 @@
 {
   "name": "minipaint",
-  "version": "1.0.0",
-  "description": "Warhammer army painting tracker",
+  "version": "0.1.0",
+  "description": "A minimalist miniature painting tracker",
   "directories": {
     "test": "tests"
   },
@@ -13,9 +13,11 @@
     "test:watch": "jest --watch"
   },
   "keywords": [
-    "warhammer",
+    "miniatures",
     "painting",
-    "tracker"
+    "tracker",
+    "wargaming",
+    "hobby"
   ],
   "author": "BearMiniPaint",
   "license": "ISC",
