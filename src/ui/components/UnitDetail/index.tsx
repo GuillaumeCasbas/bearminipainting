@@ -1,13 +1,27 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { Unit } from "@/core/entities/Unit";
 import { Project } from "@/core/entities/Project";
 import { useProjectContext } from "@/ui/contexts/projectContext";
 import { useProjectStore } from "@/ui/stores/projectStore";
 import { UnitNotFoundError, OrphanedUnitError } from "@/core/errors";
-import { getCompletionRateColor } from "@/ui/utils/completionColors";
-import { Dropdown, DropdownItem } from "@/ui/components/Dropdown";
 import {ProgressBar} from "@/ui/components/ProgressBar";
+import { SortableTodoRow } from "@/ui/components/UnitDetail/SortableTodoRow";
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -18,11 +32,20 @@ export function UnitDetail() {
   );
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus, addTodo, deleteTodo, deleteUnit } = useProjectStore();
+  const { projects, toggleTodoStatus, addTodo, deleteTodo, deleteUnit, reorderTodos } = useProjectStore();
   const [newTodoLabel, setNewTodoLabel] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
   const newTodoInputRef = useRef<HTMLInputElement>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   // Find unit and project from store
   const unit = useMemo(() => {
@@ -227,91 +250,35 @@ export function UnitDetail() {
             No todos for this unit.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    État
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Label
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(event: DragEndEvent) => {
+              const { active, over } = event;
+              if (!over || active.id === over.id) return;
+              const oldIndex = sortedTodos.findIndex((t) => t.id === active.id);
+              const newIndex = sortedTodos.findIndex((t) => t.id === over.id);
+              if (oldIndex === -1 || newIndex === -1) return;
+              const reordered = arrayMove(sortedTodos, oldIndex, newIndex);
+              reorderTodos(unit.id, reordered.map((t) => t.id));
+            }}
+          >
+            <SortableContext
+              items={sortedTodos.map((t) => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="divide-y divide-gray-100">
                 {sortedTodos.map((todo) => (
-                  <tr
+                  <SortableTodoRow
                     key={todo.id}
-                    className="hover:bg-gray-50 transition-colors"
-                    data-order={todo.order} // For future drag-and-drop
-                    data-todo-id={todo.id} // For future drag-and-drop
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <input
-                        type="checkbox"
-                        checked={todo.status === "DONE"}
-                        onChange={() => toggleTodoStatus(unit.id, todo.id)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                        aria-label={`Todo ${todo.label} ${todo.status === "DONE" ? "completed" : "not completed"}`}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm relative">
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={
-                            todo.status === "DONE"
-                              ? "line-through text-gray-400"
-                              : "text-gray-900"
-                          }
-                        >
-                          {todo.label}
-                        </span>
-                        <Dropdown
-                          position="left"
-                          trigger={
-                            <button
-                              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
-                              aria-label="Delete todo"
-                              title="Delete todo"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          }
-                        >
-                          <DropdownItem
-                            danger
-                            onClick={() => deleteTodo(unit.id, todo.id)}
-                          >
-                            Delete this todo
-                          </DropdownItem>
-                        </Dropdown>
-                      </div>
-                    </td>
-                  </tr>
+                    todo={todo}
+                    onToggle={() => toggleTodoStatus(unit.id, todo.id)}
+                    onDelete={() => deleteTodo(unit.id, todo.id)}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 

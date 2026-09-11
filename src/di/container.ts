@@ -15,6 +15,7 @@ import { AddTodoToUnitUseCase } from '../core/usecases/add-todo-to-unit.usecase'
 import { DeleteTodoUseCase } from '../core/usecases/delete-todo.usecase';
 import { DeleteProjectUseCase } from '../core/usecases/delete-project.usecase';
 import { DeleteUnitUseCase } from '../core/usecases/delete-unit.usecase';
+import { ReorderTodosUseCase } from '../core/usecases/reorder-todos.usecase';
 
 // Singleton instances
 // Repositories
@@ -27,6 +28,7 @@ const createProjectUseCase = new CreateProjectUseCase(projectRepository);
 const getProjectByIdUseCase = new GetProjectByIdUseCase(projectRepository);
 const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
 const deleteUnitUseCase = new DeleteUnitUseCase(unitRepository);
+const reorderTodosUseCase = new ReorderTodosUseCase(unitRepository);
 const createUnitUseCase = new CreateUnitUseCase(unitRepository);
 const getUnitByIdUseCase = new GetUnitByIdUseCase(unitRepository);
 const toggleTodoStatusUseCase = new ToggleTodoStatusUseCase(unitRepository);
@@ -44,6 +46,7 @@ export {
   getProjectByIdUseCase,
   deleteProjectUseCase,
   deleteUnitUseCase,
+  reorderTodosUseCase,
   createUnitUseCase,
   getUnitByIdUseCase,
   toggleTodoStatusUseCase,

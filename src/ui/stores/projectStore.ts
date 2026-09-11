@@ -22,6 +22,7 @@ import {
   deleteTodoUseCase,
   deleteProjectUseCase,
   deleteUnitUseCase,
+  reorderTodosUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -43,6 +44,7 @@ interface ProjectStore {
   addProject: (name: string, code: string) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   deleteUnit: (unitId: string) => Promise<void>;
+  reorderTodos: (unitId: string, orderedTodoIds: string[]) => Promise<void>;
   addUnit: (projectId: string, name: string, code: string) => Promise<void>;
   addTodo: (unitId: string, label: string) => Promise<void>;
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
@@ -200,6 +202,94 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           message: 'Failed to delete unit',
         }] });
       }
+    }
+  },
+
+  // Reorder todos in a unit via drag and drop
+  reorderTodos: async (unitId: string, orderedTodoIds: string[]) => {
+    let previousUnit: Unit | null = null;
+
+    try {
+      const projects = useProjectStore.getState().projects;
+
+      // Find the unit and its parent project for optimistic update + rollback
+      let targetProject: Project | null = null;
+      let targetUnitIndex = -1;
+      let targetUnit: Unit | null = null;
+
+      for (const project of projects) {
+        const unitIndex = project.units.findIndex((u) => u.id === unitId);
+        if (unitIndex !== -1) {
+          targetProject = project;
+          targetUnitIndex = unitIndex;
+          targetUnit = project.units[unitIndex];
+          break;
+        }
+      }
+
+      if (!targetUnit || !targetProject) {
+        throw new UnitNotFoundError(unitId);
+      }
+
+      // Save previous state for rollback
+      previousUnit = targetUnit;
+
+      // Optimistic update: reorder todos locally with recalculated order field
+      const reorderedTodos = orderedTodoIds.map((todoId, index) => {
+        const todo = targetUnit!.todos.find((t) => t.id === todoId);
+        return new Todo(todo!.id, todo!.label, todo!.status, index * 10);
+      });
+
+      const optimisticUnit = new Unit(
+        targetUnit.id,
+        targetUnit.name,
+        targetUnit.code,
+        targetUnit.projectId,
+        reorderedTodos
+      );
+
+      const optimisticProjects = projects.map((p) => {
+        if (p.id === targetProject!.id) {
+          const updatedUnits = [...p.units];
+          updatedUnits[targetUnitIndex] = optimisticUnit;
+          return new Project(p.id, p.name, p.code, updatedUnits);
+        }
+        return p;
+      });
+      set({ projects: optimisticProjects });
+
+      // Persist the new order via the use case
+      await reorderTodosUseCase.execute(unitId, orderedTodoIds);
+    } catch (error) {
+      // Rollback optimistic update
+      if (previousUnit) {
+        const projects = useProjectStore.getState().projects;
+        const revertedProjects = projects.map((p) => {
+          const unitIndex = p.units.findIndex((u) => u.id === unitId);
+          if (unitIndex !== -1) {
+            const updatedUnits = [...p.units];
+            updatedUnits[unitIndex] = previousUnit!;
+            return new Project(p.id, p.name, p.code, updatedUnits);
+          }
+          return p;
+        });
+        set({ projects: revertedProjects });
+      }
+
+      // Error toast
+      set({
+        toasts: [
+          ...useProjectStore.getState().toasts,
+          {
+            id: Date.now().toString(),
+            type: 'error',
+            message:
+              error instanceof Error
+            ? error.message
+            : 'Failed to reorder todos',
+          },
+        ],
+      });
     }
   },
 
