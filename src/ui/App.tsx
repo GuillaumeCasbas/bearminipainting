@@ -6,7 +6,6 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
-import { BASE_PATH } from './config';
 
 export function App() {
   const { loadProjects } = useProjectStore();
@@ -17,7 +16,7 @@ export function App() {
   }, [loadProjects]);
 
   return (
-    <Router basename={BASE_PATH}>
+    <Router>
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
