@@ -188,7 +188,6 @@ export function ProjectDetail() {
       {/* Add Unit Modal */}
       {showUnitForm && id && (
         <UnitForm
-          projectId={id}
           onClose={() => setShowUnitForm(false)}
           onSubmit={async (name: string, code: string) => {
             await addUnit(id, name, code);

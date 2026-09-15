@@ -1,4 +1,4 @@
-import { Todo, TodoStatus } from './Todo';
+import { Todo } from './Todo';
 
 export class Unit {
   readonly id: string;

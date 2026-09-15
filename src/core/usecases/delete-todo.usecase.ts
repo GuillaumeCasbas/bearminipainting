@@ -1,11 +1,10 @@
 /**
  * DeleteTodoUseCase - Handles deletion of a todo from a unit
- * 
+ *
  * BEA-29: Feature - Delete a todo
  */
 
 import { Unit } from '../entities/Unit';
-import { Todo } from '../entities/Todo';
 import { UnitRepository } from '../ports/unit.repository';
 import { UnitNotFoundError, TodoNotFoundError } from '../errors';
 
@@ -14,7 +13,7 @@ export class DeleteTodoUseCase {
 
   /**
    * Deletes a todo from a unit
-   * 
+   *
    * @param unitId - The ID of the unit containing the todo
    * @param todoId - The ID of the todo to delete
    * @returns The updated unit after deletion

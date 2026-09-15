@@ -15,8 +15,6 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { Unit } from "@/core/entities/Unit";
-import { Project } from "@/core/entities/Project";
 import { useProjectContext } from "@/ui/contexts/projectContext";
 import { useProjectStore } from "@/ui/stores/projectStore";
 import { UnitNotFoundError, OrphanedUnitError } from "@/core/errors";

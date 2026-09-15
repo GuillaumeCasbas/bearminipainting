@@ -1,12 +1,11 @@
 import { useState } from 'react';
 
 interface UnitFormProps {
-  projectId: string;
   onClose: () => void;
   onSubmit: (name: string, code: string) => Promise<void>;
 }
 
-export function UnitForm({ projectId, onClose, onSubmit }: UnitFormProps) {
+export function UnitForm({ onClose, onSubmit }: UnitFormProps) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
