@@ -40,7 +40,7 @@ export function ProjectForm() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div className="bg-white rounded-lg shadow-md p-6">
       <h2 id="project-form-title" className="text-xl font-semibold text-gray-800 mb-4">
         Create a new project
       </h2>
