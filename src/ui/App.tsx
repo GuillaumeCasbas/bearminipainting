@@ -16,7 +16,7 @@ export function App() {
   }, [loadProjects]);
 
   return (
-    <Router>
+    <Router basename={process.env.NODE_ENV === 'development' ? '/bearminipainting' : undefined}>
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
