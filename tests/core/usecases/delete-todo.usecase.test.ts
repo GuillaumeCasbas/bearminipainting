@@ -3,11 +3,11 @@
  * BEA-29: Feature - Delete a todo
  */
 
-import { DeleteTodoUseCase } from "../../../src/core/usecases/delete-todo.usecase";
-import { UnitRepository } from "../../../src/core/ports/unit.repository";
-import { Unit } from "../../../src/core/entities/Unit";
-import { Todo } from "../../../src/core/entities/Todo";
-import { UnitNotFoundError, TodoNotFoundError } from "../../../src/core/errors";
+import { DeleteTodoUseCase } from "@/core/usecases/delete-todo.usecase";
+import { UnitRepository } from "@/core/ports/unit.repository";
+import { Unit } from "@/core/entities/Unit";
+import { Todo } from "@/core/entities/Todo";
+import { UnitNotFoundError, TodoNotFoundError } from "@/core/errors";
 
 describe("DeleteTodoUseCase", () => {
   let mockRepository: UnitRepository;
