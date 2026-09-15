@@ -4,7 +4,7 @@ import { Sidebar } from '../Sidebar';
 
 export function HomePage() {
   return (
-    <div className="flex flex-row gap-6 items-start">
+    <div className="flex flex-row gap-6 items-stretch md:min-h-[calc(100vh-4rem)]">
       <main className="flex-1 min-w-0">
         <ProjectList />
       </main>
