@@ -6,6 +6,7 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
+import {BASE_PATH} from "@/ui/config";
 
 export function App() {
   const { loadProjects } = useProjectStore();
@@ -16,7 +17,7 @@ export function App() {
   }, [loadProjects]);
 
   return (
-    <Router basename={process.env.NODE_ENV === 'development' ? '/bearminipainting' : undefined}>
+    <Router basename={BASE_PATH}>
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
