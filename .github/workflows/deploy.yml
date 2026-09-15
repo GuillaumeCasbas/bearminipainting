@@ -35,6 +35,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Linter
+        run: npm run eslint
+
       - name: Run tests
         run: npm test
 

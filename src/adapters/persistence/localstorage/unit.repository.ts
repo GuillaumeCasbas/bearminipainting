@@ -70,6 +70,7 @@ export class LocalStorageUnitRepository implements UnitRepository {
     for (const project of projects) {
       const unitExists = project.units.some((u) => u.id === unitId);
       if (unitExists) {
+        // eslint-disable-next-line no-useless-assignment
         found = true;
         const updatedProject = new Project(
           project.id,
