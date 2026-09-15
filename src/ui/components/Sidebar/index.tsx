@@ -39,7 +39,7 @@ export function Sidebar({ children, title }: SidebarProps) {
       {/* Desktop / tablet sidebar (>= 768px): sticky, always visible */}
       <aside
         aria-label={title}
-        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:self-stretch md:max-h-[calc(100vh-4rem)] bg-white border border-gray-200 rounded-lg p-6 overflow-y-auto shadow-sm"
+        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:max-h-[calc(100vh-4rem)] bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto"
       >
         <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
         {children}
