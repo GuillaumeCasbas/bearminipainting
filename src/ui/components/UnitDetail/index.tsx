@@ -307,22 +307,6 @@ export function UnitDetail() {
           </button>
         </div>
       </div>
-
-      {/* Back Button */}
-      <div className="mt-6">
-        <button
-          onClick={() => navigate(`/projects/${project.id}`)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 mr-3"
-        >
-          Back to Project
-        </button>
-        <button
-          onClick={() => navigate("/")}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-        >
-          Back to Home
-        </button>
-      </div>
     </div>
 
       {/* Danger Zone - Delete Unit (Accordion) */}

@@ -25,6 +25,14 @@ export default function ProjectList() {
     );
   }
 
+  const sortedProjects = [...projects].sort((a, b) => {
+    const rateDiff = b.getCompletionRate() - a.getCompletionRate();
+    if (rateDiff !== 0) return rateDiff;
+    const nameDiff = a.name.localeCompare(b.name);
+    if (nameDiff !== 0) return nameDiff;
+    return a.id.localeCompare(b.id);
+  });
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">My Projects</h2>
@@ -47,7 +55,7 @@ export default function ProjectList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {projects.map((project: Project) => (
+            {sortedProjects.map((project: Project) => (
               <tr key={project.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <Link

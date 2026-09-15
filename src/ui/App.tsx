@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ProjectForm } from './components/ProjectForm';
-import ProjectList from './components/ProjectList';
+import { HomePage } from './components/HomePage';
 import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import ToastContainer from './components/Toast';
@@ -29,15 +28,7 @@ export function App() {
 
           <main>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <ProjectForm />
-                    <ProjectList />
-                  </>
-                }
-              />
+              <Route path="/" element={<HomePage />} />
               <Route path="/projects/:id" element={<ProjectDetail />} />
               <Route path="/units/:unitId" element={<UnitDetail />} />
             </Routes>
