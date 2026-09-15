@@ -42,7 +42,7 @@ export function Sidebar({ children, title }: SidebarProps) {
         className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:max-h-[calc(100vh-4rem)] bg-white border border-gray-200 rounded-lg p-6 overflow-y-auto shadow-sm"
       >
         <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
-        {children}
+        {!isMobileOpen && children}
       </aside>
 
       {/* Mobile (< 768px): floating action button */}

@@ -41,9 +41,11 @@ describe('Sidebar', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog).toHaveAttribute('aria-label', 'Add a project');
-    // The child is rendered both in the hidden desktop aside and the modal;
-    // scope the assertion to the dialog to target the modal instance.
+    // The child is rendered only in the modal (not duplicated in the aside),
+    // so input IDs stay unique and labels resolve to the visible inputs.
     expect(within(dialog).getByTestId('child')).toBeInTheDocument();
+    const aside = screen.getByRole('complementary');
+    expect(within(aside).queryByTestId('child')).not.toBeInTheDocument();
   });
 
   it('closes the modal when the close button is clicked', () => {
