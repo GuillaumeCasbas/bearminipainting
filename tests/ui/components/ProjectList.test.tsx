@@ -238,4 +238,71 @@ describe('ProjectList', () => {
       expect(badge).toHaveClass('text-white');
     });
   });
+
+  describe('Project list sorting (BEA-31)', () => {
+    const makeProject = (id: string, name: string, code: string, rate: number): Project =>
+      ({
+        ...new Project(id, name, code, []),
+        getCompletionRate: () => rate,
+      }) as Project;
+
+    const getRenderedNames = () =>
+      screen.getAllByRole('row').slice(1).map((row) =>
+        row.querySelector('a')?.textContent ?? ''
+      );
+
+    it('sorts projects by completion rate descending', () => {
+      const projects = [
+        makeProject('id-3', 'Bravo', 'B', 30),
+        makeProject('id-1', 'Alpha', 'A', 90),
+        makeProject('id-2', 'Charlie', 'C', 50),
+      ];
+
+      mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
+      render(<ProjectList />);
+
+      expect(getRenderedNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
+    });
+
+    it('sorts projects with equal completion rate alphabetically by name (ASC)', () => {
+      const projects = [
+        makeProject('id-2', 'Orks', 'O', 50),
+        makeProject('id-1', 'Space Marines', 'SM', 50),
+        makeProject('id-3', 'Adeptus Custodes', 'AC', 50),
+      ];
+
+      mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
+      render(<ProjectList />);
+
+      expect(getRenderedNames()).toEqual(['Adeptus Custodes', 'Orks', 'Space Marines']);
+    });
+
+    it('uses a deterministic tiebreak by id when completion rate and name are equal', () => {
+      const projects = [
+        makeProject('id-z', 'Twin', 'T2', 50),
+        makeProject('id-a', 'Twin', 'T1', 50),
+      ];
+
+      mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
+      render(<ProjectList />);
+
+      // id-a before id-z
+      const rows = screen.getAllByRole('row').slice(1);
+      expect(rows[0].textContent).toContain('id-a');
+      expect(rows[1].textContent).toContain('id-z');
+    });
+
+    it('does not mutate the original projects array order in the store', () => {
+      const projects = [
+        makeProject('id-3', 'Bravo', 'B', 30),
+        makeProject('id-1', 'Alpha', 'A', 90),
+      ];
+      const originalOrder = projects.map((p) => p.id);
+
+      mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
+      render(<ProjectList />);
+
+      expect(projects.map((p) => p.id)).toEqual(originalOrder);
+    });
+  });
 });
