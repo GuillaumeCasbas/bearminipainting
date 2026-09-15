@@ -36,15 +36,13 @@ export function Sidebar({ children, title }: SidebarProps) {
 
   return (
     <>
-      {/* Desktop / tablet sidebar (>= 768px): fixed, always visible */}
+      {/* Desktop / tablet sidebar (>= 768px): sticky, always visible */}
       <aside
         aria-label={title}
-        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:h-[calc(100vh-4rem)] md:sticky md:top-16 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto"
+        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:max-h-[calc(100vh-4rem)] bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto"
       >
-        <div className="md:sticky md:top-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
-          {children}
-        </div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
+        {children}
       </aside>
 
       {/* Mobile (< 768px): floating action button */}
@@ -80,7 +78,7 @@ export function Sidebar({ children, title }: SidebarProps) {
             type="button"
             aria-label="Close sidebar"
             onClick={closeMobileSidebar}
-            className="absolute inset-0 bg-black bg-opacity-50"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             tabIndex={-1}
           />
 
