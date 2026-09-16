@@ -31,16 +31,10 @@ export class ReorderTodosUseCase {
     });
 
     const updatedTodos = reorderedTodos.map(
-      (todo, index) => new Todo(todo.id, todo.label, todo.status, index * 10)
+      (todo, index) => new Todo(todo.id, todo.label, todo.status, index * 10),
     );
 
-    const updatedUnit = new Unit(
-      unit.id,
-      unit.name,
-      unit.code,
-      unit.projectId,
-      updatedTodos
-    );
+    const updatedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, updatedTodos);
 
     await this.unitRepository.update(updatedUnit);
     return updatedUnit;

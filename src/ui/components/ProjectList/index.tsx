@@ -18,9 +18,7 @@ export default function ProjectList() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">My Projects</h2>
-        <p className="text-gray-500 text-center py-8">
-          No projects created yet.
-        </p>
+        <p className="text-gray-500 text-center py-8">No projects created yet.</p>
       </div>
     );
   }
@@ -40,16 +38,28 @@ export default function ProjectList() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Name
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Code
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 ID
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Completion Rate
               </th>
             </tr>
@@ -72,7 +82,9 @@ export default function ProjectList() {
                   {project.id.substring(0, 8)}...
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(project.getCompletionRate())} ${getCompletionRateTextColor(project.getCompletionRate())}`}>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCompletionRateColor(project.getCompletionRate())} ${getCompletionRateTextColor(project.getCompletionRate())}`}
+                  >
                     {project.getCompletionRate()}%
                   </span>
                 </td>

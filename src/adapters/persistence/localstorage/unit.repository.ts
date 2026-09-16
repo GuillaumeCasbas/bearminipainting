@@ -30,12 +30,10 @@ export class LocalStorageUnitRepository implements UnitRepository {
       throw new ProjectNotFoundError(unit.projectId);
     }
 
-    const updatedProject = new Project(
-      project.id,
-      project.name,
-      project.code,
-      [...project.units, unit]
-    );
+    const updatedProject = new Project(project.id, project.name, project.code, [
+      ...project.units,
+      unit,
+    ]);
 
     await this.projectRepository.save(updatedProject);
   }
@@ -54,12 +52,7 @@ export class LocalStorageUnitRepository implements UnitRepository {
     }
 
     const updatedUnits = project.units.map((u) => (u.id === unit.id ? unit : u));
-    const updatedProject = new Project(
-      project.id,
-      project.name,
-      project.code,
-      updatedUnits
-    );
+    const updatedProject = new Project(project.id, project.name, project.code, updatedUnits);
 
     await this.projectRepository.save(updatedProject);
   }

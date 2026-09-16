@@ -10,8 +10,9 @@ interface SortableTodoRowProps {
 }
 
 export function SortableTodoRow({ todo, onToggle, onDelete }: SortableTodoRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: todo.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: todo.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -58,9 +59,7 @@ export function SortableTodoRow({ todo, onToggle, onDelete }: SortableTodoRowPro
         />
         <span
           className={
-            todo.status === 'DONE'
-              ? 'line-through text-gray-400 text-sm'
-              : 'text-gray-900 text-sm'
+            todo.status === 'DONE' ? 'line-through text-gray-400 text-sm' : 'text-gray-900 text-sm'
           }
         >
           {todo.label}

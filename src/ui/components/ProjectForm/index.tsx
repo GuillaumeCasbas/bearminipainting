@@ -16,14 +16,14 @@ export function ProjectForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Client-side validation
     const nameValidationError = validateName(name);
     if (nameValidationError) {
       setNameError(nameValidationError);
       return;
     }
-    
+
     setNameError('');
     await addProject(name, code);
     setName('');

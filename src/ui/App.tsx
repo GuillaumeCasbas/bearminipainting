@@ -5,7 +5,7 @@ import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import ToastContainer from './components/Toast';
 import { useProjectStore } from './stores/projectStore';
-import {BASE_PATH} from "@/ui/config";
+import { BASE_PATH } from '@/ui/config';
 
 export function App() {
   const { loadProjects } = useProjectStore();
@@ -21,9 +21,7 @@ export function App() {
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
-            <p className="text-gray-600 mt-1">
-              Track your miniature painting progress
-            </p>
+            <p className="text-gray-600 mt-1">Track your miniature painting progress</p>
           </header>
 
           <main>

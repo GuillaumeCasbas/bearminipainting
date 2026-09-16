@@ -31,10 +31,7 @@ export class LocalStorageProjectRepository implements ProjectRepository {
 
   async save(project: Project): Promise<void> {
     const projects = this.getAllFromStorage();
-    const updatedProjects = [
-      ...projects.filter((p) => p.id !== project.id),
-      project,
-    ];
+    const updatedProjects = [...projects.filter((p) => p.id !== project.id), project];
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedProjects));
   }
 
@@ -81,11 +78,11 @@ export class LocalStorageProjectRepository implements ProjectRepository {
                             todoItem.id,
                             todoItem.label,
                             todoItem.status as 'TODO' | 'DONE',
-                            todoItem.order
-                          )
+                            todoItem.order,
+                          ),
                       )
-                    : []
-                )
+                    : [],
+                ),
             )
           : [];
         return new Project(item.id, item.name, item.code, units);

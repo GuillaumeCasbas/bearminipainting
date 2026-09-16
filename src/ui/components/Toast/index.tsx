@@ -11,7 +11,7 @@ export default function ToastContainer() {
       const timer = setTimeout(() => {
         removeToast(toast.id);
       }, 5000);
-      
+
       return () => clearTimeout(timer);
     });
   }, [toasts, removeToast]);

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './ui/App';
 import './ui/index.css';
-import { ProjectProvider } from "@/ui/contexts/projectContext";
+import { ProjectProvider } from '@/ui/contexts/projectContext';
 // Import from DI container
 import {
   getAllProjectsUseCase,
@@ -13,13 +13,13 @@ import {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-      <ProjectProvider
-          getAllProjectsUseCase={getAllProjectsUseCase}
-          getProjectByIdUseCase={getProjectByIdUseCase}
-          createProjectUseCase={createProjectUseCase}
-          getUnitByIdUseCase={getUnitByIdUseCase}
-      >
-        <App />
-      </ProjectProvider>
+    <ProjectProvider
+      getAllProjectsUseCase={getAllProjectsUseCase}
+      getProjectByIdUseCase={getProjectByIdUseCase}
+      createProjectUseCase={createProjectUseCase}
+      getUnitByIdUseCase={getUnitByIdUseCase}
+    >
+      <App />
+    </ProjectProvider>
   </React.StrictMode>,
 );
