@@ -25,3 +25,5 @@ points below. When a rule here conflicts with the skill, **this file wins**.
   used in the file.
 - Reference the related Linear ticket (e.g. `(BEA-40)`) at the end of each entry.
 - Do not wait for a release: the `[Unreleased]` section is the working log.
+- Keep the `package.json` `version` in sync with the latest released version
+  (the most recent `## [X.Y.Z] - YYYY-MM-DD` entry, excluding `[Unreleased]`).

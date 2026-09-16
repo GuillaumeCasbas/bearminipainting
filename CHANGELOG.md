@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Projects are now sorted by completion rate (highest first), then by name, on the home page (BEA-31).
 - Deploy MiniPaint to GitHub Pages (BEA-25).
 - CI workflow running typecheck, lint, test and build on every pull request to `main` (BEA-40).
+- Global footer on every page showing the app version (`MiniPaint X.Y.Z`) with a link to the changelog on GitHub (BEA-42).
+- Sticky footer layout: the footer stays at the bottom of the viewport even when a page has little content (BEA-42).
 
 ### Changed
 - Improved modal overlays: backgrounds are now blurred for better focus.
