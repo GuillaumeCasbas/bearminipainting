@@ -7,15 +7,6 @@ points below. When a rule here conflicts with the skill, **this file wins**.
 
 ## ours-dev — Workflow Overrides
 
-### Questions and validation
-
-- **Ask questions only in case of genuine doubt or an open question.** Do not ask
-  routine confirmation questions.
-- **Validate only the initial plan.** Once the user has validated the plan,
-  execute **all** steps end-to-end **without asking for confirmation between
-  steps**. The per-step checkpoints from the skill are suspended after plan
-  validation.
-
 ### Delivery (Git, GitHub, Linear)
 
 - Manage Linear and GitHub through their MCP servers.
