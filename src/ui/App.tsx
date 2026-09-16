@@ -18,25 +18,27 @@ export function App() {
 
   return (
     <Router basename={BASE_PATH}>
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
-            <p className="text-gray-600 mt-1">Track your miniature painting progress</p>
-          </header>
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <div className="flex-1 flex flex-col p-8">
+          <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
+            <header className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
+              <p className="text-gray-600 mt-1">Track your miniature painting progress</p>
+            </header>
 
-          <main>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/projects/:id" element={<ProjectDetail />} />
-              <Route path="/units/:unitId" element={<UnitDetail />} />
-            </Routes>
-          </main>
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/projects/:id" element={<ProjectDetail />} />
+                <Route path="/units/:unitId" element={<UnitDetail />} />
+              </Routes>
+            </main>
 
-          <ToastContainer />
-
-          <Footer />
+            <Footer />
+          </div>
         </div>
+
+        <ToastContainer />
       </div>
     </Router>
   );
