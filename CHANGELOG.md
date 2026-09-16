@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - New home page layout with a right sidebar for adding projects, and a floating button that opens it as a modal on mobile (BEA-31).
 - Projects are now sorted by completion rate (highest first), then by name, on the home page (BEA-31).
 - Deploy MiniPaint to GitHub Pages (BEA-25).
+- CI workflow running typecheck, lint, test and build on every pull request to `main` (BEA-40).
 
 ### Changed
 - Improved modal overlays: backgrounds are now blurred for better focus.
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 - Application now loads correctly in both local and GitHub Pages environments.
+- Deploy workflow now runs the linter with the correct `npm run lint` script (BEA-40).
 
 ---
 
