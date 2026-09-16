@@ -4,6 +4,7 @@ import { HomePage } from './components/HomePage';
 import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import ToastContainer from './components/Toast';
+import { Footer } from './components/Footer';
 import { useProjectStore } from './stores/projectStore';
 import { BASE_PATH } from '@/ui/config';
 
@@ -33,6 +34,8 @@ export function App() {
           </main>
 
           <ToastContainer />
+
+          <Footer />
         </div>
       </div>
     </Router>
