@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -8,30 +8,29 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   arrayMove,
-} from "@dnd-kit/sortable";
-import { useProjectContext } from "@/ui/contexts/projectContext";
-import { useProjectStore } from "@/ui/stores/projectStore";
-import { UnitNotFoundError, OrphanedUnitError } from "@/core/errors";
-import {ProgressBar} from "@/ui/components/ProgressBar";
-import { SortableTodoRow } from "@/ui/components/UnitDetail/SortableTodoRow";
+} from '@dnd-kit/sortable';
+import { useProjectContext } from '@/ui/contexts/projectContext';
+import { useProjectStore } from '@/ui/stores/projectStore';
+import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
+import { ProgressBar } from '@/ui/components/ProgressBar';
+import { SortableTodoRow } from '@/ui/components/UnitDetail/SortableTodoRow';
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<{ code: number; message: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<{ code: number; message: string } | null>(null);
 
   const { getUnitByIdUseCase, getProjectByIdUseCase } = useProjectContext();
-  const { projects, toggleTodoStatus, addTodo, deleteTodo, deleteUnit, reorderTodos } = useProjectStore();
-  const [newTodoLabel, setNewTodoLabel] = useState("");
+  const { projects, toggleTodoStatus, addTodo, deleteTodo, deleteUnit, reorderTodos } =
+    useProjectStore();
+  const [newTodoLabel, setNewTodoLabel] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
   const newTodoInputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +63,7 @@ export function UnitDetail() {
     if (!newTodoLabel.trim() || !unit) return;
 
     await addTodo(unit.id, newTodoLabel);
-    setNewTodoLabel("");
+    setNewTodoLabel('');
 
     // Auto-focus the input for quick addition of multiple todos
     setTimeout(() => {
@@ -77,7 +76,7 @@ export function UnitDetail() {
   useEffect(() => {
     const loadUnitDetails = async () => {
       if (!unitId) {
-        setError({ code: 404, message: "Unit not found." });
+        setError({ code: 404, message: 'Unit not found.' });
         setIsLoading(false);
         return;
       }
@@ -95,16 +94,11 @@ export function UnitDetail() {
         const unitData = await getUnitByIdUseCase.execute(unitId);
 
         // Load parent project for full code and name display
-        const projectData = await getProjectByIdUseCase.execute(
-          unitData.projectId,
-        );
+        const projectData = await getProjectByIdUseCase.execute(unitData.projectId);
 
         if (!projectData) {
           // Parent project no longer exists (BEA-20 basic handling)
-          const orphanedError = new OrphanedUnitError(
-            unitData.id,
-            unitData.projectId,
-          );
+          const orphanedError = new OrphanedUnitError(unitData.id, unitData.projectId);
           setError({ code: 404, message: orphanedError.message });
         }
       } catch (err) {
@@ -113,7 +107,7 @@ export function UnitDetail() {
         } else {
           setError({
             code: 500,
-            message: "Failed to load unit details. Please try again.",
+            message: 'Failed to load unit details. Please try again.',
           });
         }
       } finally {
@@ -187,216 +181,212 @@ export function UnitDetail() {
 
   return (
     <div>
-    {/* Main card */}
-    <div className="bg-white rounded-lg shadow-md p-6">
-      {/* Breadcrumb */}
-      <nav className="text-sm mb-6" aria-label="Breadcrumb">
-        <ol className="list-none p-0 inline-flex">
-          <li className="flex items-center">
-            <Link to="/" className="text-blue-600 hover:text-blue-800">
-              Projects
-            </Link>
-            <span className="mx-2 text-gray-400">{">"}</span>
-          </li>
-          <li className="flex items-center">
-            <Link
-              to={`/projects/${project.id}`}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              {project.name}
-            </Link>
-            <span className="mx-2 text-gray-400">{">"}</span>
-          </li>
-          <li>
-            <span className="text-gray-600">{unit.name}</span>
-          </li>
-        </ol>
-      </nav>
+      {/* Main card */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        {/* Breadcrumb */}
+        <nav className="text-sm mb-6" aria-label="Breadcrumb">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to="/" className="text-blue-600 hover:text-blue-800">
+                Projects
+              </Link>
+              <span className="mx-2 text-gray-400">{'>'}</span>
+            </li>
+            <li className="flex items-center">
+              <Link to={`/projects/${project.id}`} className="text-blue-600 hover:text-blue-800">
+                {project.name}
+              </Link>
+              <span className="mx-2 text-gray-400">{'>'}</span>
+            </li>
+            <li>
+              <span className="text-gray-600">{unit.name}</span>
+            </li>
+          </ol>
+        </nav>
 
-      {/* Unit Header */}
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">{unit.name}</h1>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500">
-            {project.code}-{unit.code}
-          </span>
-        </div>
-      </div>
-
-      {/* Completion Rate */}
-      <div className="mb-6">
-        <ProgressBar completionRate={completionRate}  withLabel />
-      </div>
-
-      {/* Total Todos */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
-        <p className="text-sm text-gray-600">
-          {sortedTodos.length} total,
-          {sortedTodos.filter((t) => t.status === "DONE").length} completed
-        </p>
-      </div>
-
-      {/* Todos List */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
+        {/* Unit Header */}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{unit.name}</h1>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-500">
+              {project.code}-{unit.code}
+            </span>
+          </div>
         </div>
 
-        {sortedTodos.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
-            No todos for this unit.
+        {/* Completion Rate */}
+        <div className="mb-6">
+          <ProgressBar completionRate={completionRate} withLabel />
+        </div>
+
+        {/* Total Todos */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
+          <p className="text-sm text-gray-600">
+            {sortedTodos.length} total,
+            {sortedTodos.filter((t) => t.status === 'DONE').length} completed
           </p>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(event: DragEndEvent) => {
-              const { active, over } = event;
-              if (!over || active.id === over.id) return;
-              const oldIndex = sortedTodos.findIndex((t) => t.id === active.id);
-              const newIndex = sortedTodos.findIndex((t) => t.id === over.id);
-              if (oldIndex === -1 || newIndex === -1) return;
-              const reordered = arrayMove(sortedTodos, oldIndex, newIndex);
-              reorderTodos(unit.id, reordered.map((t) => t.id));
-            }}
-          >
-            <SortableContext
-              items={sortedTodos.map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="divide-y divide-gray-100">
-                {sortedTodos.map((todo) => (
-                  <SortableTodoRow
-                    key={todo.id}
-                    todo={todo}
-                    onToggle={() => toggleTodoStatus(unit.id, todo.id)}
-                    onDelete={() => deleteTodo(unit.id, todo.id)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
-      </div>
+        </div>
 
-      {/* Add Custom Todo Input */}
-      <div className="mt-4">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newTodoLabel}
-            onChange={(e) => setNewTodoLabel(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleAddTodo();
-              }
-            }}
-            ref={newTodoInputRef}
-            placeholder="Add a custom todo..."
-            autoComplete="off"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-            aria-label="Add custom todo"
-          />
-          <button
-            onClick={handleAddTodo}
-            disabled={!newTodoLabel.trim()}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add
-          </button>
+        {/* Todos List */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
+          </div>
+
+          {sortedTodos.length === 0 ? (
+            <p className="text-sm text-gray-500 italic">No todos for this unit.</p>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(event: DragEndEvent) => {
+                const { active, over } = event;
+                if (!over || active.id === over.id) return;
+                const oldIndex = sortedTodos.findIndex((t) => t.id === active.id);
+                const newIndex = sortedTodos.findIndex((t) => t.id === over.id);
+                if (oldIndex === -1 || newIndex === -1) return;
+                const reordered = arrayMove(sortedTodos, oldIndex, newIndex);
+                reorderTodos(
+                  unit.id,
+                  reordered.map((t) => t.id),
+                );
+              }}
+            >
+              <SortableContext
+                items={sortedTodos.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="divide-y divide-gray-100">
+                  {sortedTodos.map((todo) => (
+                    <SortableTodoRow
+                      key={todo.id}
+                      todo={todo}
+                      onToggle={() => toggleTodoStatus(unit.id, todo.id)}
+                      onDelete={() => deleteTodo(unit.id, todo.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+
+        {/* Add Custom Todo Input */}
+        <div className="mt-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newTodoLabel}
+              onChange={(e) => setNewTodoLabel(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddTodo();
+                }
+              }}
+              ref={newTodoInputRef}
+              placeholder="Add a custom todo..."
+              autoComplete="off"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              aria-label="Add custom todo"
+            />
+            <button
+              onClick={handleAddTodo}
+              disabled={!newTodoLabel.trim()}
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
       {/* Danger Zone - Delete Unit (Accordion) */}
       <div className="mt-4 border-2 border-red-500 rounded-lg bg-red-50">
         <button
-            onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
-            className="w-full p-4 flex justify-between items-center text-left"
-            aria-expanded={isDangerZoneOpen}
-            aria-controls="unit-danger-zone-content"
+          onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
+          className="w-full p-4 flex justify-between items-center text-left"
+          aria-expanded={isDangerZoneOpen}
+          aria-controls="unit-danger-zone-content"
         >
           <h3 className="text-lg font-semibold text-red-700">Danger zone</h3>
           <svg
-              className={`w-5 h-5 text-red-700 transition-transform ${isDangerZoneOpen ? 'rotate-180' : ''}`}
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+            className={`w-5 h-5 text-red-700 transition-transform ${isDangerZoneOpen ? 'rotate-180' : ''}`}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
           >
             <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
+              fillRule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clipRule="evenodd"
             />
           </svg>
         </button>
         {isDangerZoneOpen && (
-            <div id="unit-danger-zone-content" className="px-4 pb-4">
-              <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-2 text-red-600 hover:text-red-700 underline transition-colors"
+          <div id="unit-danger-zone-content" className="px-4 pb-4">
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 underline transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                  <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Delete this unit
-              </button>
-            </div>
-        )
-        }
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              Delete this unit
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && unit && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Deletion</h3>
-              <p className="text-gray-700 mb-2">
-                Are you sure you want to delete this unit? This action cannot be undone.
-              </p>
-              <p className="text-sm text-red-600 mb-6">
-                Warning: All todos in this unit will also be deleted.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                    onClick={() => setShowDeleteModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                    onClick={async () => {
-                      try {
-                        await deleteUnit(unit.id);
-                        navigate(`/projects/${project.id}`);
-                      } catch (error) {
-                        setShowDeleteModal(false);
-                        if (process.env.NODE_ENV === 'development') {
-                          console.error('Failed to delete unit:', error);
-                        }
-                      }
-                    }}
-                    className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Deletion</h3>
+            <p className="text-gray-700 mb-2">
+              Are you sure you want to delete this unit? This action cannot be undone.
+            </p>
+            <p className="text-sm text-red-600 mb-6">
+              Warning: All todos in this unit will also be deleted.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await deleteUnit(unit.id);
+                    navigate(`/projects/${project.id}`);
+                  } catch (error) {
+                    setShowDeleteModal(false);
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error('Failed to delete unit:', error);
+                    }
+                  }
+                }}
+                className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
             </div>
           </div>
+        </div>
       )}
-
     </div>
   );
 }

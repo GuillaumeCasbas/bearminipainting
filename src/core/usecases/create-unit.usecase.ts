@@ -37,7 +37,7 @@ export class CreateUnitUseCase {
     // Check code uniqueness within project
     const existingUnit = await this.unitRepository.findByProjectIdAndCode(
       projectId,
-      normalizedCode
+      normalizedCode,
     );
     if (existingUnit) {
       throw new UnitCodeNotUniqueError(normalizedCode);
@@ -45,23 +45,11 @@ export class CreateUnitUseCase {
 
     // Create todos
     const todos = CreateUnitUseCase.DEFAULT_TODOS.map(
-      (todoConfig) =>
-        new Todo(
-          crypto.randomUUID(),
-          todoConfig.label,
-          'TODO',
-          todoConfig.order
-        )
+      (todoConfig) => new Todo(crypto.randomUUID(), todoConfig.label, 'TODO', todoConfig.order),
     );
 
     // Create and persist unit
-    const unit = new Unit(
-      crypto.randomUUID(),
-      name,
-      normalizedCode,
-      projectId,
-      todos
-    );
+    const unit = new Unit(crypto.randomUUID(), name, normalizedCode, projectId, todos);
 
     await this.unitRepository.create(unit);
 

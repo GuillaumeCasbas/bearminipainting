@@ -14,7 +14,9 @@ export class UnitNameEmptyError extends BaseError {
 
 export class UnitCodeInvalidCharactersError extends BaseError {
   constructor(code: string) {
-    super(`Unit code '${code}' contains invalid characters. Only letters, numbers and hyphens are allowed.`);
+    super(
+      `Unit code '${code}' contains invalid characters. Only letters, numbers and hyphens are allowed.`,
+    );
   }
 }
 

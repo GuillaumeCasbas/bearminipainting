@@ -1,0 +1,12 @@
+# Ignore artifacts:
+build
+coverage
+dist
+
+
+node_modules
+*.min.js
+package-lock.json
+.vibe
+.github
+*.md

@@ -7,13 +7,7 @@ export class Unit {
   readonly projectId: string;
   readonly todos: Todo[];
 
-  constructor(
-    id: string,
-    name: string,
-    code: string,
-    projectId: string,
-    todos: Todo[] = []
-  ) {
+  constructor(id: string, name: string, code: string, projectId: string, todos: Todo[] = []) {
     this.id = id;
     this.name = name;
     this.code = code;

@@ -12,7 +12,11 @@ import { useState, useRef, useEffect, ReactElement, cloneElement, ReactNode } fr
 
 interface DropdownProps {
   /** Element that triggers the dropdown (should accept onClick) */
-  trigger: ReactElement<{ onClick?: (e: React.MouseEvent) => void; 'aria-haspopup'?: string; 'aria-expanded'?: boolean }>;
+  trigger: ReactElement<{
+    onClick?: (e: React.MouseEvent) => void;
+    'aria-haspopup'?: string;
+    'aria-expanded'?: boolean;
+  }>;
   /** Dropdown menu items */
   children: ReactNode;
   /** Position of dropdown relative to trigger */
@@ -84,20 +88,14 @@ export function Dropdown({
   };
 
   // Clone trigger element and add onClick handler
-  const triggerWithHandler = cloneElement(
-    trigger,
-    {
-      onClick: toggleDropdown,
-      'aria-haspopup': 'true' as const,
-      'aria-expanded': isOpen,
-    }
-  );
+  const triggerWithHandler = cloneElement(trigger, {
+    onClick: toggleDropdown,
+    'aria-haspopup': 'true' as const,
+    'aria-expanded': isOpen,
+  });
 
   return (
-    <div
-      className={`relative inline-block ${className}`}
-      ref={dropdownRef}
-    >
+    <div className={`relative inline-block ${className}`} ref={dropdownRef}>
       {triggerWithHandler}
 
       {/* Dropdown menu */}
@@ -136,9 +134,7 @@ export function DropdownItem({
       onClick={onClick}
       disabled={disabled}
       className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-        danger
-          ? 'text-red-700 hover:bg-red-50'
-          : 'text-gray-700 hover:bg-gray-100'
+        danger ? 'text-red-700 hover:bg-red-50' : 'text-gray-700 hover:bg-gray-100'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
       role="menuitem"
       tabIndex={0}

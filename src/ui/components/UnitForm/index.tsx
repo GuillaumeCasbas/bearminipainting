@@ -51,9 +51,7 @@ export function UnitForm({ onClose, onSubmit }: UnitFormProps) {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
             <input
               type="text"
               value={name}
@@ -64,9 +62,7 @@ export function UnitForm({ onClose, onSubmit }: UnitFormProps) {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unit Code *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Unit Code *</label>
             <input
               type="text"
               value={code}
@@ -74,9 +70,7 @@ export function UnitForm({ onClose, onSubmit }: UnitFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Only letters, numbers, and hyphens allowed
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Only letters, numbers, and hyphens allowed</p>
           </div>
 
           <div className="flex justify-end space-x-2">

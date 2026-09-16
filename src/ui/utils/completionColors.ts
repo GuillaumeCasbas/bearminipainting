@@ -27,13 +27,13 @@ export const getCompletionRateColor = (rate: number): string => {
     return 'bg-orange-500';
   }
   if (rate < COMPLETION_RATE_GREEN_THRESHOLD) {
-  return 'bg-yellow-500';
+    return 'bg-yellow-500';
   }
   return 'bg-green-500';
 };
 
 // needed to force tailwind classes generation.
-const textColors= "text-red-500 text-yellow-500 text-green-500 text-orange-500";
+const textColors = 'text-red-500 text-yellow-500 text-green-500 text-orange-500';
 
 /**
  * Returns the Tailwind CSS text color class for badge text based on completion rate
