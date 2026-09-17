@@ -23,6 +23,7 @@ import {
   deleteProjectUseCase,
   deleteUnitUseCase,
   reorderTodosUseCase,
+  updateUnitNameUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -49,6 +50,7 @@ interface ProjectStore {
   addTodo: (unitId: string, label: string) => Promise<void>;
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
+  updateUnitName: (unitId: string, newName: string) => Promise<boolean>;
   loadProjects: () => Promise<void>;
   addToast: (type: ToastType, message: string) => void;
   removeToast: (id: string) => void;
@@ -643,6 +645,107 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           },
         ],
       });
+    }
+  },
+
+  // Update a unit's name with optimistic update + rollback
+  updateUnitName: async (unitId: string, newName: string) => {
+    let previousUnit: Unit | null = null;
+
+    try {
+      const projects = useProjectStore.getState().projects;
+
+      // Find the unit and its parent project for optimistic update + rollback
+      let targetProject: Project | null = null;
+      let targetUnitIndex = -1;
+      let targetUnit: Unit | null = null;
+
+      for (const project of projects) {
+        const unitIndex = project.units.findIndex((u) => u.id === unitId);
+        if (unitIndex !== -1) {
+          targetProject = project;
+          targetUnitIndex = unitIndex;
+          targetUnit = project.units[unitIndex];
+          break;
+        }
+      }
+
+      if (!targetUnit || !targetProject) {
+        throw new UnitNotFoundError(unitId);
+      }
+
+      // Save previous state for rollback
+      previousUnit = targetUnit;
+
+      // Optimistic update: rename the unit locally
+      const optimisticUnit = new Unit(
+        targetUnit.id,
+        newName.trim(),
+        targetUnit.code,
+        targetUnit.projectId,
+        targetUnit.todos,
+      );
+
+      const optimisticProjects = projects.map((p) => {
+        if (p.id === targetProject!.id) {
+          const updatedUnits = [...p.units];
+          updatedUnits[targetUnitIndex] = optimisticUnit;
+          return new Project(p.id, p.name, p.code, updatedUnits);
+        }
+        return p;
+      });
+      set({ projects: optimisticProjects });
+
+      // Persist the new name via the use case
+      await updateUnitNameUseCase.execute(unitId, newName);
+
+      // Show success toast
+      set({
+        toasts: [
+          ...useProjectStore.getState().toasts,
+          {
+            id: Date.now().toString(),
+            type: 'success',
+            message: 'Unit name updated successfully',
+          },
+        ],
+      });
+
+      return true;
+    } catch (error) {
+      // Rollback optimistic update
+      if (previousUnit) {
+        const projects = useProjectStore.getState().projects;
+        const revertedProjects = projects.map((p) => {
+          const unitIndex = p.units.findIndex((u) => u.id === unitId);
+          if (unitIndex !== -1) {
+            const updatedUnits = [...p.units];
+            updatedUnits[unitIndex] = previousUnit!;
+            return new Project(p.id, p.name, p.code, updatedUnits);
+          }
+          return p;
+        });
+        set({ projects: revertedProjects });
+      }
+
+      // Empty name is handled by the UI (validation error); stay silent in the store
+      if (error instanceof UnitNameEmptyError) {
+        return false;
+      }
+
+      // Other errors: show error toast
+      set({
+        toasts: [
+          ...useProjectStore.getState().toasts,
+          {
+            id: Date.now().toString(),
+            type: 'error',
+            message: error instanceof Error ? error.message : 'Failed to update unit name',
+          },
+        ],
+      });
+
+      return false;
     }
   },
 
