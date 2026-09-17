@@ -237,7 +237,6 @@ export function UnitDetail() {
 
   // Filtered todos for display: hide DONE todos when the toggle is off
   const visibleTodos = hideDoneTodos ? sortedTodos.filter((t) => t.status !== 'DONE') : sortedTodos;
-  const hiddenDoneCount = hideDoneTodos ? sortedTodos.filter((t) => t.status === 'DONE').length : 0;
 
   return (
     <div>
@@ -360,7 +359,7 @@ export function UnitDetail() {
           <ProgressBar completionRate={completionRate} withLabel />
         </div>
 
-        {/* Total Todos */}
+        {/* Todos */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Todos</h2>
           <p className="text-sm text-gray-600">
@@ -371,17 +370,6 @@ export function UnitDetail() {
 
         {/* Todos List */}
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
-          </div>
-
-          {/* Hidden DONE indicator */}
-          {hiddenDoneCount > 0 && (
-            <p className="text-sm text-gray-500 italic mb-3">
-              {hiddenDoneCount} done {hiddenDoneCount === 1 ? 'todo' : 'todos'} hidden
-            </p>
-          )}
-
           {sortedTodos.length === 0 ? (
             <p className="text-sm text-gray-500 italic">No todos for this unit.</p>
           ) : visibleTodos.length === 0 ? (

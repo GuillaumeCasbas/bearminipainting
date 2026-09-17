@@ -289,14 +289,6 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
       expect(screen.getByLabelText('Todo Basecoat completed')).toBeInTheDocument();
     });
 
-    it('should not show the hidden indicator', () => {
-      setupStoreMocks(false);
-
-      render(<UnitDetail />);
-
-      expect(screen.queryByText(/done todo.* hidden/)).not.toBeInTheDocument();
-    });
-
     it('should not show the reordering hint', () => {
       setupStoreMocks(false);
 
@@ -330,29 +322,6 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
       expect(screen.queryByLabelText('Todo Basecoat completed')).not.toBeInTheDocument();
     });
 
-    it('should show an indicator with the number of hidden DONE todos', () => {
-      setupStoreMocks(true);
-
-      render(<UnitDetail />);
-
-      expect(screen.getByText('1 done todo hidden')).toBeInTheDocument();
-    });
-
-    it('should pluralize the indicator when multiple DONE todos are hidden', () => {
-      const unit = makeUnit({
-        todos: [
-          makeTodo('todo-1', 'Assembly', 'TODO', 10),
-          makeTodo('todo-2', 'Basecoat', 'DONE', 30),
-          makeTodo('todo-3', 'Effects', 'DONE', 40),
-        ],
-      });
-      setupStoreMocks(true, unit);
-
-      render(<UnitDetail />);
-
-      expect(screen.getByText('2 done todos hidden')).toBeInTheDocument();
-    });
-
     it('should show the reordering hint when DONE todos are hidden', () => {
       setupStoreMocks(true);
 
@@ -371,30 +340,6 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
       // Summary computed over ALL todos: 3 total, 1 completed
       expect(screen.getByText(/3 total,/)).toBeInTheDocument();
       expect(screen.getByText(/1 completed/)).toBeInTheDocument();
-    });
-  });
-
-  describe('Hidden indicator edge cases', () => {
-    it('should not show the indicator when there are no DONE todos (hidden)', () => {
-      const unit = makeUnit({
-        todos: [
-          makeTodo('todo-1', 'Assembly', 'TODO', 10),
-          makeTodo('todo-2', 'Primer', 'TODO', 20),
-        ],
-      });
-      setupStoreMocks(true, unit);
-
-      render(<UnitDetail />);
-
-      expect(screen.queryByText(/done todo.* hidden/)).not.toBeInTheDocument();
-    });
-
-    it('should not show the indicator when all todos are visible even if some are DONE', () => {
-      setupStoreMocks(false);
-
-      render(<UnitDetail />);
-
-      expect(screen.queryByText(/done todo.* hidden/)).not.toBeInTheDocument();
     });
   });
 
@@ -452,7 +397,6 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
 
       expect(screen.getByText('No todos for this unit.')).toBeInTheDocument();
       expect(screen.queryByText('All todos done 🎉')).not.toBeInTheDocument();
-      expect(screen.queryByText(/done todo.* hidden/)).not.toBeInTheDocument();
     });
 
     it('should show the empty state when a unit has no todos even when DONE are hidden', () => {
