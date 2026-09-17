@@ -38,7 +38,7 @@ export function UnitDetail() {
     reorderTodos,
     updateUnitName,
   } = useProjectStore();
-  const { showDoneTodos } = useUiPreferencesStore();
+  const { hideDoneTodos } = useUiPreferencesStore();
   const [newTodoLabel, setNewTodoLabel] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
@@ -236,8 +236,8 @@ export function UnitDetail() {
   const completionRate = unit.getCompletionRate();
 
   // Filtered todos for display: hide DONE todos when the toggle is off
-  const visibleTodos = showDoneTodos ? sortedTodos : sortedTodos.filter((t) => t.status !== 'DONE');
-  const hiddenDoneCount = showDoneTodos ? 0 : sortedTodos.filter((t) => t.status === 'DONE').length;
+  const visibleTodos = hideDoneTodos ? sortedTodos.filter((t) => t.status !== 'DONE') : sortedTodos;
+  const hiddenDoneCount = hideDoneTodos ? sortedTodos.filter((t) => t.status === 'DONE').length : 0;
 
   return (
     <div>
@@ -388,7 +388,7 @@ export function UnitDetail() {
             <div className="py-6 text-center">
               <p className="text-lg font-semibold text-green-600">All todos done 🎉</p>
             </div>
-          ) : !showDoneTodos ? (
+          ) : hideDoneTodos ? (
             <>
               <p className="text-xs text-gray-400 italic mb-2">
                 Reordering is only available when all todos are visible.

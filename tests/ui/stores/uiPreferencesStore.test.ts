@@ -6,83 +6,83 @@ describe('useUiPreferencesStore', () => {
   beforeEach(() => {
     localStorage.removeItem(STORAGE_KEY);
     // Reset store to default state between tests
-    useUiPreferencesStore.setState({ showDoneTodos: true });
+    useUiPreferencesStore.setState({ hideDoneTodos: false });
     jest.clearAllMocks();
   });
 
   describe('Default state', () => {
-    it('should default showDoneTodos to true (all todos visible)', () => {
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+    it('should default hideDoneTodos to false (all todos visible)', () => {
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
 
-    it('should return true when no preference is stored (first visit)', () => {
+    it('should return false when no preference is stored (first visit)', () => {
       useUiPreferencesStore.getState().initFromStorage();
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
 
-    it('should return true when stored value is missing', () => {
+    it('should return false when stored value is missing', () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({}));
 
       useUiPreferencesStore.getState().initFromStorage();
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
 
-    it('should return true when storage is corrupted', () => {
+    it('should return false when storage is corrupted', () => {
       localStorage.setItem(STORAGE_KEY, 'not-valid-json');
 
       useUiPreferencesStore.getState().initFromStorage();
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
   });
 
-  describe('setShowDoneTodos', () => {
-    it('should update showDoneTodos to false', () => {
-      useUiPreferencesStore.getState().setShowDoneTodos(false);
+  describe('setHideDoneTodos', () => {
+    it('should update hideDoneTodos to true', () => {
+      useUiPreferencesStore.getState().setHideDoneTodos(true);
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(false);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(true);
     });
 
-    it('should update showDoneTodos to true', () => {
-      useUiPreferencesStore.getState().setShowDoneTodos(false);
-      useUiPreferencesStore.getState().setShowDoneTodos(true);
+    it('should update hideDoneTodos to false', () => {
+      useUiPreferencesStore.getState().setHideDoneTodos(true);
+      useUiPreferencesStore.getState().setHideDoneTodos(false);
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
 
     it('should persist the preference to localStorage', () => {
-      useUiPreferencesStore.getState().setShowDoneTodos(false);
+      useUiPreferencesStore.getState().setHideDoneTodos(true);
 
       const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
-      expect(stored.showDoneTodos).toBe(false);
+      expect(stored.hideDoneTodos).toBe(true);
     });
 
-    it('should persist true to localStorage', () => {
-      useUiPreferencesStore.getState().setShowDoneTodos(true);
+    it('should persist false to localStorage', () => {
+      useUiPreferencesStore.getState().setHideDoneTodos(false);
 
       const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
-      expect(stored.showDoneTodos).toBe(true);
+      expect(stored.hideDoneTodos).toBe(false);
     });
   });
 
   describe('initFromStorage', () => {
-    it('should restore showDoneTodos=false from localStorage', () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ showDoneTodos: false }));
+    it('should restore hideDoneTodos=true from localStorage', () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ hideDoneTodos: true }));
 
       useUiPreferencesStore.getState().initFromStorage();
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(false);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(true);
     });
 
-    it('should restore showDoneTodos=true from localStorage', () => {
-      useUiPreferencesStore.getState().setShowDoneTodos(false);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ showDoneTodos: true }));
+    it('should restore hideDoneTodos=false from localStorage', () => {
+      useUiPreferencesStore.getState().setHideDoneTodos(true);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ hideDoneTodos: false }));
 
       useUiPreferencesStore.getState().initFromStorage();
 
-      expect(useUiPreferencesStore.getState().showDoneTodos).toBe(true);
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
   });
 });

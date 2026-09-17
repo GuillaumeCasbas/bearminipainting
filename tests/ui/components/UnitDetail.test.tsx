@@ -78,8 +78,8 @@ describe('UnitDetail - inline name editing (BEA-38)', () => {
       updateUnitName: mockUpdateUnitName,
     });
     mockUseUiPreferencesStore.mockReturnValue({
-      showDoneTodos: true,
-      setShowDoneTodos: jest.fn(),
+      hideDoneTodos: false,
+      setHideDoneTodos: jest.fn(),
     });
   });
 
@@ -257,7 +257,7 @@ describe('UnitDetail - inline name editing (BEA-38)', () => {
 describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
   let mockProjects: Project[];
 
-  const setupStoreMocks = (showDoneTodos: boolean, unit?: Unit) => {
+  const setupStoreMocks = (hideDoneTodos: boolean, unit?: Unit) => {
     mockProjects = [makeProject({ units: [unit ?? makeUnit()] })];
     mockUseProjectStore.mockReturnValue({
       projects: mockProjects,
@@ -269,8 +269,8 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
       updateUnitName: jest.fn(),
     });
     mockUseUiPreferencesStore.mockReturnValue({
-      showDoneTodos,
-      setShowDoneTodos: jest.fn(),
+      hideDoneTodos,
+      setHideDoneTodos: jest.fn(),
     });
   };
 
@@ -278,9 +278,9 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     jest.clearAllMocks();
   });
 
-  describe('When DONE todos are visible (showDoneTodos = true)', () => {
+  describe('When DONE todos are visible (hideDoneTodos = false)', () => {
     it('should display all todos (TODO and DONE)', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 
@@ -290,7 +290,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should not show the hidden indicator', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 
@@ -298,7 +298,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should not show the reordering hint', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 
@@ -308,7 +308,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should reflect true totals in the summary line (all todos)', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 
@@ -318,9 +318,9 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
   });
 
-  describe('When DONE todos are hidden (showDoneTodos = false)', () => {
+  describe('When DONE todos are hidden (hideDoneTodos = true)', () => {
     it('should only display TODO todos', () => {
-      setupStoreMocks(false);
+      setupStoreMocks(true);
 
       render(<UnitDetail />);
 
@@ -331,7 +331,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should show an indicator with the number of hidden DONE todos', () => {
-      setupStoreMocks(false);
+      setupStoreMocks(true);
 
       render(<UnitDetail />);
 
@@ -346,7 +346,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
           makeTodo('todo-3', 'Effects', 'DONE', 40),
         ],
       });
-      setupStoreMocks(false, unit);
+      setupStoreMocks(true, unit);
 
       render(<UnitDetail />);
 
@@ -354,7 +354,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should show the reordering hint when DONE todos are hidden', () => {
-      setupStoreMocks(false);
+      setupStoreMocks(true);
 
       render(<UnitDetail />);
 
@@ -364,7 +364,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should reflect true totals in the summary line (all todos, not just visible)', () => {
-      setupStoreMocks(false);
+      setupStoreMocks(true);
 
       render(<UnitDetail />);
 
@@ -382,7 +382,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
           makeTodo('todo-2', 'Primer', 'TODO', 20),
         ],
       });
-      setupStoreMocks(false, unit);
+      setupStoreMocks(true, unit);
 
       render(<UnitDetail />);
 
@@ -390,7 +390,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should not show the indicator when all todos are visible even if some are DONE', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 
@@ -407,7 +407,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
           makeTodo('todo-3', 'Basecoat', 'DONE', 30),
         ],
       });
-      setupStoreMocks(false, unit);
+      setupStoreMocks(true, unit);
 
       render(<UnitDetail />);
 
@@ -421,7 +421,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
           makeTodo('todo-2', 'Primer', 'DONE', 20),
         ],
       });
-      setupStoreMocks(false, unit);
+      setupStoreMocks(true, unit);
 
       render(<UnitDetail />);
 
@@ -435,7 +435,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
           makeTodo('todo-2', 'Primer', 'DONE', 20),
         ],
       });
-      setupStoreMocks(true, unit);
+      setupStoreMocks(false, unit);
 
       render(<UnitDetail />);
 
@@ -446,7 +446,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
   describe('No todos edge case', () => {
     it('should show the empty state when a unit has no todos', () => {
       const unit = makeUnit({ todos: [] });
-      setupStoreMocks(true, unit);
+      setupStoreMocks(false, unit);
 
       render(<UnitDetail />);
 
@@ -457,7 +457,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
 
     it('should show the empty state when a unit has no todos even when DONE are hidden', () => {
       const unit = makeUnit({ todos: [] });
-      setupStoreMocks(false, unit);
+      setupStoreMocks(true, unit);
 
       render(<UnitDetail />);
 
@@ -468,7 +468,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
 
   describe('Completion rate always visible', () => {
     it('should display the completion rate when DONE todos are hidden', () => {
-      setupStoreMocks(false);
+      setupStoreMocks(true);
 
       render(<UnitDetail />);
 
@@ -477,7 +477,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
     });
 
     it('should display the completion rate when DONE todos are visible', () => {
-      setupStoreMocks(true);
+      setupStoreMocks(false);
 
       render(<UnitDetail />);
 

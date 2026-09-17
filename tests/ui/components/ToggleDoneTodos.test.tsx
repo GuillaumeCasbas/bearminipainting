@@ -3,8 +3,7 @@ import '@testing-library/jest-dom';
 import { ToggleDoneTodos } from '../../../src/ui/components/ToggleDoneTodos';
 
 // Mock the store
-const mockSetShowDoneTodos = jest.fn();
-let mockShowDoneTodos = true;
+const mockSetHideDoneTodos = jest.fn();
 const mockUseUiPreferencesStore = jest.fn();
 
 jest.mock('../../../src/ui/stores/uiPreferencesStore', () => ({
@@ -13,17 +12,16 @@ jest.mock('../../../src/ui/stores/uiPreferencesStore', () => ({
 
 describe('ToggleDoneTodos', () => {
   const mockVisible = () => ({
-    showDoneTodos: true,
-    setShowDoneTodos: mockSetShowDoneTodos,
+    hideDoneTodos: false,
+    setHideDoneTodos: mockSetHideDoneTodos,
   });
   const mockHidden = () => ({
-    showDoneTodos: false,
-    setShowDoneTodos: mockSetShowDoneTodos,
+    hideDoneTodos: true,
+    setHideDoneTodos: mockSetHideDoneTodos,
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockShowDoneTodos = true;
     mockUseUiPreferencesStore.mockImplementation(mockVisible);
   });
 
@@ -55,22 +53,22 @@ describe('ToggleDoneTodos', () => {
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('should call setShowDoneTodos(false) when clicked while visible (turn on hiding)', () => {
+  it('should call setHideDoneTodos(true) when clicked while visible (turn on hiding)', () => {
     render(<ToggleDoneTodos />);
 
     fireEvent.click(screen.getByRole('button'));
 
-    expect(mockSetShowDoneTodos).toHaveBeenCalledWith(false);
+    expect(mockSetHideDoneTodos).toHaveBeenCalledWith(true);
   });
 
-  it('should call setShowDoneTodos(true) when clicked while hidden (turn off hiding)', () => {
+  it('should call setHideDoneTodos(false) when clicked while hidden (turn off hiding)', () => {
     mockUseUiPreferencesStore.mockImplementation(mockHidden);
 
     render(<ToggleDoneTodos />);
 
     fireEvent.click(screen.getByRole('button'));
 
-    expect(mockSetShowDoneTodos).toHaveBeenCalledWith(true);
+    expect(mockSetHideDoneTodos).toHaveBeenCalledWith(false);
   });
 
   it('should have a fixed accessible label', () => {

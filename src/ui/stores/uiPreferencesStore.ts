@@ -3,32 +3,32 @@ import { create } from 'zustand';
 const STORAGE_KEY = 'minipaint_ui_preferences';
 
 interface StoredUiPreferences {
-  showDoneTodos: boolean;
+  hideDoneTodos: boolean;
 }
 
 interface UiPreferencesStore {
-  showDoneTodos: boolean;
-  setShowDoneTodos: (value: boolean) => void;
+  hideDoneTodos: boolean;
+  setHideDoneTodos: (value: boolean) => void;
   initFromStorage: () => void;
 }
 
 function readFromStorage(): boolean {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return true;
+    if (!data) return false;
     const parsed = JSON.parse(data) as Partial<StoredUiPreferences>;
-    if (parsed.showDoneTodos === undefined || parsed.showDoneTodos === null) {
-      return true;
+    if (parsed.hideDoneTodos === undefined || parsed.hideDoneTodos === null) {
+      return false;
     }
-    return parsed.showDoneTodos;
+    return parsed.hideDoneTodos;
   } catch {
-    return true;
+    return false;
   }
 }
 
-function persistToStorage(showDoneTodos: boolean): void {
+function persistToStorage(hideDoneTodos: boolean): void {
   try {
-    const data: StoredUiPreferences = { showDoneTodos };
+    const data: StoredUiPreferences = { hideDoneTodos };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
     // Silently ignore storage errors (UI preference is non-critical)
@@ -36,12 +36,12 @@ function persistToStorage(showDoneTodos: boolean): void {
 }
 
 export const useUiPreferencesStore = create<UiPreferencesStore>((set) => ({
-  showDoneTodos: true,
-  setShowDoneTodos: (value: boolean) => {
+  hideDoneTodos: false,
+  setHideDoneTodos: (value: boolean) => {
     persistToStorage(value);
-    set({ showDoneTodos: value });
+    set({ hideDoneTodos: value });
   },
   initFromStorage: () => {
-    set({ showDoneTodos: readFromStorage() });
+    set({ hideDoneTodos: readFromStorage() });
   },
 }));
