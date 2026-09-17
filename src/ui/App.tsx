@@ -25,7 +25,7 @@ export function App() {
   // Load projects and restore UI preferences on mount
   useEffect(() => {
     loadProjects();
-    initFromStorage();
+    void initFromStorage();
   }, [loadProjects, initFromStorage]);
 
   return (

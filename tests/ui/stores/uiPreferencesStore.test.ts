@@ -1,39 +1,27 @@
 import { useUiPreferencesStore } from '@/ui/stores/uiPreferencesStore';
+import { uiPreferencesRepository } from '@/di/container';
 
-const STORAGE_KEY = 'minipaint_ui_preferences';
+jest.mock('@/di/container', () => ({
+  uiPreferencesRepository: {
+    getHideDoneTodos: jest.fn(),
+    setHideDoneTodos: jest.fn(),
+  },
+}));
+
+const mockGetHideDoneTodos = uiPreferencesRepository.getHideDoneTodos as jest.Mock;
+const mockSetHideDoneTodos = uiPreferencesRepository.setHideDoneTodos as jest.Mock;
 
 describe('useUiPreferencesStore', () => {
   beforeEach(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    jest.clearAllMocks();
     // Reset store to default state between tests
     useUiPreferencesStore.setState({ hideDoneTodos: false });
-    jest.clearAllMocks();
+    mockGetHideDoneTodos.mockResolvedValue(false);
+    mockSetHideDoneTodos.mockResolvedValue(undefined);
   });
 
   describe('Default state', () => {
     it('should default hideDoneTodos to false (all todos visible)', () => {
-      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
-    });
-
-    it('should return false when no preference is stored (first visit)', () => {
-      useUiPreferencesStore.getState().initFromStorage();
-
-      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
-    });
-
-    it('should return false when stored value is missing', () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({}));
-
-      useUiPreferencesStore.getState().initFromStorage();
-
-      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
-    });
-
-    it('should return false when storage is corrupted', () => {
-      localStorage.setItem(STORAGE_KEY, 'not-valid-json');
-
-      useUiPreferencesStore.getState().initFromStorage();
-
       expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
   });
@@ -41,47 +29,50 @@ describe('useUiPreferencesStore', () => {
   describe('setHideDoneTodos', () => {
     it('should update hideDoneTodos to true', () => {
       useUiPreferencesStore.getState().setHideDoneTodos(true);
-
       expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(true);
     });
 
     it('should update hideDoneTodos to false', () => {
       useUiPreferencesStore.getState().setHideDoneTodos(true);
       useUiPreferencesStore.getState().setHideDoneTodos(false);
-
       expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
 
-    it('should persist the preference to localStorage', () => {
+    it('should persist the preference through the port', () => {
       useUiPreferencesStore.getState().setHideDoneTodos(true);
-
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
-      expect(stored.hideDoneTodos).toBe(true);
+      expect(mockSetHideDoneTodos).toHaveBeenCalledWith(true);
     });
 
-    it('should persist false to localStorage', () => {
+    it('should persist false through the port', () => {
       useUiPreferencesStore.getState().setHideDoneTodos(false);
+      expect(mockSetHideDoneTodos).toHaveBeenCalledWith(false);
+    });
 
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) as string);
-      expect(stored.hideDoneTodos).toBe(false);
+    it('should update state optimistically even if the port rejects', () => {
+      mockSetHideDoneTodos.mockRejectedValue(new Error('storage error'));
+      useUiPreferencesStore.getState().setHideDoneTodos(true);
+      // State is updated optimistically regardless of persistence failure
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(true);
     });
   });
 
   describe('initFromStorage', () => {
-    it('should restore hideDoneTodos=true from localStorage', () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ hideDoneTodos: true }));
-
-      useUiPreferencesStore.getState().initFromStorage();
-
+    it('should restore hideDoneTodos=true from the port', async () => {
+      mockGetHideDoneTodos.mockResolvedValue(true);
+      await useUiPreferencesStore.getState().initFromStorage();
       expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(true);
     });
 
-    it('should restore hideDoneTodos=false from localStorage', () => {
-      useUiPreferencesStore.getState().setHideDoneTodos(true);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ hideDoneTodos: false }));
+    it('should restore hideDoneTodos=false from the port', async () => {
+      useUiPreferencesStore.setState({ hideDoneTodos: true });
+      mockGetHideDoneTodos.mockResolvedValue(false);
+      await useUiPreferencesStore.getState().initFromStorage();
+      expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
+    });
 
-      useUiPreferencesStore.getState().initFromStorage();
-
+    it('should set false when the port returns false (no stored value)', async () => {
+      mockGetHideDoneTodos.mockResolvedValue(false);
+      await useUiPreferencesStore.getState().initFromStorage();
       expect(useUiPreferencesStore.getState().hideDoneTodos).toBe(false);
     });
   });
