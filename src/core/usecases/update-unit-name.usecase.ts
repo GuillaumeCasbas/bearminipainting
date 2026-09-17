@@ -15,13 +15,7 @@ export class UpdateUnitNameUseCase {
       throw new UnitNameEmptyError();
     }
 
-    const updatedUnit = new Unit(
-      unit.id,
-      newName.trim(),
-      unit.code,
-      unit.projectId,
-      unit.todos,
-    );
+    const updatedUnit = new Unit(unit.id, newName.trim(), unit.code, unit.projectId, unit.todos);
 
     await this.unitRepository.update(updatedUnit);
     return updatedUnit;
