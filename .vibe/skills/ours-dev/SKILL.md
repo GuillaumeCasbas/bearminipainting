@@ -57,7 +57,7 @@ The agent **automatically loads and uses** the following skills at each step:
 
 #### Actions:
 1. **Check Linear ticket** (if `--ticket` provided):
-   - Call Linear API with `LINEAR_API_KEY` to retrieve:
+   - Retrieve the ticket via the Linear MCP server to get:
      - Title, description, acceptance criteria, attachments.
    - **Output format**: Structured context (ex: `Ticket: APP-123 - "Add user profile"`).
 
@@ -411,7 +411,7 @@ Please validate before continuing.
 vibe --agent ours-dev --ticket APP-123 --feature "Add user profile"
 ```
 **Flow**:
-1. Fetch APP-123 ticket via Linear API.
+1. Fetch APP-123 ticket via the Linear MCP server.
 2. Git verification + create branch `feat/APP-123-add-user-profile`.
 3. Architectural design → Validation.
 4. Core/Adapters/UI development with checkpoints.
