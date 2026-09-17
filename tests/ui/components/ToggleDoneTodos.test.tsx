@@ -12,52 +12,50 @@ jest.mock('../../../src/ui/stores/uiPreferencesStore', () => ({
 }));
 
 describe('ToggleDoneTodos', () => {
+  const mockVisible = () => ({
+    showDoneTodos: true,
+    setShowDoneTodos: mockSetShowDoneTodos,
+  });
+  const mockHidden = () => ({
+    showDoneTodos: false,
+    setShowDoneTodos: mockSetShowDoneTodos,
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockShowDoneTodos = true;
-    mockUseUiPreferencesStore.mockImplementation(() => ({
-      showDoneTodos: mockShowDoneTodos,
-      setShowDoneTodos: mockSetShowDoneTodos,
-    }));
+    mockUseUiPreferencesStore.mockImplementation(mockVisible);
   });
 
-  it('should render a "Hide done" toggle when DONE todos are visible', () => {
+  it('should render a fixed label representing the boolean', () => {
     render(<ToggleDoneTodos />);
 
-    expect(screen.getByText('Hide done')).toBeInTheDocument();
+    expect(screen.getByText('Hide completed todos')).toBeInTheDocument();
   });
 
-  it('should render a "Show done" toggle when DONE todos are hidden', () => {
-    mockShowDoneTodos = false;
-    mockUseUiPreferencesStore.mockImplementation(() => ({
-      showDoneTodos: false,
-      setShowDoneTodos: mockSetShowDoneTodos,
-    }));
+  it('should keep the same fixed label when DONE todos are hidden', () => {
+    mockUseUiPreferencesStore.mockImplementation(mockHidden);
 
     render(<ToggleDoneTodos />);
 
-    expect(screen.getByText('Show done')).toBeInTheDocument();
+    expect(screen.getByText('Hide completed todos')).toBeInTheDocument();
   });
 
-  it('should have aria-pressed true when DONE todos are visible', () => {
-    render(<ToggleDoneTodos />);
-
-    expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('should have aria-pressed false when DONE todos are hidden', () => {
-    mockShowDoneTodos = false;
-    mockUseUiPreferencesStore.mockImplementation(() => ({
-      showDoneTodos: false,
-      setShowDoneTodos: mockSetShowDoneTodos,
-    }));
-
+  it('should have aria-pressed false when DONE todos are visible', () => {
     render(<ToggleDoneTodos />);
 
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('should call setShowDoneTodos(false) when clicked while visible', () => {
+  it('should have aria-pressed true when DONE todos are hidden', () => {
+    mockUseUiPreferencesStore.mockImplementation(mockHidden);
+
+    render(<ToggleDoneTodos />);
+
+    expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('should call setShowDoneTodos(false) when clicked while visible (turn on hiding)', () => {
     render(<ToggleDoneTodos />);
 
     fireEvent.click(screen.getByRole('button'));
@@ -65,12 +63,8 @@ describe('ToggleDoneTodos', () => {
     expect(mockSetShowDoneTodos).toHaveBeenCalledWith(false);
   });
 
-  it('should call setShowDoneTodos(true) when clicked while hidden', () => {
-    mockShowDoneTodos = false;
-    mockUseUiPreferencesStore.mockImplementation(() => ({
-      showDoneTodos: false,
-      setShowDoneTodos: mockSetShowDoneTodos,
-    }));
+  it('should call setShowDoneTodos(true) when clicked while hidden (turn off hiding)', () => {
+    mockUseUiPreferencesStore.mockImplementation(mockHidden);
 
     render(<ToggleDoneTodos />);
 
@@ -79,21 +73,17 @@ describe('ToggleDoneTodos', () => {
     expect(mockSetShowDoneTodos).toHaveBeenCalledWith(true);
   });
 
-  it('should have an accessible label reflecting the current state', () => {
+  it('should have a fixed accessible label', () => {
     render(<ToggleDoneTodos />);
 
     expect(screen.getByLabelText('Hide completed todos')).toBeInTheDocument();
   });
 
-  it('should have an accessible label when hidden', () => {
-    mockShowDoneTodos = false;
-    mockUseUiPreferencesStore.mockImplementation(() => ({
-      showDoneTodos: false,
-      setShowDoneTodos: mockSetShowDoneTodos,
-    }));
+  it('should keep the same accessible label when hidden', () => {
+    mockUseUiPreferencesStore.mockImplementation(mockHidden);
 
     render(<ToggleDoneTodos />);
 
-    expect(screen.getByLabelText('Show completed todos')).toBeInTheDocument();
+    expect(screen.getByLabelText('Hide completed todos')).toBeInTheDocument();
   });
 });
