@@ -3,6 +3,7 @@
 
 import { LocalStorageProjectRepository } from '../adapters/persistence/localstorage/project.repository';
 import { LocalStorageUnitRepository } from '../adapters/persistence/localstorage/unit.repository';
+import { LocalStorageUiPreferencesRepository } from '../adapters/persistence/localstorage/ui-preferences.repository';
 
 // UseCases
 import { GetAllProjectsUseCase } from '../core/usecases/get-all-projects.usecase';
@@ -22,6 +23,7 @@ import { UpdateUnitNameUseCase } from '../core/usecases/update-unit-name.usecase
 // Repositories
 const projectRepository = new LocalStorageProjectRepository();
 const unitRepository = new LocalStorageUnitRepository(projectRepository);
+const uiPreferencesRepository = new LocalStorageUiPreferencesRepository();
 
 // UseCases
 const getAllProjectsUseCase = new GetAllProjectsUseCase(projectRepository);
@@ -42,6 +44,7 @@ export {
   // Repositories
   projectRepository,
   unitRepository,
+  uiPreferencesRepository,
   // UseCases
   getAllProjectsUseCase,
   createProjectUseCase,
