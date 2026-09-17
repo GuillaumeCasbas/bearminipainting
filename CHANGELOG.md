@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 - Rename a unit after its creation via inline editing on the unit details page (BEA-38).
+- Toggle to show/hide completed (DONE) todos on the unit details page, persisted as a global UI preference (BEA-30).
 - New home page layout with a right sidebar for adding projects, and a floating button that opens it as a modal on mobile (BEA-31).
 - Projects are now sorted by completion rate (highest first), then by name, on the home page (BEA-31).
 - Deploy MiniPaint to GitHub Pages (BEA-25).

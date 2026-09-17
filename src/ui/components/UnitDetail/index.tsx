@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useProjectContext } from '@/ui/contexts/projectContext';
 import { useProjectStore } from '@/ui/stores/projectStore';
+import { useUiPreferencesStore } from '@/ui/stores/uiPreferencesStore';
 import { UnitNotFoundError, OrphanedUnitError } from '@/core/errors';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { SortableTodoRow } from '@/ui/components/UnitDetail/SortableTodoRow';
@@ -37,6 +38,7 @@ export function UnitDetail() {
     reorderTodos,
     updateUnitName,
   } = useProjectStore();
+  const { showDoneTodos } = useUiPreferencesStore();
   const [newTodoLabel, setNewTodoLabel] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
@@ -233,6 +235,10 @@ export function UnitDetail() {
   const sortedTodos = [...unit.todos].sort((a, b) => a.order - b.order);
   const completionRate = unit.getCompletionRate();
 
+  // Filtered todos for display: hide DONE todos when the toggle is off
+  const visibleTodos = showDoneTodos ? sortedTodos : sortedTodos.filter((t) => t.status !== 'DONE');
+  const hiddenDoneCount = showDoneTodos ? 0 : sortedTodos.filter((t) => t.status === 'DONE').length;
+
   return (
     <div>
       {/* Main card */}
@@ -369,8 +375,35 @@ export function UnitDetail() {
             <h2 className="text-lg font-semibold text-gray-800">Todo List</h2>
           </div>
 
+          {/* Hidden DONE indicator */}
+          {hiddenDoneCount > 0 && (
+            <p className="text-sm text-gray-500 italic mb-3">
+              {hiddenDoneCount} done {hiddenDoneCount === 1 ? 'todo' : 'todos'} hidden
+            </p>
+          )}
+
           {sortedTodos.length === 0 ? (
             <p className="text-sm text-gray-500 italic">No todos for this unit.</p>
+          ) : visibleTodos.length === 0 ? (
+            <div className="py-6 text-center">
+              <p className="text-lg font-semibold text-green-600">All todos done 🎉</p>
+            </div>
+          ) : !showDoneTodos ? (
+            <>
+              <p className="text-xs text-gray-400 italic mb-2">
+                Reordering is only available when all todos are visible.
+              </p>
+              <div className="divide-y divide-gray-100">
+                {visibleTodos.map((todo) => (
+                  <SortableTodoRow
+                    key={todo.id}
+                    todo={todo}
+                    onToggle={() => toggleTodoStatus(unit.id, todo.id)}
+                    onDelete={() => deleteTodo(unit.id, todo.id)}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <DndContext
               sensors={sensors}
