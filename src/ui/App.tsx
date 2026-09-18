@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { HomePage } from './components/HomePage';
 import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
+import { AboutPage } from './pages/AboutPage';
 import ToastContainer from './components/Toast';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
@@ -38,6 +39,7 @@ export function App() {
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/about" element={<AboutPage />} />
                 <Route path="/projects/:id" element={<ProjectDetail />} />
                 <Route path="/units/:unitId" element={<UnitDetail />} />
               </Routes>

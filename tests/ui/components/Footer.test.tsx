@@ -2,6 +2,14 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from '../../../src/ui/components/Footer';
 
+jest.mock('react-router-dom', () => ({
+  Link: ({ children, to, ...rest }: { children: React.ReactNode; to: string } & Record<string, unknown>) => (
+    <a href={to} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
 describe('Footer', () => {
   it('renders the app version without a "v" prefix', () => {
     render(<Footer />);
