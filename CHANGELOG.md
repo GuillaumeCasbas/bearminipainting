@@ -10,6 +10,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+-
+
+### Changed
+-
+
+### Deprecated
+-
+
+### Removed
+-
+
+### Fixed
+-
+
+### Security
+-
+
+---
+
+## [0.2.0] - 2026-09-18
+
+Second release of BearMiniPainting.
+
+### Added
 - New "About" page presenting the project description and its features, reachable from the footer (BEA-39).
 - Rename a unit after its creation via inline editing on the unit details page (BEA-38).
 - Toggle to show/hide completed (DONE) todos on the unit details page, persisted as a global UI preference (BEA-30).
