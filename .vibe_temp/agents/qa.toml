@@ -1,0 +1,27 @@
+agent_type = "agent"
+display_name = "QA"
+description = "Agent for quality assurance, testing and validation"
+safety = "safe"
+disabled_tools = []
+
+# Auto-loaded skills
+[skill]
+code-quality = true
+
+[tools.bash]
+permission = "ask"
+
+[tools.read_file]
+permission = "always"
+
+[tools.write_file]
+permission = "ask"
+
+[tools.search_replace]
+permission = "ask"
+
+[tools.grep]
+permission = "always"
+
+[tools.todo]
+permission = "always"

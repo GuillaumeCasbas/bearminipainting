@@ -1,0 +1,27 @@
+agent_type = "agent"
+display_name = "Ours dev"
+description = "Agent for structured feature development, from design to delivery, with systematic validation (TDD, Clean Architecture, coding rules)."
+safety = "yolo"
+disabled_tools = []
+
+# Auto-loaded skills
+[skill]
+ours-dev = true
+
+[tools.bash]
+permission = "ask"
+
+[tools.read_file]
+permission = "always"
+
+[tools.write_file]
+permission = "always"
+
+[tools.search_replace]
+permission = "always"
+
+[tools.grep]
+permission = "always"
+
+[tools.todo]
+permission = "always"
