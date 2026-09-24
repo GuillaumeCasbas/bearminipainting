@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   actions?: ReactNode;
@@ -12,7 +13,15 @@ export function Header({ actions }: HeaderProps) {
           <h1 className="text-3xl font-bold text-gray-900">MiniPaint</h1>
           <p className="text-gray-600 mt-1">Track your miniature painting progress</p>
         </div>
-        {actions && <div className="flex-shrink-0">{actions}</div>}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          <Link
+            to="/settings"
+            className="text-sm text-blue-600 hover:text-blue-800 underline transition-colors"
+          >
+            Settings
+          </Link>
+          {actions && <div>{actions}</div>}
+        </div>
       </div>
     </header>
   );

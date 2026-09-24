@@ -15,6 +15,8 @@ import {
 import {
   getAllProjectsUseCase,
   createProjectUseCase,
+  exportDataUseCase,
+  importDataUseCase,
   createUnitUseCase,
   getProjectByIdUseCase,
   toggleTodoStatusUseCase,
@@ -52,6 +54,8 @@ interface ProjectStore {
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   updateUnitName: (unitId: string, newName: string) => Promise<boolean>;
   loadProjects: () => Promise<void>;
+  exportData: () => Promise<string>;
+  importData: (rawData: string) => Promise<boolean>;
   addToast: (type: ToastType, message: string) => void;
   removeToast: (id: string) => void;
 }
@@ -745,6 +749,33 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         ],
       });
 
+      return false;
+    }
+  },
+
+  // Export all painting data as a JSON string
+  exportData: async () => {
+    return exportDataUseCase.execute();
+  },
+
+  // Import painting data from a JSON string, replacing all current data
+  importData: async (rawData: string) => {
+    try {
+      await importDataUseCase.execute(rawData);
+      const projects = await getAllProjectsUseCase.execute();
+      set({ projects });
+      return true;
+    } catch (error) {
+      set({
+        toasts: [
+          ...useProjectStore.getState().toasts,
+          {
+            id: Date.now().toString(),
+            type: 'error',
+            message: error instanceof Error ? error.message : 'Failed to import data',
+          },
+        ],
+      });
       return false;
     }
   },

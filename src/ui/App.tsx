@@ -4,6 +4,7 @@ import { HomePage } from './components/HomePage';
 import { ProjectDetail } from './components/ProjectDetail';
 import { UnitDetail } from './components/UnitDetail';
 import { AboutPage } from './pages/AboutPage';
+import { SettingsPage } from './components/SettingsPage';
 import ToastContainer from './components/Toast';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
@@ -40,6 +41,7 @@ export function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/projects/:id" element={<ProjectDetail />} />
                 <Route path="/units/:unitId" element={<UnitDetail />} />
               </Routes>

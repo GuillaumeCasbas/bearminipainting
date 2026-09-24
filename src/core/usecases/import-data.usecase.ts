@@ -1,9 +1,5 @@
 import { DataManagementRepository } from '../ports/data-management.repository';
-import {
-  StoredProjectData,
-  StoredUnitData,
-  StoredTodoData,
-} from '../entities/backup-data';
+import { StoredProjectData, StoredUnitData, StoredTodoData } from '../entities/backup-data';
 import { InvalidBackupError } from '../errors/data.errors';
 
 export class ImportDataUseCase {
