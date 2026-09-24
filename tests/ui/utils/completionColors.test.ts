@@ -3,7 +3,7 @@
  * BEA-26: Fix - Completion rate bar et badge color
  */
 
-import { getCompletionRateColor, getCompletionRateTextColor } from '../../../src/ui/utils/completionColors';
+import { getCompletionRateColor } from '../../../src/ui/utils/completionColors';
 
 describe('getCompletionRateColor', () => {
   // Test cases for each color range according to BEA-26 requirements
@@ -83,22 +83,3 @@ describe('getCompletionRateColor', () => {
   });
 });
 
-describe('getCompletionRateTextColor', () => {
-  describe('Text color for readability', () => {
-    it('should return text-white for red background (< 20%)', () => {
-      expect(getCompletionRateTextColor(10)).toBe('text-white');
-    });
-
-    it('should return text-white for orange background (20% - 80%)', () => {
-      expect(getCompletionRateTextColor(50)).toBe('text-white');
-    });
-
-    it('should return text-gray-800 for yellow background (80% - 100%)', () => {
-      expect(getCompletionRateTextColor(90)).toBe('text-gray-800');
-    });
-
-    it('should return text-white for green background (100%)', () => {
-      expect(getCompletionRateTextColor(100)).toBe('text-white');
-    });
-  });
-});

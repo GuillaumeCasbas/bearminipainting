@@ -83,8 +83,8 @@ export function Sidebar({ children, title }: SidebarProps) {
           />
 
           {/* Sidebar panel */}
-          <div className="relative w-[300px] max-w-[85vw] h-full bg-gray-50 border-l border-gray-200 shadow-xl overflow-y-auto p-6 flex flex-col">
-            <div className="flex items-center justify-end mb-4">
+          <div className="relative w-[300px] max-w-[85vw] h-full bg-gray-50 border-l border-gray-200 shadow-xl overflow-y-auto flex flex-col">
+            <div className="flex items-center justify-end p-4">
               <button
                 ref={closeButtonRef}
                 type="button"

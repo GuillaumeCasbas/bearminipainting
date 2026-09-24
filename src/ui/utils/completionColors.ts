@@ -32,24 +32,6 @@ export const getCompletionRateColor = (rate: number): string => {
   return 'bg-green-500';
 };
 
-// needed to force tailwind classes generation.
-const textColors = 'text-red-500 text-yellow-500 text-green-500 text-orange-500';
-
-/**
- * Returns the Tailwind CSS text color class for badge text based on completion rate
- * Used for badge text to ensure readability against background
- * @param rate - Completion rate as a percentage (0-100)
- * @returns Tailwind text color class string
- */
-export const getCompletionRateTextColor = (rate: number): string => {
-  if (rate < COMPLETION_RATE_RED_THRESHOLD) {
-    return 'text-white';
-  }
-  if (rate < COMPLETION_RATE_YELLOW_THRESHOLD) {
-    return 'text-white';
-  }
-  if (rate < COMPLETION_RATE_GREEN_THRESHOLD) {
-    return 'text-gray-800';
-  }
-  return 'text-white';
-};
+// Exported so ESLint sees it as used; needed to force Tailwind classes generation
+// for the dynamic `text-${color.substring(3)}` label in ProgressBar.
+export const textColors = 'text-red-500 text-yellow-500 text-green-500 text-orange-500';

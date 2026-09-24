@@ -28,11 +28,7 @@ const createTestProject = (overrides = {}): Project => {
   };
 };
 
-const getRenderedCards = () =>
-  screen.getAllByRole('link').flatMap((link) => {
-    const card = link.closest('div');
-    return card ? [card] : [];
-  });
+const getRenderedCards = () => screen.getAllByTestId('project-card');
 
 describe('ProjectList', () => {
   beforeEach(() => {

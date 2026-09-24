@@ -38,6 +38,7 @@ export default function ProjectList() {
         {sortedProjects.map((project: Project) => (
           <div
             key={project.id}
+            data-testid="project-card"
             className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-start mb-2">
@@ -50,10 +51,8 @@ export default function ProjectList() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">{project.code}</span>
-              <div className="flex items-center space-x-2">
-                <div className="w-40">
-                  <ProgressBar completionRate={project.getCompletionRate()} withLabel />
-                </div>
+              <div className="w-40">
+                <ProgressBar completionRate={project.getCompletionRate()} withLabel />
               </div>
             </div>
           </div>
