@@ -8,7 +8,7 @@ export function HomePage() {
       <main className="flex-1 min-w-0">
         <ProjectList />
       </main>
-      <Sidebar title="Add a project">
+      <Sidebar title="Create a new project">
         <ProjectForm />
       </Sidebar>
     </div>

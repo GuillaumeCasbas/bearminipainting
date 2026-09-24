@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -
 
 ### Changed
--
+- Home page: the project list is now displayed as cards (name link, code, completion rate with progress bar) instead of a table, matching the unit list style (BEA-47).
+- Home page sidebar: removed the duplicate "Add a project" title and the double card/padding; the project form renders as a single clean card (BEA-47).
 
 ### Deprecated
 -

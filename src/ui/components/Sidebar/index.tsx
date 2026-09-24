@@ -36,12 +36,12 @@ export function Sidebar({ children, title }: SidebarProps) {
 
   return (
     <>
-      {/* Desktop / tablet sidebar (>= 768px): sticky, always visible */}
+      {/* Desktop / tablet sidebar (>= 768px): sticky, always visible.
+          No card/padding wrapper: the child renders its own card (BEA-47). */}
       <aside
         aria-label={title}
-        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:max-h-[calc(100vh-4rem)] bg-white border border-gray-200 rounded-lg p-6 overflow-y-auto shadow-sm"
+        className="hidden md:flex md:flex-col md:w-[300px] md:flex-shrink-0 md:sticky md:top-8 md:max-h-[calc(100vh-4rem)] overflow-y-auto"
       >
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
         {!isMobileOpen && children}
       </aside>
 
@@ -84,8 +84,7 @@ export function Sidebar({ children, title }: SidebarProps) {
 
           {/* Sidebar panel */}
           <div className="relative w-[300px] max-w-[85vw] h-full bg-gray-50 border-l border-gray-200 shadow-xl overflow-y-auto p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+            <div className="flex items-center justify-end mb-4">
               <button
                 ref={closeButtonRef}
                 type="button"
