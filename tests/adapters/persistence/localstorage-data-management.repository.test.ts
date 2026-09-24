@@ -1,5 +1,7 @@
 import { LocalStorageDataManagementRepository } from '../../../src/adapters/persistence/localstorage/data-management.repository';
-import { StoredProjectData } from '@/core/entities/backup-data';
+import { Project } from '@/core/entities/Project';
+import { Unit } from '@/core/entities/Unit';
+import { Todo } from '@/core/entities/Todo';
 
 describe('LocalStorageDataManagementRepository (BEA-46)', () => {
   const STORAGE_KEY = 'minipaint_projects';
@@ -33,21 +35,12 @@ describe('LocalStorageDataManagementRepository (BEA-46)', () => {
       JSON.stringify([{ id: 'old-project', name: 'Old', code: 'OLD', units: [] }]),
     );
 
-    const newProjects: StoredProjectData[] = [
-      {
-        id: 'project-1',
-        name: 'Space Marines',
-        code: 'SM',
-        units: [
-          {
-            id: 'unit-1',
-            name: 'Intercessor',
-            code: 'IA-01',
-            projectId: 'project-1',
-            todos: [{ id: 'todo-1', label: 'Assembly', status: 'TODO', order: 10 }],
-          },
-        ],
-      },
+    const newProjects: Project[] = [
+      new Project('project-1', 'Space Marines', 'SM', [
+        new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', [
+          new Todo('todo-1', 'Assembly', 'TODO', 10),
+        ]),
+      ]),
     ];
     await repository.replaceAll(newProjects);
 
@@ -68,7 +61,7 @@ describe('LocalStorageDataManagementRepository (BEA-46)', () => {
   it('never touches UI preferences storage', async () => {
     localStorage.setItem('minipaint_ui_preferences', JSON.stringify({ hideDone: true }));
 
-    await repository.replaceAll([{ id: 'p1', name: 'P', code: 'P', units: [] }]);
+    await repository.replaceAll([new Project('p1', 'P', 'P')]);
 
     expect(localStorage.getItem('minipaint_ui_preferences')).toBe(
       JSON.stringify({ hideDone: true }),

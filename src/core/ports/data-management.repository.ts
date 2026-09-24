@@ -1,6 +1,6 @@
-import { StoredProjectData } from '../entities/backup-data';
+import { Project } from '../entities/Project';
 
 export interface DataManagementRepository {
   getAll(): Promise<string>;
-  replaceAll(projects: StoredProjectData[]): Promise<void>;
+  replaceAll(projects: Project[]): Promise<void>;
 }

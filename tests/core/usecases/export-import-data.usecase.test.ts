@@ -2,6 +2,9 @@ import { ExportDataUseCase } from '@/core/usecases/export-data.usecase';
 import { ImportDataUseCase } from '@/core/usecases/import-data.usecase';
 import { InvalidBackupError } from '@/core/errors/data.errors';
 import { DataManagementRepository } from '@/core/ports/data-management.repository';
+import { Project } from '@/core/entities/Project';
+import { Unit } from '@/core/entities/Unit';
+import { Todo } from '@/core/entities/Todo';
 
 describe('ExportDataUseCase (BEA-46)', () => {
   it('exports all painting data as a JSON string of the persisted structure', async () => {
@@ -81,7 +84,13 @@ describe('ImportDataUseCase (BEA-46)', () => {
     await useCase.execute(validBackup);
 
     expect(repository.replaceAll).toHaveBeenCalledTimes(1);
-    expect(repository.replaceAll).toHaveBeenCalledWith(JSON.parse(validBackup));
+    expect(repository.replaceAll).toHaveBeenCalledWith([
+      new Project('project-1', 'Space Marines', 'SM', [
+        new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', [
+          new Todo('todo-1', 'Assembly', 'TODO', 10),
+        ]),
+      ]),
+    ]);
   });
 
   it('rejects a malformed JSON file and does not touch existing data', async () => {

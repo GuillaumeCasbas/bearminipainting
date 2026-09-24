@@ -1,5 +1,7 @@
 import { DataManagementRepository } from '../ports/data-management.repository';
-import { StoredProjectData, StoredUnitData, StoredTodoData } from '../entities/backup-data';
+import { Project } from '../entities/Project';
+import { Unit } from '../entities/Unit';
+import { Todo } from '../entities/Todo';
 import { InvalidBackupError } from '../errors/data.errors';
 
 export class ImportDataUseCase {
@@ -10,7 +12,7 @@ export class ImportDataUseCase {
     await this.repository.replaceAll(projects);
   }
 
-  private parseAndValidate(rawData: string): StoredProjectData[] {
+  private parseAndValidate(rawData: string): Project[] {
     let parsed: unknown;
     try {
       parsed = JSON.parse(rawData);
@@ -25,7 +27,7 @@ export class ImportDataUseCase {
     return parsed.map((item) => this.validateProject(item));
   }
 
-  private validateProject(item: unknown): StoredProjectData {
+  private validateProject(item: unknown): Project {
     if (!this.isObject(item)) {
       throw new InvalidBackupError('a project entry is not an object');
     }
@@ -44,15 +46,15 @@ export class ImportDataUseCase {
     }
 
     const units = candidate.units.map((unit) => this.validateUnit(unit, candidate.id as string));
-    return {
-      id: candidate.id as string,
-      name: candidate.name as string,
-      code: candidate.code as string,
+    return new Project(
+      candidate.id as string,
+      candidate.name as string,
+      candidate.code as string,
       units,
-    };
+    );
   }
 
-  private validateUnit(item: unknown, projectId: string): StoredUnitData {
+  private validateUnit(item: unknown, projectId: string): Unit {
     if (!this.isObject(item)) {
       throw new InvalidBackupError(`a unit of project ${projectId} is not an object`);
     }
@@ -74,16 +76,16 @@ export class ImportDataUseCase {
     }
 
     const todos = candidate.todos.map((todo) => this.validateTodo(todo, candidate.id as string));
-    return {
-      id: candidate.id as string,
-      name: candidate.name as string,
-      code: candidate.code as string,
-      projectId: candidate.projectId as string,
+    return new Unit(
+      candidate.id as string,
+      candidate.name as string,
+      candidate.code as string,
+      candidate.projectId as string,
       todos,
-    };
+    );
   }
 
-  private validateTodo(item: unknown, unitId: string): StoredTodoData {
+  private validateTodo(item: unknown, unitId: string): Todo {
     if (!this.isObject(item)) {
       throw new InvalidBackupError(`a todo of unit ${unitId} is not an object`);
     }
@@ -101,12 +103,12 @@ export class ImportDataUseCase {
       throw new InvalidBackupError(`todo ${candidate.id} is missing a valid order`);
     }
 
-    return {
-      id: candidate.id as string,
-      label: candidate.label as string,
-      status: candidate.status as 'TODO' | 'DONE',
-      order: candidate.order as number,
-    };
+    return new Todo(
+      candidate.id as string,
+      candidate.label as string,
+      candidate.status as 'TODO' | 'DONE',
+      candidate.order as number,
+    );
   }
 
   private isObject(item: unknown): boolean {

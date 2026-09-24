@@ -1,5 +1,5 @@
 import { DataManagementRepository } from '@/core/ports/data-management.repository';
-import { StoredProjectData } from '@/core/entities/backup-data';
+import { Project } from '@/core/entities/Project';
 
 export class LocalStorageDataManagementRepository implements DataManagementRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
@@ -8,7 +8,7 @@ export class LocalStorageDataManagementRepository implements DataManagementRepos
     return localStorage.getItem(this.STORAGE_KEY) ?? '[]';
   }
 
-  async replaceAll(projects: StoredProjectData[]): Promise<void> {
+  async replaceAll(projects: Project[]): Promise<void> {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(projects));
   }
 }
