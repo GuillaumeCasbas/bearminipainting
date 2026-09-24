@@ -2,6 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Header } from '../../../src/ui/components/Header';
 
+// Mock react-router-dom
+jest.mock('react-router-dom', () => ({
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
+}));
+
 describe('Header', () => {
   it('should render the app title and tagline', () => {
     render(<Header />);

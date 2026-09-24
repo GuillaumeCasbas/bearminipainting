@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
--
+- New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
 ### Changed
 - Home page: the project list is now displayed as cards (name link, code, completion rate with progress bar) instead of a table, matching the unit list style (BEA-47).
