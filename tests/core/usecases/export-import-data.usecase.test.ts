@@ -25,7 +25,7 @@ describe('ExportDataUseCase (BEA-46)', () => {
       },
     ]);
     const repository: DataManagementRepository = {
-      getAllRaw: jest.fn().mockResolvedValue(rawData),
+      getAll: jest.fn().mockResolvedValue(rawData),
       replaceAll: jest.fn(),
     };
     const useCase = new ExportDataUseCase(repository);
@@ -33,12 +33,12 @@ describe('ExportDataUseCase (BEA-46)', () => {
     const result = await useCase.execute();
 
     expect(result).toBe(rawData);
-    expect(repository.getAllRaw).toHaveBeenCalledTimes(1);
+    expect(repository.getAll).toHaveBeenCalledTimes(1);
   });
 
   it('exports an empty projects array when there is no data', async () => {
     const repository: DataManagementRepository = {
-      getAllRaw: jest.fn().mockResolvedValue('[]'),
+      getAll: jest.fn().mockResolvedValue('[]'),
       replaceAll: jest.fn(),
     };
     const useCase = new ExportDataUseCase(repository);
@@ -51,7 +51,7 @@ describe('ExportDataUseCase (BEA-46)', () => {
 
 describe('ImportDataUseCase (BEA-46)', () => {
   const buildRepository = (initialData = '[]'): DataManagementRepository => ({
-    getAllRaw: jest.fn().mockResolvedValue(initialData),
+    getAll: jest.fn().mockResolvedValue(initialData),
     replaceAll: jest.fn(),
   });
 

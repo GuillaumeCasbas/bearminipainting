@@ -4,7 +4,7 @@ import { StoredProjectData } from '@/core/entities/backup-data';
 export class LocalStorageDataManagementRepository implements DataManagementRepository {
   private readonly STORAGE_KEY = 'minipaint_projects';
 
-  async getAllRaw(): Promise<string> {
+  async getAll(): Promise<string> {
     return localStorage.getItem(this.STORAGE_KEY) ?? '[]';
   }
 

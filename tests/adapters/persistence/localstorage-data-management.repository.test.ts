@@ -16,13 +16,13 @@ describe('LocalStorageDataManagementRepository (BEA-46)', () => {
     ]);
     localStorage.setItem(STORAGE_KEY, rawData);
 
-    const result = await repository.getAllRaw();
+    const result = await repository.getAll();
 
     expect(result).toBe(rawData);
   });
 
   it('returns an empty array JSON when nothing is persisted', async () => {
-    const result = await repository.getAllRaw();
+    const result = await repository.getAll();
 
     expect(result).toBe('[]');
   });
