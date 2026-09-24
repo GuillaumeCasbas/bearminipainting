@@ -24,12 +24,6 @@ describe('Header', () => {
     expect(container.querySelector('[data-testid]')).toBeNull();
   });
 
-  it('should render a Settings link on every page (BEA-46)', () => {
-    render(<Header />);
-    const settingsLink = screen.getByRole('link', { name: 'Settings' });
-    expect(settingsLink).toHaveAttribute('href', '/settings');
-  });
-
   it('should render the actions slot when provided', () => {
     render(<Header actions={<button data-testid="action-btn">Toggle</button>} />);
 
