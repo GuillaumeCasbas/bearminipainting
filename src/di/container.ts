@@ -2,6 +2,7 @@
 // This container provides singleton instances to avoid duplication and ensure consistency
 
 import { LocalStorageProjectRepository } from '../adapters/persistence/localstorage/project.repository';
+import { LocalStorageDataManagementRepository } from '../adapters/persistence/localstorage/data-management.repository';
 import { LocalStorageUnitRepository } from '../adapters/persistence/localstorage/unit.repository';
 import { LocalStorageUiPreferencesRepository } from '../adapters/persistence/localstorage/ui-preferences.repository';
 
@@ -18,12 +19,15 @@ import { DeleteProjectUseCase } from '../core/usecases/delete-project.usecase';
 import { DeleteUnitUseCase } from '../core/usecases/delete-unit.usecase';
 import { ReorderTodosUseCase } from '../core/usecases/reorder-todos.usecase';
 import { UpdateUnitNameUseCase } from '../core/usecases/update-unit-name.usecase';
+import { ExportDataUseCase } from '../core/usecases/export-data.usecase';
+import { ImportDataUseCase } from '../core/usecases/import-data.usecase';
 
 // Singleton instances
 // Repositories
 const projectRepository = new LocalStorageProjectRepository();
 const unitRepository = new LocalStorageUnitRepository(projectRepository);
 const uiPreferencesRepository = new LocalStorageUiPreferencesRepository();
+const dataManagementRepository = new LocalStorageDataManagementRepository();
 
 // UseCases
 const getAllProjectsUseCase = new GetAllProjectsUseCase(projectRepository);
@@ -38,6 +42,8 @@ const toggleTodoStatusUseCase = new ToggleTodoStatusUseCase(unitRepository);
 const addTodoToUnitUseCase = new AddTodoToUnitUseCase(unitRepository);
 const deleteTodoUseCase = new DeleteTodoUseCase(unitRepository);
 const updateUnitNameUseCase = new UpdateUnitNameUseCase(unitRepository);
+const exportDataUseCase = new ExportDataUseCase(dataManagementRepository);
+const importDataUseCase = new ImportDataUseCase(dataManagementRepository);
 
 // Export everything
 export {
@@ -45,6 +51,7 @@ export {
   projectRepository,
   unitRepository,
   uiPreferencesRepository,
+  dataManagementRepository,
   // UseCases
   getAllProjectsUseCase,
   createProjectUseCase,
@@ -58,4 +65,6 @@ export {
   addTodoToUnitUseCase,
   deleteTodoUseCase,
   updateUnitNameUseCase,
+  exportDataUseCase,
+  importDataUseCase,
 };
