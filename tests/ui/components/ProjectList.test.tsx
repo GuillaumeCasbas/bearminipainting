@@ -28,6 +28,8 @@ const createTestProject = (overrides = {}): Project => {
   };
 };
 
+const getRenderedCards = () => screen.getAllByTestId('project-card');
+
 describe('ProjectList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,28 +57,7 @@ describe('ProjectList', () => {
     expect(screen.getByText('No projects created yet.')).toBeInTheDocument();
   });
 
-  it('should display projects in a table', () => {
-    const testProject = createTestProject({
-      id: 'proj-1',
-      name: 'Space Marines',
-      code: 'SM',
-    });
-
-    mockUseProjectStore.mockReturnValue({
-      projects: [testProject],
-      isLoading: false,
-    });
-
-    render(<ProjectList />);
-
-    expect(screen.getByText('My Projects')).toBeInTheDocument();
-    expect(screen.getByText('Space Marines')).toBeInTheDocument();
-    expect(screen.getByText('SM')).toBeInTheDocument();
-    // ID is truncated to 8 chars + "..."
-    expect(screen.getByText('proj-1...')).toBeInTheDocument();
-  });
-
-  it('should display multiple projects', () => {
+  it('should display one card per project instead of a table (BEA-47)', () => {
     const project1 = createTestProject({
       id: 'proj-1',
       name: 'Space Marines',
@@ -95,13 +76,51 @@ describe('ProjectList', () => {
 
     render(<ProjectList />);
 
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText('Space Marines')).toBeInTheDocument();
     expect(screen.getByText('Orks')).toBeInTheDocument();
     expect(screen.getByText('SM')).toBeInTheDocument();
     expect(screen.getByText('ORK')).toBeInTheDocument();
+    expect(getRenderedCards()).toHaveLength(2);
   });
 
-  it('should display completion rate for each project', () => {
+  it('should link each project name to its detail page', () => {
+    const project = createTestProject({
+      id: 'proj-1',
+      name: 'Space Marines',
+      code: 'SM',
+    });
+
+    mockUseProjectStore.mockReturnValue({
+      projects: [project],
+      isLoading: false,
+    });
+
+    render(<ProjectList />);
+
+    const link = screen.getByRole('link', { name: 'Space Marines' });
+    expect(link).toHaveAttribute('href', '/projects/proj-1');
+  });
+
+  it('should not display the internal project UUID (BEA-47)', () => {
+    const project = createTestProject({
+      id: 'very-long-project-id-12345678',
+      name: 'Test Project',
+      code: 'TEST',
+    });
+
+    mockUseProjectStore.mockReturnValue({
+      projects: [project],
+      isLoading: false,
+    });
+
+    render(<ProjectList />);
+
+    expect(screen.queryByText('very-lon...')).not.toBeInTheDocument();
+    expect(screen.queryByText(/very-long-project-id/)).not.toBeInTheDocument();
+  });
+
+  it('should display the completion rate with a progress bar for each project (BEA-47)', () => {
     const project = createTestProject({
       id: 'proj-1',
       name: 'Test Project',
@@ -117,126 +136,7 @@ describe('ProjectList', () => {
     render(<ProjectList />);
 
     expect(screen.getByText('50%')).toBeInTheDocument();
-  });
-
-  it('should display table headers', () => {
-    const project = createTestProject();
-
-    mockUseProjectStore.mockReturnValue({
-      projects: [project],
-      isLoading: false,
-    });
-
-    render(<ProjectList />);
-
-    expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('Code')).toBeInTheDocument();
-    expect(screen.getByText('ID')).toBeInTheDocument();
-    expect(screen.getByText('Completion Rate')).toBeInTheDocument();
-  });
-
-  it('should truncate long project IDs', () => {
-    const project = createTestProject({
-      id: 'very-long-project-id-12345678',
-      name: 'Test Project',
-      code: 'TEST',
-    });
-
-    mockUseProjectStore.mockReturnValue({
-      projects: [project],
-      isLoading: false,
-    });
-
-    render(<ProjectList />);
-
-    // Should display first 8 characters + "..." (very-lon + ...)
-    expect(screen.getByText('very-lon...')).toBeInTheDocument();
-  });
-
-  describe('Completion rate badge colors (BEA-26)', () => {
-    it('should display red badge for completion rate < 20%', () => {
-      const project = createTestProject({
-        id: 'proj-1',
-        name: 'Test Project',
-        code: 'TEST',
-        getCompletionRate: () => 10,
-      });
-
-      mockUseProjectStore.mockReturnValue({
-        projects: [project],
-        isLoading: false,
-      });
-
-      render(<ProjectList />);
-
-      const badge = screen.getByText('10%');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-red-500');
-      expect(badge).toHaveClass('text-white');
-    });
-
-    it('should display orange badge for completion rate >= 20% and < 80%', () => {
-      const project = createTestProject({
-        id: 'proj-1',
-        name: 'Test Project',
-        code: 'TEST',
-        getCompletionRate: () => 50,
-      });
-
-      mockUseProjectStore.mockReturnValue({
-        projects: [project],
-        isLoading: false,
-      });
-
-      render(<ProjectList />);
-
-      const badge = screen.getByText('50%');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-orange-500');
-      expect(badge).toHaveClass('text-white');
-    });
-
-    it('should display yellow badge for completion rate >= 80% and < 100%', () => {
-      const project = createTestProject({
-        id: 'proj-1',
-        name: 'Test Project',
-        code: 'TEST',
-        getCompletionRate: () => 90,
-      });
-
-      mockUseProjectStore.mockReturnValue({
-        projects: [project],
-        isLoading: false,
-      });
-
-      render(<ProjectList />);
-
-      const badge = screen.getByText('90%');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-yellow-500');
-      expect(badge).toHaveClass('text-gray-800');
-    });
-
-    it('should display green badge for completion rate = 100%', () => {
-      const project = createTestProject({
-        id: 'proj-1',
-        name: 'Test Project',
-        code: 'TEST',
-        getCompletionRate: () => 100,
-      });
-
-      mockUseProjectStore.mockReturnValue({
-        projects: [project],
-        isLoading: false,
-      });
-
-      render(<ProjectList />);
-
-      const badge = screen.getByText('100%');
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveClass('bg-green-500');
-      expect(badge).toHaveClass('text-white');
-    });
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
   });
 
   describe('Project list sorting (BEA-31)', () => {
@@ -247,9 +147,7 @@ describe('ProjectList', () => {
       }) as Project;
 
     const getRenderedNames = () =>
-      screen.getAllByRole('row').slice(1).map((row) =>
-        row.querySelector('a')?.textContent ?? ''
-      );
+      screen.getAllByRole('link').map((link) => link.textContent ?? '');
 
     it('sorts projects by completion rate descending', () => {
       const projects = [
@@ -286,10 +184,10 @@ describe('ProjectList', () => {
       mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
       render(<ProjectList />);
 
-      // id-a before id-z
-      const rows = screen.getAllByRole('row').slice(1);
-      expect(rows[0].textContent).toContain('id-a');
-      expect(rows[1].textContent).toContain('id-z');
+      const codes = screen
+        .getAllByText(/T[12]/)
+        .map((element) => element.textContent ?? '');
+      expect(codes).toEqual(['T1', 'T2']);
     });
 
     it('does not mutate the original projects array order in the store', () => {

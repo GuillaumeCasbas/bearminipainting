@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 -
 
 ### Changed
--
+- Home page: the project list is now displayed as cards (name link, code, completion rate with progress bar) instead of a table, matching the unit list style (BEA-47).
+- Home page sidebar: removed the duplicate "Add a project" title and the double card/padding; the project form renders as a single clean card (BEA-47).
+- Home page review follow-up: simplified the progress bar wrapper in project cards, aligned the mobile sidebar panel padding with desktop, added a stable `project-card` test id, and removed the unused `getCompletionRateTextColor` utility (BEA-47).
 
 ### Deprecated
 -

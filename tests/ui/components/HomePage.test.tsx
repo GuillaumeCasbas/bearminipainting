@@ -10,14 +10,17 @@ jest.mock('../../../src/ui/components/ProjectList', () => ({
 
 jest.mock('../../../src/ui/components/ProjectForm', () => ({
   __esModule: true,
-  ProjectForm: () => <div data-testid="project-form">ProjectForm</div>,
+  ProjectForm: () => (
+    <div data-testid="project-form">
+      <h2>Create a new project</h2>
+    </div>
+  ),
 }));
 
 jest.mock('../../../src/ui/components/Sidebar', () => ({
   __esModule: true,
   Sidebar: ({ children, title }: { children: React.ReactNode; title: string }) => (
     <aside data-testid="sidebar" aria-label={title}>
-      <h2>{title}</h2>
       {children}
     </aside>
   ),
@@ -38,10 +41,11 @@ describe('HomePage', () => {
     expect(sidebar).toContainElement(screen.getByTestId('project-form'));
   });
 
-  it('gives the sidebar a title', () => {
+  it('labels the sidebar with the form title (BEA-47)', () => {
     render(<HomePage />);
 
-    expect(screen.getByText('Add a project')).toBeInTheDocument();
+    const sidebar = screen.getByTestId('sidebar');
+    expect(sidebar).toHaveAttribute('aria-label', 'Create a new project');
   });
 
   it('renders main and sidebar as siblings', () => {

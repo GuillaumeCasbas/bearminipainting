@@ -3,22 +3,22 @@ import '@testing-library/jest-dom';
 import { Sidebar } from '../../../src/ui/components/Sidebar';
 
 describe('Sidebar', () => {
-  it('renders a desktop aside with the provided title and children', () => {
+  it('renders a desktop aside with children and no visible title (BEA-47)', () => {
     render(
-      <Sidebar title="Add a project">
+      <Sidebar title="Create a new project">
         <div data-testid="child">Form content</div>
       </Sidebar>
     );
 
     const aside = screen.getByRole('complementary');
-    expect(aside).toHaveAttribute('aria-label', 'Add a project');
-    expect(screen.getByText('Add a project')).toBeInTheDocument();
+    expect(aside).toHaveAttribute('aria-label', 'Create a new project');
+    expect(within(aside).queryByRole('heading')).not.toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
   it('renders a floating action button to open the sidebar on mobile', () => {
     render(
-      <Sidebar title="Add a project">
+      <Sidebar title="Create a new project">
         <div>Form content</div>
       </Sidebar>
     );
@@ -29,7 +29,7 @@ describe('Sidebar', () => {
 
   it('opens the mobile modal when the FAB is clicked', () => {
     render(
-      <Sidebar title="Add a project">
+      <Sidebar title="Create a new project">
         <div data-testid="child">Form content</div>
       </Sidebar>
     );
@@ -40,7 +40,7 @@ describe('Sidebar', () => {
 
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
-    expect(dialog).toHaveAttribute('aria-label', 'Add a project');
+    expect(dialog).toHaveAttribute('aria-label', 'Create a new project');
     // The child is rendered only in the modal (not duplicated in the aside),
     // so input IDs stay unique and labels resolve to the visible inputs.
     expect(within(dialog).getByTestId('child')).toBeInTheDocument();
@@ -50,8 +50,8 @@ describe('Sidebar', () => {
 
   it('closes the modal when the close button is clicked', () => {
     render(
-      <Sidebar title="Add a project">
-        <div>Form content</div>
+      <Sidebar title="Create a new project">
+        <div data-testid="child">Form content</div>
       </Sidebar>
     );
 
@@ -68,8 +68,8 @@ describe('Sidebar', () => {
 
   it('closes the modal when clicking outside (backdrop)', () => {
     render(
-      <Sidebar title="Add a project">
-        <div>Form content</div>
+      <Sidebar title="Create a new project">
+        <div data-testid="child">Form content</div>
       </Sidebar>
     );
 
@@ -85,8 +85,8 @@ describe('Sidebar', () => {
 
   it('closes the modal when Escape is pressed', () => {
     render(
-      <Sidebar title="Add a project">
-        <div>Form content</div>
+      <Sidebar title="Create a new project">
+        <div data-testid="child">Form content</div>
       </Sidebar>
     );
 
