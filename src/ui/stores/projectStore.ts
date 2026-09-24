@@ -766,16 +766,9 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects });
       return true;
     } catch (error) {
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'error',
-            message: error instanceof Error ? error.message : 'Failed to import data',
-          },
-        ],
-      });
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to import data');
       return false;
     }
   },

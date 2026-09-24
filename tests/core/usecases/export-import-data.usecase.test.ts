@@ -154,4 +154,92 @@ describe('ImportDataUseCase (BEA-46)', () => {
 
     expect(repository.replaceAll).toHaveBeenCalledWith([]);
   });
+
+  it('rejects a project entry missing an id', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([{ name: 'No id', code: 'SM', units: [] }]);
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a unit entry that is not an object', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      { id: 'project-1', name: 'Space Marines', code: 'SM', units: ['not-an-object'] },
+    ]);
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a todo entry that is not an object', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-1', todos: [42] },
+        ],
+      },
+    ]);
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a project entry that is not an object', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    await expect(useCase.execute('[' + '"not-an-object"' + ']')).rejects.toThrow(
+      InvalidBackupError,
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a unit entry missing a name', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [{ id: 'unit-1', code: 'IA-01', projectId: 'project-1', todos: [] }],
+      },
+    ]);
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a todo entry missing a label', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          {
+            id: 'unit-1',
+            name: 'Intercessor',
+            code: 'IA-01',
+            projectId: 'project-1',
+            todos: [{ id: 'todo-1', status: 'TODO', order: 10 }],
+          },
+        ],
+      },
+    ]);
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
 });
