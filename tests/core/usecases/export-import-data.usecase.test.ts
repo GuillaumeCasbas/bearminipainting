@@ -289,7 +289,7 @@ describe('ImportDataUseCase (BEA-46)', () => {
     ]);
 
     await expect(useCase.execute(invalid)).rejects.toThrow(
-      new InvalidBackupError('Duplicate unit code: "IA-01" in project "project-1"'),
+      new InvalidBackupError('Duplicate unit code: "IA-01" in project "Space Marines"'),
     );
     expect(repository.replaceAll).not.toHaveBeenCalled();
   });

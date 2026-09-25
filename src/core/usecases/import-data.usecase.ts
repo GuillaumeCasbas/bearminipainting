@@ -28,7 +28,7 @@ export class ImportDataUseCase {
       for (const unit of project.units) {
         if (unitCodes.has(unit.code)) {
           throw new InvalidBackupError(
-            `Duplicate unit code: "${unit.code}" in project "${project.id}"`,
+            `Duplicate unit code: "${unit.code}" in project "${project.name}"`,
           );
         }
         unitCodes.add(unit.code);
