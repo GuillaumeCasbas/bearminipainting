@@ -9,7 +9,39 @@ export class ImportDataUseCase {
 
   async execute(rawData: string): Promise<void> {
     const projects = this.parseAndValidate(rawData);
+    this.validateDomainInvariants(projects);
     await this.repository.replaceAll(projects);
+  }
+
+  private validateDomainInvariants(projects: Project[]): void {
+    const projectIds = new Set<string>();
+    const projectCodes = new Set<string>();
+    const unitCodes = new Set<string>();
+
+    for (const project of projects) {
+      if (projectCodes.has(project.code)) {
+        throw new InvalidBackupError(`Duplicate project code: "${project.code}"`);
+      }
+      projectCodes.add(project.code);
+      projectIds.add(project.id);
+
+      for (const unit of project.units) {
+        if (unitCodes.has(unit.code)) {
+          throw new InvalidBackupError(`Duplicate unit code: "${unit.code}"`);
+        }
+        unitCodes.add(unit.code);
+      }
+    }
+
+    for (const project of projects) {
+      for (const unit of project.units) {
+        if (!projectIds.has(unit.projectId)) {
+          throw new InvalidBackupError(
+            `Unit "${unit.id}" references unknown project "${unit.projectId}"`,
+          );
+        }
+      }
+    }
   }
 
   private parseAndValidate(rawData: string): Project[] {

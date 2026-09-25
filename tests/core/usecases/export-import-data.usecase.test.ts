@@ -242,4 +242,100 @@ describe('ImportDataUseCase (BEA-46)', () => {
     await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
     expect(repository.replaceAll).not.toHaveBeenCalled();
   });
+
+  // === DOMAIN INVARIANTS (BEA-50) ===
+
+  it('rejects a backup with two projects sharing the same code', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      { id: 'project-1', name: 'Space Marines', code: 'SM', units: [] },
+      { id: 'project-2', name: 'Salvage Marines', code: 'SM', units: [] },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(
+      new InvalidBackupError('Duplicate project code: "SM"'),
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a backup with two units sharing the same code across different projects', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          {
+            id: 'unit-1',
+            name: 'Intercessor',
+            code: 'IA-01',
+            projectId: 'project-1',
+            todos: [],
+          },
+        ],
+      },
+      {
+        id: 'project-2',
+        name: 'Necrons',
+        code: 'NEC',
+        units: [
+          {
+            id: 'unit-2',
+            name: 'Warrior',
+            code: 'IA-01',
+            projectId: 'project-2',
+            todos: [],
+          },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(
+      new InvalidBackupError('Duplicate unit code: "IA-01"'),
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejects a backup containing a unit whose projectId references a non-existent project', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          {
+            id: 'unit-1',
+            name: 'Intercessor',
+            code: 'IA-01',
+            projectId: 'unknown-project',
+            todos: [],
+          },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(
+      new InvalidBackupError('Unit "unit-1" references unknown project "unknown-project"'),
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('still imports a valid app export after domain invariant validation (regression guard)', async () => {
+    const repository = buildRepository(
+      JSON.stringify([{ id: 'old-project', name: 'Old', code: 'OLD', units: [] }]),
+    );
+    const useCase = new ImportDataUseCase(repository);
+
+    await useCase.execute(validBackup);
+
+    expect(repository.replaceAll).toHaveBeenCalledTimes(1);
+  });
 });
