@@ -24,6 +24,10 @@ points below. When a rule here conflicts with the skill, **this file wins**.
   following the [Keep a Changelog](https://keepachangelog.com/) format already
   used in the file.
 - Reference the related Linear ticket (e.g. `(BEA-40)`) at the end of each entry.
+- Write each entry for the end user, in one simple sentence (action + visible
+  benefit). No implementation details (file names, technical attributes,
+  internal steps, transitional states). Technical precision belongs in the PR
+  description and Linear comments.
 - Do not wait for a release: the `[Unreleased]` section is the working log.
 - Keep the `package.json` `version` in sync with the latest released version
   (the most recent `## [X.Y.Z] - YYYY-MM-DD` entry, excluding `[Unreleased]`).
