@@ -10,4 +10,8 @@ module.exports = {
   },
   testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx'],
   collectCoverageFrom: ['src/**/*.ts', 'src/**/*.tsx', '!src/**/*.d.ts'],
+  coverageThreshold: {
+    './src/core/': { lines: 80, branches: 80 },
+    './src/adapters/': { lines: 70, branches: 70 },
+  },
 };

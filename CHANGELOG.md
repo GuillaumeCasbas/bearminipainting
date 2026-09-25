@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
 ### Changed
+- CI: the test step in CI now runs Jest with coverage (`npm run test:coverage`) enforcing the RULES.md minimums via `coverageThreshold` — 80% lines/branches for `src/core`, 70% for `src/adapters` (BEA-43).
 - Tests: rewrote UI tests coupled to implementation details (DOM traversal, CSS classes, internal link hrefs, firstChild) to behavior-based assertions (roles, accessible names, user interactions) so they survive internal refactors; audit covered HomePage, Header, ToastContainer, Dropdown, RenderMarkdown, ProjectList, and Sidebar (BEA-49).
 - Project detail: adding a unit no longer re-fetches the project from the repository; the store builds the updated project locally and returns it to the component, eliminating a redundant read after unit creation (BEA-21).
 - Home page: the project list is now displayed as cards (name link, code, completion rate with progress bar) instead of a table, matching the unit list style (BEA-47).
