@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal } from '../Modal';
+import { UNIT_CODE_REGEX } from '@/core/constants/unit-code';
 
 interface UnitFormProps {
   onClose: () => void;
@@ -23,6 +24,12 @@ export function UnitForm({ onClose, onSubmit }: UnitFormProps) {
 
     if (!code.trim()) {
       setError('Unit code cannot be empty');
+      return;
+    }
+    if (!UNIT_CODE_REGEX.test(code)) {
+      setError(
+        'Unit code contains invalid characters. Only letters, numbers and hyphens are allowed.',
+      );
       return;
     }
 
