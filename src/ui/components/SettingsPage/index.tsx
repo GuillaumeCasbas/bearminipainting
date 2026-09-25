@@ -121,7 +121,12 @@ export function SettingsPage() {
       </section>
 
       {/* Import confirmation modal */}
-      <Modal isOpen={pendingFile !== null} onClose={cancelImport} title="Confirm import">
+      <Modal
+        isOpen={pendingFile !== null}
+        onClose={cancelImport}
+        title="Confirm import"
+        closeOnBackdropClick={false}
+      >
         <p className="text-gray-700 mb-2">
           You are about to import <span className="font-medium">{pendingFile?.name}</span>.
         </p>

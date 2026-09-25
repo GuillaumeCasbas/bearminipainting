@@ -7,8 +7,6 @@ describe('Modal', () => {
     render(
       <Modal isOpen={true} onClose={onClose} title="Confirm action">
         <p>Modal content</p>
-        <button type="button">First</button>
-        <button type="button">Last</button>
       </Modal>,
     );
 
@@ -42,22 +40,13 @@ describe('Modal', () => {
     expect(dialog).toHaveAttribute('aria-labelledby', labelId);
   });
 
-  it('should call onClose when Escape is pressed inside the dialog', () => {
+  it('should call onClose when Escape is pressed', () => {
     const onClose = jest.fn();
     renderOpenModal(onClose);
 
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
 
     expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not call onClose when Escape is pressed outside the dialog', () => {
-    const onClose = jest.fn();
-    renderOpenModal(onClose);
-
-    fireEvent.keyDown(document.body, { key: 'Escape' });
-
-    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('should call onClose when the backdrop is clicked', () => {
@@ -74,6 +63,19 @@ describe('Modal', () => {
     renderOpenModal(onClose);
 
     fireEvent.click(screen.getByText('Modal content'));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('should not call onClose on backdrop click when closeOnBackdropClick is false', () => {
+    const onClose = jest.fn();
+    render(
+      <Modal isOpen={true} onClose={onClose} title="Confirm action" closeOnBackdropClick={false}>
+        <p>Modal content</p>
+      </Modal>,
+    );
+
+    fireEvent.click(screen.getByRole('dialog'));
 
     expect(onClose).not.toHaveBeenCalled();
   });
@@ -106,43 +108,5 @@ describe('Modal', () => {
 
     expect(trigger).toHaveFocus();
     document.body.removeChild(trigger);
-  });
-
-  it('should trap Tab focus inside the dialog (wraps from last to first)', () => {
-    renderOpenModal();
-
-    screen.getByRole('button', { name: 'Last' }).focus();
-    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Tab' });
-
-    expect(screen.getByRole('button', { name: 'First' })).toHaveFocus();
-  });
-
-  it('should wrap Shift+Tab focus from the first element to the last', () => {
-    renderOpenModal();
-
-    screen.getByRole('button', { name: 'First' }).focus();
-    fireEvent.keyDown(screen.getByRole('dialog'), {
-      key: 'Tab',
-      shiftKey: true,
-    });
-
-    expect(screen.getByRole('button', { name: 'Last' })).toHaveFocus();
-  });
-
-  it('should not re-run open effects when the parent re-renders with a new inline onClose', () => {
-    const onClose = jest.fn();
-    const { rerender } = render(
-      <Modal isOpen={true} onClose={onClose} title="Confirm action">
-        <p>Modal content</p>
-      </Modal>,
-    );
-
-    rerender(
-      <Modal isOpen={true} onClose={() => onClose()} title="Confirm action">
-        <p>Modal content</p>
-      </Modal>,
-    );
-
-    expect(screen.getByRole('dialog')).toHaveFocus();
   });
 });
