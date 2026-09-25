@@ -22,6 +22,10 @@ jest.mock('../../../src/ui/components/Sidebar', () => ({
   ),
 }));
 
+jest.mock('../../../src/ui/stores/projectStore', () => ({
+  useProjectStore: () => ({ projects: [] }),
+}));
+
 describe('HomePage', () => {
   it('renders the project list in the main area', () => {
     render(<HomePage />);
@@ -41,6 +45,14 @@ describe('HomePage', () => {
     render(<HomePage />);
     expect(
       screen.getByRole('complementary', { name: 'Create a new project' }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders the "Almost there!" section in the main area, below the project list (BEA-48)', () => {
+    render(<HomePage />);
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getByRole('heading', { name: 'Almost there!' }),
     ).toBeInTheDocument();
   });
 });
