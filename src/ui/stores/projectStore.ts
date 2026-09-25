@@ -18,7 +18,6 @@ import {
   exportDataUseCase,
   importDataUseCase,
   createUnitUseCase,
-  getProjectByIdUseCase,
   toggleTodoStatusUseCase,
   addTodoToUnitUseCase,
   deleteTodoUseCase,
@@ -48,7 +47,7 @@ interface ProjectStore {
   deleteProject: (projectId: string) => Promise<void>;
   deleteUnit: (unitId: string) => Promise<void>;
   reorderTodos: (unitId: string, orderedTodoIds: string[]) => Promise<void>;
-  addUnit: (projectId: string, name: string, code: string) => Promise<void>;
+  addUnit: (projectId: string, name: string, code: string) => Promise<Project | null>;
   addTodo: (unitId: string, label: string) => Promise<void>;
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
@@ -361,21 +360,26 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     }
   },
 
-  // Add a unit to a project
-  addUnit: async (projectId: string, name: string, code: string) => {
+  // Add a unit to a project and return the updated project
+  addUnit: async (projectId: string, name: string, code: string): Promise<Project | null> => {
     try {
       const newUnit = await createUnitUseCase.execute(name, code, projectId);
 
-      // Reload the project to get updated units
-      const updatedProject = await getProjectByIdUseCase.execute(projectId);
-      if (!updatedProject) {
-        throw new Error('Project not found');
-      }
-
-      // Update the project in the store
+      // Build the updated project locally, no need to re-fetch it
       const projects = useProjectStore.getState().projects;
-      const updatedProjects = projects.map((p) => (p.id === projectId ? updatedProject : p));
-      set({ projects: updatedProjects });
+      const currentProject = projects.find((p) => p.id === projectId);
+      const updatedProject = currentProject
+        ? new Project(currentProject.id, currentProject.name, currentProject.code, [
+            ...currentProject.units,
+            newUnit,
+          ])
+        : null;
+
+      if (updatedProject) {
+        // Update the project in the store
+        const updatedProjects = projects.map((p) => (p.id === projectId ? updatedProject : p));
+        set({ projects: updatedProjects });
+      }
 
       // Show success toast
       set({
@@ -388,6 +392,8 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           },
         ],
       });
+
+      return updatedProject;
     } catch (error) {
       // Handle specific errors with user-friendly messages
       if (error instanceof UnitNameEmptyError) {
@@ -435,6 +441,8 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           ],
         });
       }
+
+      return null;
     }
   },
 

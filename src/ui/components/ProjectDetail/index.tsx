@@ -193,9 +193,7 @@ export function ProjectDetail() {
           <UnitForm
             onClose={() => setShowUnitForm(false)}
             onSubmit={async (name: string, code: string) => {
-              await addUnit(id, name, code);
-              // Refresh the project after adding a unit from the store
-              const updatedProject = useProjectStore.getState().projects.find((p) => p.id === id);
+              const updatedProject = await addUnit(id, name, code);
               if (updatedProject) {
                 setProject(updatedProject);
               }
