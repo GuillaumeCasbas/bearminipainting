@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { UnitForm } from '../../../src/ui/components/UnitForm';
 
@@ -92,6 +93,16 @@ describe('UnitForm', () => {
     fillAndSubmit('Intercessors', 'INT-01');
     expect(screen.queryByText(/invalid characters/i)).not.toBeInTheDocument();
     expect(mockOnSubmit).toHaveBeenCalledWith('Intercessors', 'INT-01');
+  });
+
+  it('keeps focus on the input while typing multiple characters (BEA-57)', async () => {
+    const user = userEvent.setup();
+    render(<UnitForm onClose={mockOnClose} onSubmit={mockOnSubmit} />);
+    const [nameInput] = screen.getAllByRole('textbox');
+    nameInput.focus();
+    await user.type(nameInput, 'Intercessors');
+    expect(nameInput).toHaveValue('Intercessors');
+    expect(nameInput).toHaveFocus();
   });
 
   it('shows the hint about allowed characters', () => {
