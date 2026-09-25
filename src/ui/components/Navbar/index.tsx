@@ -36,16 +36,22 @@ function Brand() {
   );
 }
 
-function NavLinks() {
+function NavLinks({
+  onNavigate,
+  listClassName,
+}: {
+  onNavigate?: () => void;
+  listClassName?: string;
+}) {
   return (
-    <ul className="flex items-center gap-4">
+    <ul className={listClassName ?? 'flex items-center gap-4'}>
       <li>
-        <NavLink to="/settings" className={navLinkClassName}>
+        <NavLink to="/settings" className={navLinkClassName} onClick={onNavigate}>
           Settings
         </NavLink>
       </li>
       <li>
-        <NavLink to="/about" className={navLinkClassName}>
+        <NavLink to="/about" className={navLinkClassName} onClick={onNavigate}>
           About
         </NavLink>
       </li>
@@ -55,6 +61,7 @@ function NavLinks() {
           target="_blank"
           rel="noreferrer"
           className="text-sm text-blue-600 hover:text-blue-800 underline transition-colors"
+          onClick={onNavigate}
         >
           Changelog
         </a>
@@ -84,7 +91,7 @@ export function Navbar() {
               onClick={() => setIsMenuOpen((open) => !open)}
               className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             >
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
               <svg
                 className="h-5 w-5"
                 xmlns="http://www.w3.org/2000/svg"
@@ -106,37 +113,10 @@ export function Navbar() {
       </div>
       {!isDesktop && isMenuOpen && (
         <div id="navbar-menu" className="mt-3">
-          <ul className="flex flex-col gap-3 border-b border-gray-300 pb-3">
-            <li>
-              <NavLink
-                to="/settings"
-                className={navLinkClassName}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Settings
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/about"
-                className={navLinkClassName}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </NavLink>
-            </li>
-            <li>
-              <a
-                href={CHANGELOG_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-blue-600 hover:text-blue-800 underline transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Changelog
-              </a>
-            </li>
-          </ul>
+          <NavLinks
+            onNavigate={() => setIsMenuOpen(false)}
+            listClassName="flex flex-col items-start gap-3 border-b border-gray-300 pb-3"
+          />
         </div>
       )}
       {isHomePage && <p className="text-gray-600 mt-2">{TAGLINE}</p>}

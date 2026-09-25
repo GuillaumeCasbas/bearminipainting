@@ -178,13 +178,27 @@ describe('Navbar responsive menu (BEA-62)', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Open menu' }));
 
-    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );
     expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Changelog' })).toBeInTheDocument();
+  });
+
+  it('announces the button as "Open menu" again after the menu is closed', async () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    await user.click(screen.getByRole('button', { name: 'Close menu' }));
+
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
   });
 
   it('closes the menu after a link is clicked', async () => {
