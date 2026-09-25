@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjectStore } from '@/ui/stores/projectStore';
+import { Modal } from '@/ui/components/Modal';
 
 export function SettingsPage() {
   const { exportData, importData, addToast } = useProjectStore();
@@ -120,40 +121,40 @@ export function SettingsPage() {
       </section>
 
       {/* Import confirmation modal */}
-      {pendingFile && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm import</h3>
-            <p className="text-gray-700 mb-2">
-              You are about to import <span className="font-medium">{pendingFile.name}</span>.
-            </p>
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <p className="text-sm text-red-700">
-                Warning: ALL your current data will be replaced by the file's data. This action
-                cannot be undone.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="button"
-                disabled={isImporting}
-                onClick={confirmImport}
-                className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Replace all data
-              </button>
-              <button
-                type="button"
-                disabled={isImporting}
-                onClick={cancelImport}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+      <Modal
+        isOpen={pendingFile !== null}
+        onClose={cancelImport}
+        title="Confirm import"
+        closeOnBackdropClick={false}
+      >
+        <p className="text-gray-700 mb-2">
+          You are about to import <span className="font-medium">{pendingFile?.name}</span>.
+        </p>
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <p className="text-sm text-red-700">
+            Warning: ALL your current data will be replaced by the file's data. This action cannot
+            be undone.
+          </p>
         </div>
-      )}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            disabled={isImporting}
+            onClick={confirmImport}
+            className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Replace all data
+          </button>
+          <button
+            type="button"
+            disabled={isImporting}
+            onClick={cancelImport}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

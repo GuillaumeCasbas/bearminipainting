@@ -6,6 +6,7 @@ import { useProjectContext } from '@/ui/contexts/projectContext';
 import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import { ProgressBar } from '@/ui/components/ProgressBar';
+import { Modal } from '@/ui/components/Modal';
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -251,43 +252,44 @@ export function ProjectDetail() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && project && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Deletion</h3>
-            <p className="text-gray-700 mb-6">
-              Warning: Deleting {project.name} will also delete its {project.units.length} units and
-              all their todos. This action cannot be undone. Continue?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  if (!id) {
-                    return;
+      {project && (
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Confirm Deletion"
+        >
+          <p className="text-gray-700 mb-6">
+            Warning: Deleting {project.name} will also delete its {project.units.length} units and
+            all their todos. This action cannot be undone. Continue?
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                if (!id) {
+                  return;
+                }
+                try {
+                  await deleteProject(id);
+                  navigate('/');
+                } catch (error) {
+                  // Error is already handled by the store (toast shown)
+                  if (process.env.NODE_ENV === 'development') {
+                    console.error('Failed to delete project:', error);
                   }
-                  try {
-                    await deleteProject(id);
-                    navigate('/');
-                  } catch (error) {
-                    // Error is already handled by the store (toast shown)
-                    if (process.env.NODE_ENV === 'development') {
-                      console.error('Failed to delete project:', error);
-                    }
-                  }
-                }}
-                className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
+                }
+              }}
+              className="px-4 py-2 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );
