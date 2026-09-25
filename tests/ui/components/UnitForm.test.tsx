@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UnitForm } from '../../../src/ui/components/UnitForm';
 
@@ -31,9 +31,22 @@ describe('UnitForm', () => {
   it('calls onSubmit and closes the modal when the code format is valid', async () => {
     render(<UnitForm onClose={mockOnClose} onSubmit={mockOnSubmit} />);
     fillAndSubmit('Intercessors', 'INT-01');
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    await Promise.resolve();
-    expect(mockOnSubmit).toHaveBeenCalledWith('Intercessors', 'INT-01');
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith('Intercessors', 'INT-01');
+    });
+    await waitFor(() => {
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('shows the backend error and keeps the modal open when onSubmit rejects', async () => {
+    mockOnSubmit.mockRejectedValueOnce(new Error('Unit code is not unique'));
+    render(<UnitForm onClose={mockOnClose} onSubmit={mockOnSubmit} />);
+    fillAndSubmit('Intercessors', 'INT-01');
+    await waitFor(() => {
+      expect(screen.getByText('Unit code is not unique')).toBeInTheDocument();
+    });
+    expect(mockOnClose).not.toHaveBeenCalled();
   });
 
   it.each(['unit@code', 'unit code', 'unit_code', 'INT 01', 'unit.code'])(
