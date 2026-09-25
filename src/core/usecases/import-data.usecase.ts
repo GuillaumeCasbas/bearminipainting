@@ -16,7 +16,6 @@ export class ImportDataUseCase {
   private validateDomainInvariants(projects: Project[]): void {
     const projectIds = new Set<string>();
     const projectCodes = new Set<string>();
-    const unitCodes = new Set<string>();
 
     for (const project of projects) {
       if (projectCodes.has(project.code)) {
@@ -25,9 +24,12 @@ export class ImportDataUseCase {
       projectCodes.add(project.code);
       projectIds.add(project.id);
 
+      const unitCodes = new Set<string>();
       for (const unit of project.units) {
         if (unitCodes.has(unit.code)) {
-          throw new InvalidBackupError(`Duplicate unit code: "${unit.code}"`);
+          throw new InvalidBackupError(
+            `Duplicate unit code: "${unit.code}" in project "${project.id}"`,
+          );
         }
         unitCodes.add(unit.code);
       }
