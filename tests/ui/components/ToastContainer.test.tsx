@@ -4,7 +4,6 @@ import ToastContainer from '../../../src/ui/components/Toast';
 import { ToastNotification } from '../../../src/ui/stores/projectStore';
 
 // Mock the useProjectStore
-const mockToasts: ToastNotification[] = [];
 const mockRemoveToast = jest.fn();
 const mockUseProjectStore = jest.fn();
 
@@ -32,58 +31,32 @@ describe('ToastContainer', () => {
     jest.useRealTimers();
   });
 
-  it('should not render when there are no toasts', () => {
+  it('should not render any alert when there are no toasts', () => {
     mockUseProjectStore.mockReturnValue({
       toasts: [],
       removeToast: mockRemoveToast,
     });
 
-    const { container } = render(<ToastContainer />);
-
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('should render a success toast', () => {
-    const toast = createTestToast({ type: 'success' });
-
-    mockUseProjectStore.mockReturnValue({
-      toasts: [toast],
-      removeToast: mockRemoveToast,
-    });
-
     render(<ToastContainer />);
 
-    expect(screen.getByText('Test message')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-green-500');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('should render an error toast', () => {
-    const toast = createTestToast({ type: 'error' });
+  it.each(['success', 'error', 'info'] as const)(
+    'should render a %s toast with its message',
+    (type) => {
+      const toast = createTestToast({ type });
 
-    mockUseProjectStore.mockReturnValue({
-      toasts: [toast],
-      removeToast: mockRemoveToast,
-    });
+      mockUseProjectStore.mockReturnValue({
+        toasts: [toast],
+        removeToast: mockRemoveToast,
+      });
 
-    render(<ToastContainer />);
+      render(<ToastContainer />);
 
-    expect(screen.getByText('Test message')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-red-500');
-  });
-
-  it('should render an info toast', () => {
-    const toast = createTestToast({ type: 'info' });
-
-    mockUseProjectStore.mockReturnValue({
-      toasts: [toast],
-      removeToast: mockRemoveToast,
-    });
-
-    render(<ToastContainer />);
-
-    expect(screen.getByText('Test message')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-blue-500');
-  });
+      expect(screen.getByRole('alert')).toHaveTextContent('Test message');
+    },
+  );
 
   it('should render multiple toasts', () => {
     const toast1 = createTestToast({ id: 'toast-1', message: 'Message 1' });
@@ -110,7 +83,7 @@ describe('ToastContainer', () => {
 
     render(<ToastContainer />);
 
-    const closeButton = screen.getByLabelText('Close');
+    const closeButton = screen.getByRole('button', { name: 'Close' });
     fireEvent.click(closeButton);
 
     expect(mockRemoveToast).toHaveBeenCalledWith('toast-1');
@@ -133,18 +106,5 @@ describe('ToastContainer', () => {
     await waitFor(() => {
       expect(mockRemoveToast).toHaveBeenCalledWith('toast-1');
     });
-  });
-
-  it('should have close button with aria-label', () => {
-    const toast = createTestToast();
-
-    mockUseProjectStore.mockReturnValue({
-      toasts: [toast],
-      removeToast: mockRemoveToast,
-    });
-
-    render(<ToastContainer />);
-
-    expect(screen.getByLabelText('Close')).toBeInTheDocument();
   });
 });

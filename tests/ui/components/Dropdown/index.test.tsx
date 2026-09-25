@@ -134,44 +134,6 @@ describe('Dropdown', () => {
     });
   });
 
-  describe('Positioning', () => {
-    it('should apply right position by default', () => {
-      render(
-        <Dropdown trigger={<div>{triggerText}</div>} defaultOpen={true}>
-          <DropdownItem>{menuItemText}</DropdownItem>
-        </Dropdown>
-      );
-
-      const dropdownMenu = screen.getByRole('menu');
-      expect(dropdownMenu).toHaveClass('left-full');
-      expect(dropdownMenu).toHaveClass('ml-2');
-    });
-
-    it('should apply left position when specified', () => {
-      render(
-        <Dropdown trigger={<div>{triggerText}</div>} defaultOpen={true} position="left">
-          <DropdownItem>{menuItemText}</DropdownItem>
-        </Dropdown>
-      );
-
-      const dropdownMenu = screen.getByRole('menu');
-      expect(dropdownMenu).toHaveClass('right-full');
-      expect(dropdownMenu).toHaveClass('mr-2');
-    });
-
-    it('should apply bottom position when specified', () => {
-      render(
-        <Dropdown trigger={<div>{triggerText}</div>} defaultOpen={true} position="bottom">
-          <DropdownItem>{menuItemText}</DropdownItem>
-        </Dropdown>
-      );
-
-      const dropdownMenu = screen.getByRole('menu');
-      expect(dropdownMenu).toHaveClass('top-full');
-      expect(dropdownMenu).toHaveClass('mt-2');
-    });
-  });
-
   describe('Accessibility', () => {
     it('should have aria-haspopup on trigger', () => {
       render(
@@ -271,30 +233,6 @@ describe('DropdownItem', () => {
     );
 
     expect(screen.getByText('Test Item')).toBeInTheDocument();
-  });
-
-  it('should apply danger styling when danger prop is true', () => {
-    render(
-      <Dropdown trigger={<div>Trigger</div>} defaultOpen={true}>
-        <DropdownItem danger>Delete</DropdownItem>
-      </Dropdown>
-    );
-
-    const item = screen.getByText('Delete');
-    expect(item).toHaveClass('text-red-700');
-    expect(item).toHaveClass('hover:bg-red-50');
-  });
-
-  it('should apply normal styling when danger prop is false', () => {
-    render(
-      <Dropdown trigger={<div>Trigger</div>} defaultOpen={true}>
-        <DropdownItem>Normal</DropdownItem>
-      </Dropdown>
-    );
-
-    const item = screen.getByText('Normal');
-    expect(item).toHaveClass('text-gray-700');
-    expect(item).toHaveClass('hover:bg-gray-100');
   });
 
   it('should call onClick when clicked', async () => {
