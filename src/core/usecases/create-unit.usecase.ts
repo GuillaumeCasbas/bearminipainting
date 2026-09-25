@@ -2,6 +2,7 @@ import { Unit } from '../entities/Unit';
 import { Todo } from '../entities/Todo';
 import { UnitRepository } from '../ports/unit.repository';
 import { DEFAULT_TODOS } from '../constants/default-todos';
+import { UNIT_CODE_REGEX } from '../constants/unit-code';
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -9,8 +10,6 @@ import {
 } from '../errors';
 
 export class CreateUnitUseCase {
-  private readonly unitCodeRegex = /^[a-zA-Z0-9-]+$/;
-
   constructor(private readonly unitRepository: UnitRepository) {}
 
   async execute(name: string, code: string, projectId: string): Promise<Unit> {
@@ -21,7 +20,7 @@ export class CreateUnitUseCase {
 
     // Normalize and validate code
     const normalizedCode = code.toUpperCase();
-    if (!this.unitCodeRegex.test(normalizedCode)) {
+    if (!UNIT_CODE_REGEX.test(normalizedCode)) {
       throw new UnitCodeInvalidCharactersError(code);
     }
 
