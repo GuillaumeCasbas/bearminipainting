@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GetAlmostThereUnitsUseCase } from '@/core/usecases/get-almost-there-units.usecase';
 import { Unit } from '@/core/entities/Unit';
@@ -8,8 +9,22 @@ const getAlmostThereUnits = new GetAlmostThereUnitsUseCase();
 
 export function AlmostThereSection() {
   const { projects } = useProjectStore();
-  const allUnits: Unit[] = projects.flatMap((project) => project.units);
-  const almostThereUnits = getAlmostThereUnits.execute(allUnits);
+  const [almostThereUnits, setAlmostThereUnits] = useState<Unit[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const allUnits: Unit[] = projects.flatMap((project) => project.units);
+    getAlmostThereUnits.execute(allUnits).then((units) => {
+      if (!cancelled) {
+        setAlmostThereUnits(units);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projects]);
 
   return (
     <section className="mt-8" aria-label="Almost there">

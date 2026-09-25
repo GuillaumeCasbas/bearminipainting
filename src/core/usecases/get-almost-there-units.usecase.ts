@@ -2,7 +2,7 @@ import { Unit } from '../entities/Unit';
 import { ALMOST_THERE_MIN_RATE, ALMOST_THERE_MAX_COUNT } from '../constants/almost-there';
 
 export class GetAlmostThereUnitsUseCase {
-  execute(units: Unit[]): Unit[] {
+  async execute(units: Unit[]): Promise<Unit[]> {
     return units
       .filter(
         (unit) =>

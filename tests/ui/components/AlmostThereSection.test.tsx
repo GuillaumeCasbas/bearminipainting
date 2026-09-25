@@ -56,14 +56,21 @@ describe('AlmostThereSection', () => {
     jest.clearAllMocks();
   });
 
-  it('displays the section title "Almost there!"', () => {
+  it('displays the section title "Almost there!"', async () => {
     mockUseProjectStore.mockReturnValue({ projects: [] });
     renderSection();
 
     expect(screen.getByRole('heading', { name: 'Almost there!' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Nothing above 75% yet. Push a miniature to the final stretch!',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
-  it('displays eligible units with their name and completion rate', () => {
+  it('displays eligible units with their name and completion rate', async () => {
     const unit = makeUnit('u1', 'Intercessors', 3, 4);
     mockUseProjectStore.mockReturnValue({
       projects: [
@@ -72,12 +79,14 @@ describe('AlmostThereSection', () => {
     });
     renderSection();
 
-    expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
+    });
     expect(screen.getByText('75%')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
   });
 
-  it('displays at most 3 eligible units sorted by completion rate', () => {
+  it('displays at most 3 eligible units sorted by completion rate', async () => {
     const units = [
       makeUnit('u1', 'Ninety', 9, 10),
       makeUnit('u2', 'Eighty', 8, 10),
@@ -89,15 +98,17 @@ describe('AlmostThereSection', () => {
     });
     renderSection();
 
-    const links = screen.getAllByRole('link');
-    expect(links.map((link) => link.textContent)).toEqual([
-      'Ninety-five',
-      'Ninety',
-      'Eighty-five',
-    ]);
+    await waitFor(() => {
+      const links = screen.getAllByRole('link');
+      expect(links.map((link) => link.textContent)).toEqual([
+        'Ninety-five',
+        'Ninety',
+        'Eighty-five',
+      ]);
+    });
   });
 
-  it('never displays units at 100% or below 75%', () => {
+  it('never displays units at 100% or below 75%', async () => {
     const units = [
       makeUnit('u1', 'Finished', 4, 4),
       makeUnit('u2', 'Barely started', 1, 4),
@@ -107,7 +118,13 @@ describe('AlmostThereSection', () => {
     });
     renderSection();
 
-    expect(screen.getByText('Nothing above 75% yet. Push a miniature to the final stretch!')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Nothing above 75% yet. Push a miniature to the final stretch!',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   it('navigates to the unit detail page when a unit is clicked', async () => {
@@ -117,6 +134,9 @@ describe('AlmostThereSection', () => {
     });
     const { getCurrentPath } = renderSection();
 
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
+    });
     const user = userEvent.setup();
     await user.click(screen.getByRole('link', { name: 'Intercessors' }));
 
@@ -125,12 +145,18 @@ describe('AlmostThereSection', () => {
     });
   });
 
-  it('displays the empty state message when no unit is eligible', () => {
+  it('displays the empty state message when no unit is eligible', async () => {
     mockUseProjectStore.mockReturnValue({
       projects: [{ id: 'p1', name: 'Project', code: 'P', units: [] }],
     });
     renderSection();
 
-    expect(screen.getByText('Nothing above 75% yet. Push a miniature to the final stretch!')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Nothing above 75% yet. Push a miniature to the final stretch!',
+        ),
+      ).toBeInTheDocument();
+    });
   });
 });
