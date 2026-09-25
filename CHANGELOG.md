@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
 ### Changed
+- Importing a backup now validates the data and rejects the file with explicit errors if it contains duplicate codes or units referencing unknown projects, before any data is replaced (BEA-50).
 - On small screens, the navigation bar now collapses into a menu opened by a button, keeping the navigation compact and easy to reach (BEA-62).
 - The navigation is now unified in the global navigation bar: the page header and footer no longer repeat links, the tagline appears on the home page, and the "Hide completed todos" toggle appears on the unit page (BEA-61).
 - CI: the test step in CI now runs Jest with coverage (`npm run test:coverage`) enforcing the RULES.md minimums via `coverageThreshold` — 80% lines/branches for `src/core`, 70% for `src/adapters` (BEA-43).
