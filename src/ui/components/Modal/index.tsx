@@ -4,20 +4,18 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  closeOnBackdropClick?: boolean;
   children: React.ReactNode;
 }
 
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  closeOnBackdropClick = true,
-  children,
-}: ModalProps) {
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) {
@@ -27,18 +25,37 @@ export function Modal({
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
       restoreFocusRef.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      onCloseRef.current();
+      return;
+    }
+
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+    if (!focusableElements || focusableElements.length === 0) {
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  };
 
   if (!isOpen) {
     return null;
@@ -52,7 +69,8 @@ export function Modal({
       aria-labelledby={titleId}
       tabIndex={-1}
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 outline-none"
-      onClick={closeOnBackdropClick ? onClose : undefined}
+      onClick={onCloseRef.current}
+      onKeyDown={handleKeyDown}
     >
       <div
         className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full"
