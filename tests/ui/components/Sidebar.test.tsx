@@ -56,12 +56,13 @@ describe('Sidebar', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Open sidebar' }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-    // The dialog contains both the backdrop and the panel; the panel's close
-    // button is the second one rendered in DOM order (after the backdrop).
-    const closeButtons = screen.getAllByRole('button', { name: 'Close sidebar' });
-    fireEvent.click(closeButtons[1]);
+    // When the modal opens, focus moves to the panel's close button.
+    const closeButton = screen
+      .getAllByRole('button', { name: 'Close sidebar' })
+      .find((button) => button === document.activeElement);
+    expect(closeButton).toBeDefined();
+    fireEvent.click(closeButton!);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
@@ -74,11 +75,13 @@ describe('Sidebar', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Open sidebar' }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-    // The backdrop is the first "Close sidebar" button rendered in DOM order.
-    const closeButtons = screen.getAllByRole('button', { name: 'Close sidebar' });
-    fireEvent.click(closeButtons[0]);
+    // The backdrop is the close control that did not receive focus on open.
+    const backdrop = screen
+      .getAllByRole('button', { name: 'Close sidebar' })
+      .find((button) => button !== document.activeElement);
+    expect(backdrop).toBeDefined();
+    fireEvent.click(backdrop!);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
