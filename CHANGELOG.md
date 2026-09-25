@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
 ### Changed
+- On small screens, the navigation bar now collapses into a menu opened by a button, keeping the navigation compact and easy to reach (BEA-62).
 - The navigation is now unified in the global navigation bar: the page header and footer no longer repeat links, the tagline appears on the home page, and the "Hide completed todos" toggle appears on the unit page (BEA-61).
 - CI: the test step in CI now runs Jest with coverage (`npm run test:coverage`) enforcing the RULES.md minimums via `coverageThreshold` — 80% lines/branches for `src/core`, 70% for `src/adapters` (BEA-43).
 - Tests: rewrote UI tests coupled to implementation details (DOM traversal, CSS classes, internal link hrefs, firstChild) to behavior-based assertions (roles, accessible names, user interactions) so they survive internal refactors; audit covered HomePage, Header, ToastContainer, Dropdown, RenderMarkdown, ProjectList, and Sidebar (BEA-49).

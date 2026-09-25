@@ -119,3 +119,100 @@ describe('Navbar', () => {
     expect(screen.queryByText('Track your miniature painting progress')).not.toBeInTheDocument();
   });
 });
+
+const setViewport = (isDesktop: boolean) => {
+  window.matchMedia = (query: string) => ({
+    matches: isDesktop,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  });
+};
+
+describe('Navbar responsive menu (BEA-62)', () => {
+  afterEach(() => {
+    setViewport(true);
+  });
+
+  it('shows a hamburger button on small screens', () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument();
+  });
+
+  it('keeps the brand visible next to the hamburger button on small screens', () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    expect(screen.getByRole('link', { name: 'MiniPaint' })).toBeInTheDocument();
+  });
+
+  it('does not show a hamburger button on large screens', () => {
+    setViewport(true);
+    renderNavbarAt('/');
+
+    expect(screen.queryByRole('button', { name: 'Open menu' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+  });
+
+  it('has the menu closed by default on small screens', () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(screen.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument();
+  });
+
+  it('opens the menu when the hamburger button is clicked', async () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+
+    expect(screen.getByRole('button', { name: 'Close menu' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Changelog' })).toBeInTheDocument();
+  });
+
+  it('announces the button as "Open menu" again after the menu is closed', async () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    await user.click(screen.getByRole('button', { name: 'Close menu' }));
+
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  });
+
+  it('closes the menu after a link is clicked', async () => {
+    setViewport(false);
+    renderNavbarAt('/');
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    await user.click(screen.getByRole('link', { name: 'Settings' }));
+
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(screen.queryByRole('link', { name: 'About' })).not.toBeInTheDocument();
+  });
+});
