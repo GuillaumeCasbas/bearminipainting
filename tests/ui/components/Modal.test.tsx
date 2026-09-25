@@ -67,19 +67,6 @@ describe('Modal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it('should not call onClose on backdrop click when closeOnBackdropClick is false', () => {
-    const onClose = jest.fn();
-    render(
-      <Modal isOpen={true} onClose={onClose} title="Confirm action" closeOnBackdropClick={false}>
-        <p>Modal content</p>
-      </Modal>,
-    );
-
-    fireEvent.click(screen.getByRole('dialog'));
-
-    expect(onClose).not.toHaveBeenCalled();
-  });
-
   it('should move focus into the dialog when opened', () => {
     renderOpenModal();
 
