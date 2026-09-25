@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- New global navigation bar displayed on every page above the header, with the "MiniPaint" title as home link, links to Settings and About, an external Changelog link opening in a new tab, and the current page link highlighted via `aria-current`; additive step, the legacy header/footer navigation remains in place (BEA-60).
 - Unit form: the unit code format is now validated on the frontend before submission, showing the same error message as the backend for invalid characters; the validation regex is extracted to a shared Core constant (`src/core/constants/unit-code.ts`) used by both `CreateUnitUseCase` and the form (BEA-22).
 - New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 

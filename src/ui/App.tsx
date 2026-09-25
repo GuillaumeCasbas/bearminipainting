@@ -8,6 +8,7 @@ import { SettingsPage } from './components/SettingsPage';
 import ToastContainer from './components/Toast';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { Navbar } from './components/Navbar';
 import { ToggleDoneTodos } from './components/ToggleDoneTodos';
 import { useProjectStore } from './stores/projectStore';
 import { useUiPreferencesStore } from './stores/uiPreferencesStore';
@@ -35,6 +36,7 @@ export function App() {
       <div className="min-h-screen flex flex-col bg-gray-100">
         <div className="flex-1 flex flex-col p-8">
           <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
+            <Navbar />
             <AppHeader />
 
             <main className="flex-1">
