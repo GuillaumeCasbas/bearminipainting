@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Header } from '../../../src/ui/components/Header';
 
@@ -12,28 +12,19 @@ jest.mock('react-router-dom', () => ({
 describe('Header', () => {
   it('should render the app title and tagline', () => {
     render(<Header />);
-
-    expect(screen.getByText('MiniPaint')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'MiniPaint' })).toBeInTheDocument();
     expect(screen.getByText('Track your miniature painting progress')).toBeInTheDocument();
   });
 
   it('should not render the actions slot when none is provided', () => {
-    const { container } = render(<Header />);
-
-    expect(container.querySelector('header')).toBeInTheDocument();
-    expect(container.querySelector('[data-testid]')).toBeNull();
+    render(<Header />);
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Toggle' })).not.toBeInTheDocument();
   });
 
-  it('should render the actions slot when provided', () => {
-    render(<Header actions={<button data-testid="action-btn">Toggle</button>} />);
-
-    expect(screen.getByTestId('action-btn')).toBeInTheDocument();
-  });
-
-  it('should place actions on the right side of the header', () => {
-    render(<Header actions={<button data-testid="action-btn">Toggle</button>} />);
-
-    const action = screen.getByTestId('action-btn');
-    expect(action).toBeInTheDocument();
+  it('should render the actions slot inside the header when provided', () => {
+    render(<Header actions={<button>Toggle</button>} />);
+    const banner = screen.getByRole('banner');
+    expect(within(banner).getByRole('button', { name: 'Toggle' })).toBeInTheDocument();
   });
 });
