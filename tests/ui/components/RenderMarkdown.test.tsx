@@ -52,9 +52,4 @@ describe('RenderMarkdown', () => {
     rerender(<RenderMarkdown content="# Second" />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Second');
   });
-
-  it('should expose the container to assistive styles via className propagation', () => {
-    render(<RenderMarkdown content="# Title" className="custom-prose" />);
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-  });
 });

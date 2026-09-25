@@ -1,3 +1,9 @@
+// Polyfill TextEncoder for react-router-dom in the jsdom environment
+if (typeof globalThis.TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  Object.assign(globalThis, { TextEncoder, TextDecoder });
+}
+
 // Mock localStorage for Node.js environment
 const localStorageMock = {
   store: {},

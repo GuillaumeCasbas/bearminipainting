@@ -1,14 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import ProjectList from '../../../src/ui/components/ProjectList';
 import { Project } from '@/core/entities/Project';
-
-// Mock react-router-dom
-jest.mock('react-router-dom', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-}));
 
 // Mock the useProjectStore
 const mockProjects: Project[] = [];
@@ -45,13 +40,21 @@ describe('ProjectList', () => {
       isLoading: true,
     });
 
-    render(<ProjectList />);
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('Loading projects...')).toBeInTheDocument();
   });
 
   it('should display empty state when no projects', () => {
-    render(<ProjectList />);
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('My Projects')).toBeInTheDocument();
     expect(screen.getByText('No projects created yet.')).toBeInTheDocument();
@@ -74,7 +77,11 @@ describe('ProjectList', () => {
       isLoading: false,
     });
 
-    render(<ProjectList />);
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText('Space Marines')).toBeInTheDocument();
@@ -84,7 +91,7 @@ describe('ProjectList', () => {
     expect(getRenderedCards()).toHaveLength(2);
   });
 
-  it('should link each project name to its detail page', () => {
+  it('should navigate to the project detail page when a project name is clicked', async () => {
     const project = createTestProject({
       id: 'proj-1',
       name: 'Space Marines',
@@ -96,10 +103,28 @@ describe('ProjectList', () => {
       isLoading: false,
     });
 
-    render(<ProjectList />);
+    let currentPath = '';
+    function LocationProbe() {
+      const location = useLocation();
+      currentPath = location.pathname;
+      return null;
+    }
 
-    const link = screen.getByRole('link', { name: 'Space Marines' });
-    expect(link).toBeInTheDocument();
+    render(
+      <MemoryRouter>
+        <ProjectList />
+        <Routes>
+          <Route path="/projects/:id" element={<LocationProbe />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('link', { name: 'Space Marines' }));
+
+    await waitFor(() => {
+      expect(currentPath).toBe('/projects/proj-1');
+    });
   });
 
   it('should not display the internal project UUID (BEA-47)', () => {
@@ -114,7 +139,11 @@ describe('ProjectList', () => {
       isLoading: false,
     });
 
-    render(<ProjectList />);
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
 
     expect(screen.queryByText('very-lon...')).not.toBeInTheDocument();
     expect(screen.queryByText(/very-long-project-id/)).not.toBeInTheDocument();
@@ -133,7 +162,11 @@ describe('ProjectList', () => {
       isLoading: false,
     });
 
-    render(<ProjectList />);
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('50%')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
@@ -157,7 +190,11 @@ describe('ProjectList', () => {
       ];
 
       mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
-      render(<ProjectList />);
+      render(
+        <MemoryRouter>
+          <ProjectList />
+        </MemoryRouter>,
+      );
 
       expect(getRenderedNames()).toEqual(['Alpha', 'Charlie', 'Bravo']);
     });
@@ -170,7 +207,11 @@ describe('ProjectList', () => {
       ];
 
       mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
-      render(<ProjectList />);
+      render(
+        <MemoryRouter>
+          <ProjectList />
+        </MemoryRouter>,
+      );
 
       expect(getRenderedNames()).toEqual(['Adeptus Custodes', 'Orks', 'Space Marines']);
     });
@@ -182,11 +223,13 @@ describe('ProjectList', () => {
       ];
 
       mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
-      render(<ProjectList />);
+      render(
+        <MemoryRouter>
+          <ProjectList />
+        </MemoryRouter>,
+      );
 
-      const codes = screen
-        .getAllByText(/T[12]/)
-        .map((element) => element.textContent ?? '');
+      const codes = screen.getAllByText(/T[12]/).map((element) => element.textContent ?? '');
       expect(codes).toEqual(['T1', 'T2']);
     });
 
@@ -198,7 +241,11 @@ describe('ProjectList', () => {
       const originalOrder = projects.map((p) => p.id);
 
       mockUseProjectStore.mockReturnValue({ projects, isLoading: false });
-      render(<ProjectList />);
+      render(
+        <MemoryRouter>
+          <ProjectList />
+        </MemoryRouter>,
+      );
 
       expect(projects.map((p) => p.id)).toEqual(originalOrder);
     });
