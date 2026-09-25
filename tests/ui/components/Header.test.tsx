@@ -16,6 +16,21 @@ describe('Header', () => {
     expect(screen.getByText('Track your miniature painting progress')).toBeInTheDocument();
   });
 
+  it('should link the app title to the home page', () => {
+    render(<Header />);
+
+    const titleLink = screen.getByRole('link', { name: 'MiniPaint' });
+    expect(titleLink).toHaveAttribute('href', '/');
+  });
+
+  it('should keep the tagline as plain non-clickable text', () => {
+    render(<Header />);
+
+    const tagline = screen.getByText('Track your miniature painting progress');
+    expect(tagline.tagName).toBe('P');
+    expect(tagline.closest('a')).toBeNull();
+  });
+
   it('should not render the actions slot when none is provided', () => {
     render(<Header />);
     expect(screen.getByRole('banner')).toBeInTheDocument();
