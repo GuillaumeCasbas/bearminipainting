@@ -1,5 +1,7 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { CHANGELOG_URL } from '@/ui/version';
+
+const TAGLINE = 'Track your miniature painting progress';
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
   `text-sm transition-colors ${
@@ -8,16 +10,38 @@ const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
       : 'text-blue-600 hover:text-blue-800 underline'
   }`;
 
+function Brand() {
+  const { pathname } = useLocation();
+  const isHomePage = pathname === '/';
+
+  const content = 'MiniPaint';
+  const className = 'text-lg font-bold text-gray-900 hover:text-blue-800 transition-colors';
+
+  if (isHomePage) {
+    return (
+      <h1 className="text-lg font-bold">
+        <Link to="/" className={className}>
+          {content}
+        </Link>
+      </h1>
+    );
+  }
+
+  return (
+    <Link to="/" className={className}>
+      {content}
+    </Link>
+  );
+}
+
 export function Navbar() {
+  const { pathname } = useLocation();
+  const isHomePage = pathname === '/';
+
   return (
     <nav className="mb-6">
       <div className="flex items-center justify-between gap-4 border-b border-gray-300 pb-3">
-        <Link
-          to="/"
-          className="text-lg font-bold text-gray-900 hover:text-blue-800 transition-colors"
-        >
-          MiniPaint
-        </Link>
+        <Brand />
         <ul className="flex items-center gap-4">
           <li>
             <NavLink to="/settings" className={navLinkClassName}>
@@ -41,6 +65,7 @@ export function Navbar() {
           </li>
         </ul>
       </div>
+      {isHomePage && <p className="text-gray-600 mt-2">{TAGLINE}</p>}
     </nav>
   );
 }

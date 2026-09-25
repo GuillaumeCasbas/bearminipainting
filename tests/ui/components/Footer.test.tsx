@@ -2,32 +2,19 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from '../../../src/ui/components/Footer';
 
-jest.mock('react-router-dom', () => ({
-  Link: ({ children, to, ...rest }: { children: React.ReactNode; to: string } & Record<string, unknown>) => (
-    <a href={to} {...rest}>
-      {children}
-    </a>
-  ),
-}));
-
 describe('Footer', () => {
   it('renders the app version without a "v" prefix', () => {
     render(<Footer />);
-
     const footer = screen.getByRole('contentinfo');
     expect(footer).toHaveTextContent(/MiniPaint\s+\d+\.\d+\.\d+/);
     expect(footer).not.toHaveTextContent('MiniPaint v');
   });
 
-  it('renders the changelog link pointing to CHANGELOG.md on GitHub', () => {
+  it('does not contain any navigation link (About/Changelog moved to the navbar) (BEA-61)', () => {
     render(<Footer />);
 
-    const link = screen.getByRole('link', { name: 'Changelog' });
-    expect(link).toHaveAttribute(
-      'href',
-      'https://github.com/GuillaumeCasbas/bearminipainting/blob/main/CHANGELOG.md',
-    );
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noreferrer');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByText('About')).not.toBeInTheDocument();
+    expect(screen.queryByText('Changelog')).not.toBeInTheDocument();
   });
 });

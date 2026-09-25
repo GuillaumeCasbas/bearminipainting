@@ -94,4 +94,28 @@ describe('Navbar', () => {
 
     expect(screen.getByRole('navigation')).toBeInTheDocument();
   });
+
+  it('should render the brand as the page heading on the home page (BEA-61)', () => {
+    renderNavbarAt('/');
+
+    expect(screen.getByRole('heading', { name: 'MiniPaint', level: 1 })).toBeInTheDocument();
+  });
+
+  it('should not render a heading on non-home pages so each page keeps a single h1 (BEA-61)', () => {
+    renderNavbarAt('/settings');
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'MiniPaint' })).toBeInTheDocument();
+  });
+
+  it('should display the tagline under the navbar on the home page only (BEA-61)', () => {
+    renderNavbarAt('/');
+    expect(screen.getByText('Track your miniature painting progress')).toBeInTheDocument();
+  });
+
+  it('should not display the tagline on non-home pages (BEA-61)', () => {
+    renderNavbarAt('/about');
+
+    expect(screen.queryByText('Track your miniature painting progress')).not.toBeInTheDocument();
+  });
 });
