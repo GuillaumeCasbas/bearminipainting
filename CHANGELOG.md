@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- A global navigation bar is now displayed on every page, giving quick access to Settings, About and the Changelog from anywhere in the app (BEA-60).
 - Unit form: the unit code format is now validated on the frontend before submission, showing the same error message as the backend for invalid characters; the validation regex is extracted to a shared Core constant (`src/core/constants/unit-code.ts`) used by both `CreateUnitUseCase` and the form (BEA-22).
 - New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
