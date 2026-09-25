@@ -5,6 +5,7 @@ import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
 import { Todo } from '@/core/entities/Todo';
 import { UnitCodeNotUniqueError, ProjectNotFoundError, UnitNotFoundError } from '@/core/errors';
+import { DEFAULT_TODOS } from '@/core/constants/default-todos';
 
 describe('LocalStorageUnitRepository Integration', () => {
   let projectRepository: LocalStorageProjectRepository;
@@ -263,19 +264,11 @@ describe('LocalStorageUnitRepository Integration', () => {
       PROJECT_ID
     );
 
-    expect(result.todos.length).toBe(6);
-    expect(result.todos[0].label).toBe('Assembly');
-    expect(result.todos[0].order).toBe(10);
-    expect(result.todos[1].label).toBe('Primer');
-    expect(result.todos[1].order).toBe(20);
-    expect(result.todos[2].label).toBe('Basecoat');
-    expect(result.todos[2].order).toBe(30);
-    expect(result.todos[3].label).toBe('Effects');
-    expect(result.todos[3].order).toBe(40);
-    expect(result.todos[4].label).toBe('Base');
-    expect(result.todos[4].order).toBe(50);
-    expect(result.todos[5].label).toBe('Varnish');
-    expect(result.todos[5].order).toBe(60);
+    expect(result.todos.length).toBe(DEFAULT_TODOS.length);
+    DEFAULT_TODOS.forEach((todoConfig, index) => {
+      expect(result.todos[index].label).toBe(todoConfig.label);
+      expect(result.todos[index].order).toBe(todoConfig.order);
+    });
   });
 
   // === findById Method Tests ===

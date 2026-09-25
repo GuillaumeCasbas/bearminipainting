@@ -2,6 +2,7 @@ import { CreateUnitUseCase } from "../../../src/core/usecases/create-unit.usecas
 import { UnitRepository } from "../../../src/core/ports/unit.repository";
 import { Unit } from "../../../src/core/entities/Unit";
 import { Todo } from "../../../src/core/entities/Todo";
+import { DEFAULT_TODOS } from "../../../src/core/constants/default-todos";
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -14,16 +15,6 @@ describe("CreateUnitUseCase", () => {
   const VALID_CODE = "INT-01";
   const INVALID_CODE_WITH_SPECIAL_CHARS = "INT@01";
   const INVALID_CODE_WITH_SPACE = "INT 01";
-
-  // Default todos configuration from CONTEXT.md
-  const DEFAULT_TODOS = [
-    { label: "Assembly", order: 10 },
-    { label: "Primer", order: 20 },
-    { label: "Basecoat", order: 30 },
-    { label: "Effects", order: 40 },
-    { label: "Base", order: 50 },
-    { label: "Varnish", order: 60 },
-  ];
 
   let mockRepository: UnitRepository;
   let useCase: CreateUnitUseCase;
@@ -63,19 +54,11 @@ describe("CreateUnitUseCase", () => {
   it("should create unit with default todos in correct order", async () => {
     const result = await useCase.execute(VALID_NAME, VALID_CODE, PROJECT_ID);
 
-    expect(result.todos.length).toBe(6);
-    expect(result.todos[0].label).toBe("Assembly");
-    expect(result.todos[0].order).toBe(10);
-    expect(result.todos[1].label).toBe("Primer");
-    expect(result.todos[1].order).toBe(20);
-    expect(result.todos[2].label).toBe("Basecoat");
-    expect(result.todos[2].order).toBe(30);
-    expect(result.todos[3].label).toBe("Effects");
-    expect(result.todos[3].order).toBe(40);
-    expect(result.todos[4].label).toBe("Base");
-    expect(result.todos[4].order).toBe(50);
-    expect(result.todos[5].label).toBe("Varnish");
-    expect(result.todos[5].order).toBe(60);
+    expect(result.todos.length).toBe(DEFAULT_TODOS.length);
+    DEFAULT_TODOS.forEach((todoConfig, index) => {
+      expect(result.todos[index].label).toBe(todoConfig.label);
+      expect(result.todos[index].order).toBe(todoConfig.order);
+    });
   });
 
   // === ERROR CASES ===

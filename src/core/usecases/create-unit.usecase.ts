@@ -1,6 +1,7 @@
 import { Unit } from '../entities/Unit';
 import { Todo } from '../entities/Todo';
 import { UnitRepository } from '../ports/unit.repository';
+import { DEFAULT_TODOS } from '../constants/default-todos';
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -8,16 +9,6 @@ import {
 } from '../errors';
 
 export class CreateUnitUseCase {
-  // Default todos configuration from CONTEXT.md
-  private static readonly DEFAULT_TODOS = [
-    { label: 'Assembly', order: 10 },
-    { label: 'Primer', order: 20 },
-    { label: 'Basecoat', order: 30 },
-    { label: 'Effects', order: 40 },
-    { label: 'Base', order: 50 },
-    { label: 'Varnish', order: 60 },
-  ];
-
   private readonly unitCodeRegex = /^[a-zA-Z0-9-]+$/;
 
   constructor(private readonly unitRepository: UnitRepository) {}
@@ -44,7 +35,7 @@ export class CreateUnitUseCase {
     }
 
     // Create todos
-    const todos = CreateUnitUseCase.DEFAULT_TODOS.map(
+    const todos = DEFAULT_TODOS.map(
       (todoConfig) => new Todo(crypto.randomUUID(), todoConfig.label, 'TODO', todoConfig.order),
     );
 
