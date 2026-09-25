@@ -64,7 +64,7 @@ describe('AlmostThereSection', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Nothing above 75% yet. Push a miniature to the final stretch!',
+          'Nothing that close yet. Push a miniature to the final stretch!',
         ),
       ).toBeInTheDocument();
     });
@@ -121,7 +121,7 @@ describe('AlmostThereSection', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Nothing above 75% yet. Push a miniature to the final stretch!',
+          'Nothing that close yet. Push a miniature to the final stretch!',
         ),
       ).toBeInTheDocument();
     });
@@ -154,7 +154,7 @@ describe('AlmostThereSection', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          'Nothing above 75% yet. Push a miniature to the final stretch!',
+          'Nothing that close yet. Push a miniature to the final stretch!',
         ),
       ).toBeInTheDocument();
     });

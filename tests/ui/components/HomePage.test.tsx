@@ -30,7 +30,7 @@ const renderHomePageSettled = async () => {
   render(<HomePage />);
   await waitFor(() => {
     expect(
-      screen.getByText('Nothing above 75% yet. Push a miniature to the final stretch!'),
+      screen.getByText('Nothing that close yet. Push a miniature to the final stretch!'),
     ).toBeInTheDocument();
   });
 };
