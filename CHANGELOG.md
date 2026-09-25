@@ -10,33 +10,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
-- The home page now shows an "Almost there!" section with your most advanced unfinished miniatures (75% and above, up to 3), so you know what to finish before starting something new (BEA-48).
-- A global navigation bar is now displayed on every page, giving quick access to Settings, About and the Changelog from anywhere in the app (BEA-60).
-- Unit form: the unit code format is now validated on the frontend before submission, showing the same error message as the backend for invalid characters; the validation regex is extracted to a shared Core constant (`src/core/constants/unit-code.ts`) used by both `CreateUnitUseCase` and the form (BEA-22).
-- New Settings page (accessible from the header on every page) to export all painting data as a dated JSON backup (`minipaint-export-YYYY-MM-DD.json`) and to import a backup with an explicit overwrite warning and confirmation (BEA-46).
 
 ### Changed
-- Importing a backup now validates the data and rejects the file with explicit errors if it contains duplicate codes or units referencing unknown projects, before any data is replaced (BEA-50).
-- On small screens, the navigation bar now collapses into a menu opened by a button, keeping the navigation compact and easy to reach (BEA-62).
-- The navigation is now unified in the global navigation bar: the page header and footer no longer repeat links, the tagline appears on the home page, and the "Hide completed todos" toggle appears on the unit page (BEA-61).
-- CI: the test step in CI now runs Jest with coverage (`npm run test:coverage`) enforcing the RULES.md minimums via `coverageThreshold` — 80% lines/branches for `src/core`, 70% for `src/adapters` (BEA-43).
-- Tests: rewrote UI tests coupled to implementation details (DOM traversal, CSS classes, internal link hrefs, firstChild) to behavior-based assertions (roles, accessible names, user interactions) so they survive internal refactors; audit covered HomePage, Header, ToastContainer, Dropdown, RenderMarkdown, ProjectList, and Sidebar (BEA-49).
-- Project detail: adding a unit no longer re-fetches the project from the repository; the store builds the updated project locally and returns it to the component, eliminating a redundant read after unit creation (BEA-21).
-- Home page: the project list is now displayed as cards (name link, code, completion rate with progress bar) instead of a table, matching the unit list style (BEA-47).
-- Home page sidebar: removed the duplicate "Add a project" title and the double card/padding; the project form renders as a single clean card (BEA-47).
-- Home page review follow-up: simplified the progress bar wrapper in project cards, aligned the mobile sidebar panel padding with desktop, added a stable `project-card` test id, and removed the unused `getCompletionRateTextColor` utility (BEA-47).
 
 ### Deprecated
--
 
 ### Removed
--
 
 ### Fixed
--
 
 ### Security
--
+
+---
+
+## [0.3.0] - 2026-09-25
+
+Third release of BearMiniPainting.
+
+### Added
+
+- The home page now shows an "Almost there!" section with your most advanced unfinished miniatures (75% and above, up to 3), so you know what to finish before starting something new (BEA-48).
+- A global navigation bar is now displayed on every page, giving quick access to Settings, About and the Changelog from anywhere in the app (BEA-60, BEA-61, BEA-62).
+- New Settings page to save all your painting data as a backup file and restore it later, with a clear warning before anything is replaced (BEA-46).
+- The unit form now shows a clear error message right away when the unit code contains invalid characters (BEA-22).
+
+### Changed
+
+- The home page now displays projects as cards sorted by progress, so you see your most advanced projects first (BEA-47).
+- Importing a backup now checks the file and explains what is wrong (duplicate codes, unknown projects) before replacing any data (BEA-50).
+
+### Fixed
+
+### Security
 
 ---
 
