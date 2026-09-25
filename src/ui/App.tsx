@@ -7,18 +7,25 @@ import { AboutPage } from './pages/AboutPage';
 import { SettingsPage } from './components/SettingsPage';
 import ToastContainer from './components/Toast';
 import { Footer } from './components/Footer';
-import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
 import { ToggleDoneTodos } from './components/ToggleDoneTodos';
 import { useProjectStore } from './stores/projectStore';
 import { useUiPreferencesStore } from './stores/uiPreferencesStore';
 import { BASE_PATH } from '@/ui/config';
 
-function AppHeader() {
+function AppBanner() {
   const location = useLocation();
   const isUnitDetailPage = location.pathname.startsWith('/units/');
 
-  return <Header actions={isUnitDetailPage ? <ToggleDoneTodos /> : undefined} />;
+  if (!isUnitDetailPage) {
+    return null;
+  }
+
+  return (
+    <div className="mb-6 flex justify-end">
+      <ToggleDoneTodos />
+    </div>
+  );
 }
 
 export function App() {
@@ -37,8 +44,7 @@ export function App() {
         <div className="flex-1 flex flex-col p-8">
           <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
             <Navbar />
-            <AppHeader />
-
+            <AppBanner />
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -48,11 +54,9 @@ export function App() {
                 <Route path="/units/:unitId" element={<UnitDetail />} />
               </Routes>
             </main>
-
             <Footer />
           </div>
         </div>
-
         <ToastContainer />
       </div>
     </Router>
