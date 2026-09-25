@@ -177,6 +177,20 @@ src/
 
 ---
 
+## 🧭 UI Navigation (BEA-55)
+- **Navbar**: Global navigation bar displayed on every page, above page content.
+  - **Brand**: "MiniPaint" title on the left, links to home (`/`) (BEA-34).
+  - **Links**: Settings (`/settings`), About (`/about`), external Changelog (GitHub, new tab).
+  - **Active state**: Current page link is visually highlighted.
+  - **Mobile**: Hamburger button toggles a menu with the same links (closed by default, closes on link click).
+  - **Position**: Not sticky (scrolls with the page).
+- **Tagline**: "Track your miniature painting progress" displayed under the navbar, on the home page only.
+- **Actions banner**: Page-specific actions (e.g. "Show/Hide done todos" on unit detail) are displayed in a banner below the navbar.
+- **Footer**: Displays only the app version (About & Changelog links moved to the navbar).
+- **Language**: All UI texts are in English.
+
+---
+
 ## 🔒 Security & API Access
 ### **Linear Access**
 - Linear is accessed entirely through the **Linear MCP server**; no API key is
