@@ -50,6 +50,19 @@ export function AlmostThereSection() {
                   <ProgressBar completionRate={unit.getCompletionRate()} withLabel />
                 </div>
               </div>
+              {(() => {
+                const remainingTodos = unit.todos
+                  .filter((todo) => todo.status === 'TODO')
+                  .sort((a, b) => a.order - b.order);
+                if (remainingTodos.length === 0) return null;
+                return (
+                  <ul>
+                    {remainingTodos.map((todo) => (
+                      <li key={todo.id}>{todo.label}</li>
+                    ))}
+                  </ul>
+                );
+              })()}
             </li>
           ))}
         </ul>

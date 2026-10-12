@@ -145,6 +145,48 @@ describe('AlmostThereSection', () => {
     });
   });
 
+  it('displays unfinished todos sorted by order ASC with label only', async () => {
+    const todos = [
+      new Todo('t1', 'Varnish', 'TODO', 60),
+      new Todo('t2', 'Basecoat', 'DONE', 30),
+      new Todo('t3', 'Base', 'TODO', 50),
+      new Todo('t4', 'Effects', 'DONE', 40),
+      new Todo('t5', 'Assembly', 'DONE', 10),
+      new Todo('t6', 'Primer', 'DONE', 20),
+      new Todo('t7', 'Highlight', 'DONE', 70),
+      new Todo('t8', 'Detail', 'DONE', 80),
+    ];
+    const unit = new Unit('u1', 'Intercessors', 'UNIT-u1', 'project-1', todos);
+    mockUseProjectStore.mockReturnValue({
+      projects: [{ id: 'p1', name: 'Project', code: 'P', units: [unit] }],
+    });
+    renderSection();
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
+    });
+    const card = screen.getByTestId('almost-there-card');
+    const todoItems = Array.from(card.querySelectorAll('li'));
+    expect(todoItems.map((item) => item.textContent)).toEqual(['Base', 'Varnish']);
+    expect(card.querySelector('input[type="checkbox"]')).not.toBeInTheDocument();
+    expect(screen.queryByText('Remaining tasks:')).not.toBeInTheDocument();
+  });
+
+  it('displays nothing under the unit name when there is no unfinished todo', async () => {
+    const unit = makeUnit('u1', 'Intercessors', 4, 4);
+    unit.getCompletionRate = () => 80;
+    mockUseProjectStore.mockReturnValue({
+      projects: [{ id: 'p1', name: 'Project', code: 'P', units: [unit] }],
+    });
+    renderSection();
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
+    });
+    const card = screen.getByTestId('almost-there-card');
+    expect(card.querySelectorAll('li').length).toBe(0);
+  });
+
   it('displays the empty state message when no unit is eligible', async () => {
     mockUseProjectStore.mockReturnValue({
       projects: [{ id: 'p1', name: 'Project', code: 'P', units: [] }],
