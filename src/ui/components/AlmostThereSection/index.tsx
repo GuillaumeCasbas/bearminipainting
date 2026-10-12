@@ -6,9 +6,7 @@ import { ProgressBar } from '@/ui/components/ProgressBar';
 import { useProjectStore } from '@/ui/stores/projectStore';
 
 function getRemainingTodos(unit: Unit) {
-  return unit.todos
-    .filter((todo) => todo.status === 'TODO')
-    .sort((a, b) => a.order - b.order);
+  return unit.todos.filter((todo) => todo.status === 'TODO').sort((a, b) => a.order - b.order);
 }
 
 export function AlmostThereSection() {
