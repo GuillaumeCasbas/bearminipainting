@@ -5,6 +5,12 @@ import { Unit } from '@/core/entities/Unit';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { useProjectStore } from '@/ui/stores/projectStore';
 
+function getRemainingTodos(unit: Unit) {
+  return unit.todos
+    .filter((todo) => todo.status === 'TODO')
+    .sort((a, b) => a.order - b.order);
+}
+
 export function AlmostThereSection() {
   const { projects } = useProjectStore();
   const [almostThereUnits, setAlmostThereUnits] = useState<Unit[]>([]);
@@ -51,9 +57,7 @@ export function AlmostThereSection() {
                 </div>
               </div>
               {(() => {
-                const remainingTodos = unit.todos
-                  .filter((todo) => todo.status === 'TODO')
-                  .sort((a, b) => a.order - b.order);
+                const remainingTodos = getRemainingTodos(unit);
                 if (remainingTodos.length === 0) return null;
                 return (
                   <ul>
