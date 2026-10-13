@@ -19,6 +19,7 @@ import { DeleteProjectUseCase } from '../core/usecases/delete-project.usecase';
 import { DeleteUnitUseCase } from '../core/usecases/delete-unit.usecase';
 import { ReorderTodosUseCase } from '../core/usecases/reorder-todos.usecase';
 import { UpdateUnitNameUseCase } from '../core/usecases/update-unit-name.usecase';
+import { UpdateProjectNameUseCase } from '../core/usecases/update-project-name.usecase';
 import { ExportDataUseCase } from '../core/usecases/export-data.usecase';
 import { ImportDataUseCase } from '../core/usecases/import-data.usecase';
 import { GetAlmostThereUnitsUseCase } from '../core/usecases/get-almost-there-units.usecase';
@@ -43,6 +44,7 @@ const toggleTodoStatusUseCase = new ToggleTodoStatusUseCase(unitRepository);
 const addTodoToUnitUseCase = new AddTodoToUnitUseCase(unitRepository);
 const deleteTodoUseCase = new DeleteTodoUseCase(unitRepository);
 const updateUnitNameUseCase = new UpdateUnitNameUseCase(unitRepository);
+const updateProjectNameUseCase = new UpdateProjectNameUseCase(projectRepository);
 const exportDataUseCase = new ExportDataUseCase(dataManagementRepository);
 const importDataUseCase = new ImportDataUseCase(dataManagementRepository);
 const getAlmostThereUnitsUseCase = new GetAlmostThereUnitsUseCase();
@@ -67,6 +69,7 @@ export {
   addTodoToUnitUseCase,
   deleteTodoUseCase,
   updateUnitNameUseCase,
+  updateProjectNameUseCase,
   exportDataUseCase,
   importDataUseCase,
   getAlmostThereUnitsUseCase,
