@@ -25,6 +25,7 @@ import {
   deleteUnitUseCase,
   reorderTodosUseCase,
   updateUnitNameUseCase,
+  updateProjectNameUseCase,
 } from '@/di/container';
 
 // Types for toast notifications
@@ -52,6 +53,7 @@ interface ProjectStore {
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   updateUnitName: (unitId: string, newName: string) => Promise<boolean>;
+  updateProjectName: (projectId: string, newName: string) => Promise<boolean>;
   loadProjects: () => Promise<void>;
   exportData: () => Promise<string>;
   importData: (rawData: string) => Promise<boolean>;
@@ -531,6 +533,54 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         .getState()
         .addToast('error', error instanceof Error ? error.message : 'Failed to update unit name');
 
+      return false;
+    }
+  },
+
+  // Update a project's name with optimistic update + rollback
+  updateProjectName: async (projectId: string, newName: string) => {
+    let previousProject: Project | null = null;
+    try {
+      const projects = useProjectStore.getState().projects;
+      const currentProject = projects.find((p) => p.id === projectId) ?? null;
+      if (!currentProject) {
+        throw new ProjectNotFoundError(projectId);
+      }
+      // Save previous state for rollback
+      previousProject = currentProject;
+      // Optimistic update: rename the project locally
+      const optimisticProject = new Project(
+        currentProject.id,
+        newName.trim(),
+        currentProject.code,
+        currentProject.units,
+      );
+      const optimisticProjects = projects.map((p) =>
+        p.id === projectId ? optimisticProject : p,
+      );
+      set({ projects: optimisticProjects });
+      // Persist the new name via the use case
+      await updateProjectNameUseCase.execute(projectId, newName);
+      // Show success toast
+      useProjectStore.getState().addToast('success', 'Project name updated successfully');
+      return true;
+    } catch (error) {
+      // Rollback optimistic update
+      if (previousProject) {
+        const projects = useProjectStore.getState().projects;
+        const revertedProjects = projects.map((p) =>
+          p.id === projectId ? previousProject! : p,
+        );
+        set({ projects: revertedProjects });
+      }
+      // Empty name is handled by the UI (validation error); stay silent in the store
+      if (error instanceof ProjectNameRequiredError) {
+        return false;
+      }
+      // Other errors: show error toast
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to update project name');
       return false;
     }
   },

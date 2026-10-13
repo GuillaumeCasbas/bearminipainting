@@ -5,6 +5,7 @@ import { UnitCodeNotUniqueError } from '@/core/errors';
 
 const mockCreateUnitUseCase = { execute: jest.fn() };
 const mockGetProjectByIdUseCase = { execute: jest.fn() };
+const mockUpdateProjectNameUseCase = { execute: jest.fn() };
 
 jest.mock('@/di/container', () => ({
   getAllProjectsUseCase: { execute: jest.fn() },
@@ -20,6 +21,7 @@ jest.mock('@/di/container', () => ({
   deleteUnitUseCase: { execute: jest.fn() },
   reorderTodosUseCase: { execute: jest.fn() },
   updateUnitNameUseCase: { execute: jest.fn() },
+  updateProjectNameUseCase: mockUpdateProjectNameUseCase,
 }));
 
 import { useProjectStore } from '@/ui/stores/projectStore';
@@ -93,6 +95,56 @@ describe('projectStore addUnit', () => {
     const result = await useProjectStore.getState().addUnit('project-1', 'Hellblasters', 'HEL-01');
 
     expect(result).toBeNull();
+    expect(useProjectStore.getState().projects).toHaveLength(0);
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('error');
+  });
+});
+
+describe('projectStore updateProjectName', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useProjectStore.setState({
+      projects: [new Project('project-1', 'Space Marines', 'SM', [])],
+      isLoading: false,
+      toasts: [],
+    });
+  });
+
+  it('optimistically renames the project in the store and returns true', async () => {
+    mockUpdateProjectNameUseCase.execute.mockResolvedValueOnce(undefined);
+    const result = await useProjectStore.getState().updateProjectName('project-1', 'Ultramarines');
+    expect(result).toBe(true);
+    const storedProject = useProjectStore.getState().projects.find((p) => p.id === 'project-1');
+    expect(storedProject!.name).toBe('Ultramarines');
+    expect(mockUpdateProjectNameUseCase.execute).toHaveBeenCalledWith('project-1', 'Ultramarines');
+  });
+
+  it('shows a success toast after renaming', async () => {
+    mockUpdateProjectNameUseCase.execute.mockResolvedValueOnce(undefined);
+    await useProjectStore.getState().updateProjectName('project-1', 'Ultramarines');
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('success');
+  });
+
+  it('rolls back the optimistic update and shows an error toast on failure', async () => {
+    mockUpdateProjectNameUseCase.execute.mockRejectedValueOnce(new Error('boom'));
+    const result = await useProjectStore.getState().updateProjectName('project-1', 'Ultramarines');
+    expect(result).toBe(false);
+    const storedProject = useProjectStore.getState().projects.find((p) => p.id === 'project-1');
+    expect(storedProject!.name).toBe('Space Marines');
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('error');
+  });
+
+  it('returns false and rolls back when the project is missing from the store', async () => {
+    useProjectStore.setState({ projects: [] });
+    mockUpdateProjectNameUseCase.execute.mockResolvedValueOnce(undefined);
+    const result = await useProjectStore.getState().updateProjectName('project-1', 'Ultramarines');
+    expect(result).toBe(false);
     expect(useProjectStore.getState().projects).toHaveLength(0);
     const toasts = useProjectStore.getState().toasts;
     expect(toasts).toHaveLength(1);
