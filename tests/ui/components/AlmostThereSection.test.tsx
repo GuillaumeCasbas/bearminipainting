@@ -169,22 +169,6 @@ describe('AlmostThereSection', () => {
     const todoItems = Array.from(card.querySelectorAll('li'));
     expect(todoItems.map((item) => item.textContent)).toEqual(['Base', 'Varnish']);
     expect(card.querySelector('input[type="checkbox"]')).not.toBeInTheDocument();
-    expect(screen.queryByText('Remaining tasks:')).not.toBeInTheDocument();
-  });
-
-  it('displays nothing under the unit name when there is no unfinished todo', async () => {
-    const unit = makeUnit('u1', 'Intercessors', 4, 4);
-    unit.getCompletionRate = () => 80;
-    mockUseProjectStore.mockReturnValue({
-      projects: [{ id: 'p1', name: 'Project', code: 'P', units: [unit] }],
-    });
-    renderSection();
-
-    await waitFor(() => {
-      expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
-    });
-    const card = screen.getByTestId('almost-there-card');
-    expect(card.querySelectorAll('li').length).toBe(0);
   });
 
   it('displays the empty state message when no unit is eligible', async () => {

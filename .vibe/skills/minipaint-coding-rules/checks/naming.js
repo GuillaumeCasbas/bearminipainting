@@ -113,7 +113,7 @@ if (typeof require !== 'undefined' && require.main === module) {
   const path = require('path');
   
   const skill = module.exports;
-  const srcDir = path.join(__dirname, '../../../src');
+  const srcDir = path.join(__dirname, '../../../../src');
   
   function checkDirectory(dir) {
     const files = fs.readdirSync(dir);
