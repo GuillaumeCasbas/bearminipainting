@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The "Almost there!" section now lists the remaining tasks of each miniature, so you know exactly what is left to finish (BEA-84).
+
 ### Changed
 
 ### Deprecated

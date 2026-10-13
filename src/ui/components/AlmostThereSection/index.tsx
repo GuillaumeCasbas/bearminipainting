@@ -5,6 +5,22 @@ import { Unit } from '@/core/entities/Unit';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { useProjectStore } from '@/ui/stores/projectStore';
 
+function getRemainingTodos(unit: Unit) {
+  return unit.todos.filter((todo) => todo.status === 'TODO').sort((a, b) => a.order - b.order);
+}
+
+function RemainingTodoList({ unit }: { unit: Unit }) {
+  const remainingTodos = getRemainingTodos(unit);
+  if (remainingTodos.length === 0) return null;
+  return (
+    <ul>
+      {remainingTodos.map((todo) => (
+        <li key={todo.id}>{todo.label}</li>
+      ))}
+    </ul>
+  );
+}
+
 export function AlmostThereSection() {
   const { projects } = useProjectStore();
   const [almostThereUnits, setAlmostThereUnits] = useState<Unit[]>([]);
@@ -50,6 +66,7 @@ export function AlmostThereSection() {
                   <ProgressBar completionRate={unit.getCompletionRate()} withLabel />
                 </div>
               </div>
+              <RemainingTodoList unit={unit} />
             </li>
           ))}
         </ul>
