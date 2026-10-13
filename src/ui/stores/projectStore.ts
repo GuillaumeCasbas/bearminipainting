@@ -379,19 +379,30 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         // Update the project in the store
         const updatedProjects = projects.map((p) => (p.id === projectId ? updatedProject : p));
         set({ projects: updatedProjects });
+        // Show success toast
+        set({
+          toasts: [
+            ...useProjectStore.getState().toasts,
+            {
+              id: Date.now().toString(),
+              type: 'success',
+              message: `Unit "${newUnit.name}" added successfully!`,
+            },
+          ],
+        });
+      } else {
+        // Show error toast when the project is missing from the store
+        set({
+          toasts: [
+            ...useProjectStore.getState().toasts,
+            {
+              id: Date.now().toString(),
+              type: 'error',
+              message: `Project not found: unit "${newUnit.name}" was saved but is not visible yet. Reload to see it.`,
+            },
+          ],
+        });
       }
-
-      // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: `Unit "${newUnit.name}" added successfully!`,
-          },
-        ],
-      });
 
       return updatedProject;
     } catch (error) {
