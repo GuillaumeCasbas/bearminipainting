@@ -1,17 +1,16 @@
 import { Project } from '../../../src/core/entities/Project';
 import { Unit } from '../../../src/core/entities/Unit';
 import { UpdateProjectNameUseCase } from '../../../src/core/usecases/update-project-name.usecase';
-import {
-  ProjectNotFoundError,
-  ProjectNameRequiredError,
-} from '../../../src/core/errors';
+import { ProjectNotFoundError, ProjectNameRequiredError } from '../../../src/core/errors';
 import { ProjectRepository } from '../../../src/core/ports/project.repository';
 
 const makeRepository = (projects: Project[]): ProjectRepository => ({
   save: jest.fn().mockResolvedValue(undefined),
-  findById: jest.fn().mockImplementation(async (id: string) =>
-    projects.find((project) => project.id === id) ?? null,
-  ),
+  findById: jest
+    .fn()
+    .mockImplementation(
+      async (id: string) => projects.find((project) => project.id === id) ?? null,
+    ),
   findByCode: jest.fn().mockResolvedValue(null),
   findAll: jest.fn().mockResolvedValue(projects),
   delete: jest.fn().mockResolvedValue(undefined),
@@ -50,9 +49,7 @@ describe('UpdateProjectNameUseCase', () => {
     const repository = makeRepository([]);
     const useCase = new UpdateProjectNameUseCase(repository);
 
-    await expect(useCase.execute('missing', 'New name')).rejects.toThrow(
-      ProjectNotFoundError,
-    );
+    await expect(useCase.execute('missing', 'New name')).rejects.toThrow(ProjectNotFoundError);
   });
 
   it('throws ProjectNameRequiredError when the new name is empty or whitespace', async () => {
@@ -60,11 +57,7 @@ describe('UpdateProjectNameUseCase', () => {
     const repository = makeRepository([project]);
     const useCase = new UpdateProjectNameUseCase(repository);
 
-    await expect(useCase.execute('project-1', '')).rejects.toThrow(
-      ProjectNameRequiredError,
-    );
-    await expect(useCase.execute('project-1', '   ')).rejects.toThrow(
-      ProjectNameRequiredError,
-    );
+    await expect(useCase.execute('project-1', '')).rejects.toThrow(ProjectNameRequiredError);
+    await expect(useCase.execute('project-1', '   ')).rejects.toThrow(ProjectNameRequiredError);
   });
 });

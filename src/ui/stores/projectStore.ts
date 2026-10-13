@@ -555,9 +555,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         currentProject.code,
         currentProject.units,
       );
-      const optimisticProjects = projects.map((p) =>
-        p.id === projectId ? optimisticProject : p,
-      );
+      const optimisticProjects = projects.map((p) => (p.id === projectId ? optimisticProject : p));
       set({ projects: optimisticProjects });
       // Persist the new name via the use case
       await updateProjectNameUseCase.execute(projectId, newName);
@@ -568,9 +566,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       // Rollback optimistic update
       if (previousProject) {
         const projects = useProjectStore.getState().projects;
-        const revertedProjects = projects.map((p) =>
-          p.id === projectId ? previousProject! : p,
-        );
+        const revertedProjects = projects.map((p) => (p.id === projectId ? previousProject! : p));
         set({ projects: revertedProjects });
       }
       // Empty name is handled by the UI (validation error); stay silent in the store
@@ -580,7 +576,10 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       // Other errors: show error toast
       useProjectStore
         .getState()
-        .addToast('error', error instanceof Error ? error.message : 'Failed to update project name');
+        .addToast(
+          'error',
+          error instanceof Error ? error.message : 'Failed to update project name',
+        );
       return false;
     }
   },

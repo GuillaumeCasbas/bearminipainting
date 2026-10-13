@@ -26,11 +26,10 @@ jest.mock('../../../src/ui/contexts/projectContext', () => ({
 // Mock the project store
 const mockAddUnit = jest.fn();
 const mockDeleteProject = jest.fn();
+const mockUpdateProjectName = jest.fn();
+const mockUseProjectStore = jest.fn();
 jest.mock('../../../src/ui/stores/projectStore', () => ({
-  useProjectStore: () => ({
-    addUnit: mockAddUnit,
-    deleteProject: mockDeleteProject,
-  }),
+  useProjectStore: () => mockUseProjectStore(),
 }));
 
 const makeTodo = (id: string, label: string, status: 'TODO' | 'DONE', order: number) =>
@@ -46,6 +45,12 @@ describe('ProjectDetail add unit', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetProjectByIdUseCase.execute.mockResolvedValue(makeProject([]));
+    mockUseProjectStore.mockReturnValue({
+      addUnit: mockAddUnit,
+      deleteProject: mockDeleteProject,
+      projects: [makeProject([])],
+      updateProjectName: mockUpdateProjectName,
+    });
   });
 
   it('displays the newly added unit immediately without re-fetching the project', async () => {
@@ -89,5 +94,75 @@ describe('ProjectDetail add unit', () => {
       screen.getByText('No units, please add new one to start your wonderful painting journey!'),
     ).toBeInTheDocument();
     expect(mockGetProjectByIdUseCase.execute).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ProjectDetail - inline project name editing (BEA-68)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetProjectByIdUseCase.execute.mockResolvedValue(makeProject([]));
+    mockUseProjectStore.mockReturnValue({
+      addUnit: mockAddUnit,
+      deleteProject: mockDeleteProject,
+      projects: [makeProject([])],
+      updateProjectName: mockUpdateProjectName,
+    });
+  });
+
+  it('displays an edit icon next to the project name', async () => {
+    render(<ProjectDetail />);
+
+    expect(await screen.findByRole('heading', { name: 'Space Marines' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Edit project name')).toBeInTheDocument();
+  });
+
+  it('turns the name into a prefilled input when the edit icon is clicked', async () => {
+    render(<ProjectDetail />);
+
+    fireEvent.click(await screen.findByLabelText('Edit project name'));
+
+    const input = screen.getByLabelText('Edit project name') as HTMLInputElement;
+    expect(input.value).toBe('Space Marines');
+    expect(screen.getByLabelText('Save project name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Cancel project name edit')).toBeInTheDocument();
+  });
+
+  it('saves the new name via the store on submit', async () => {
+    mockUpdateProjectName.mockResolvedValueOnce(true);
+    render(<ProjectDetail />);
+
+    fireEvent.click(await screen.findByLabelText('Edit project name'));
+    const input = screen.getByLabelText('Edit project name') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Ultramarines' } });
+    fireEvent.click(screen.getByLabelText('Save project name'));
+
+    await waitFor(() => {
+      expect(mockUpdateProjectName).toHaveBeenCalledWith('project-1', 'Ultramarines');
+    });
+  });
+
+  it('shows a validation error and does not save when the name is empty', async () => {
+    render(<ProjectDetail />);
+
+    fireEvent.click(await screen.findByLabelText('Edit project name'));
+    const input = screen.getByLabelText('Edit project name') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.click(screen.getByLabelText('Save project name'));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Project name cannot be empty');
+    expect(mockUpdateProjectName).not.toHaveBeenCalled();
+  });
+
+  it('cancels and restores the original name without saving', async () => {
+    render(<ProjectDetail />);
+
+    fireEvent.click(await screen.findByLabelText('Edit project name'));
+    const input = screen.getByLabelText('Edit project name') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Ultramarines' } });
+    fireEvent.click(screen.getByLabelText('Cancel project name edit'));
+
+    expect(screen.getByRole('heading', { name: 'Space Marines' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Save project name')).not.toBeInTheDocument();
+    expect(mockUpdateProjectName).not.toHaveBeenCalled();
   });
 });

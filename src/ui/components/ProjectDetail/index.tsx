@@ -7,6 +7,7 @@ import { UnitForm } from '@/ui/components/UnitForm';
 import { useProjectStore } from '@/ui/stores/projectStore';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { Modal } from '@/ui/components/Modal';
+import { EditableName } from '@/ui/components/EditableName';
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,7 +20,7 @@ export function ProjectDetail() {
   const [isDangerZoneOpen, setIsDangerZoneOpen] = useState<boolean>(false);
 
   const { getProjectByIdUseCase } = useProjectContext();
-  const { addUnit, deleteProject } = useProjectStore();
+  const { addUnit, deleteProject, updateProjectName } = useProjectStore();
 
   useEffect(() => {
     const loadProject = async () => {
@@ -125,7 +126,11 @@ export function ProjectDetail() {
 
         {/* Project Header */}
         <div className="mb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{project.name}</h1>
+          <EditableName
+            name={project.name}
+            entityLabel="Project"
+            onSave={(newName) => updateProjectName(project.id, newName)}
+          />
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">{project.code}</span>
           </div>
