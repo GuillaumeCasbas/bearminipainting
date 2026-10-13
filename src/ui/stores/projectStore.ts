@@ -610,7 +610,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       toasts: [
         ...useProjectStore.getState().toasts,
         {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           type,
           message,
         },

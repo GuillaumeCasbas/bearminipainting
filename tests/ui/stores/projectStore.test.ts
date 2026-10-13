@@ -151,3 +151,24 @@ describe('projectStore updateProjectName', () => {
     expect(toasts[0].type).toBe('error');
   });
 });
+
+describe('projectStore addToast', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useProjectStore.setState({
+      projects: [],
+      isLoading: false,
+      toasts: [],
+    });
+  });
+
+  it('gives a unique id to each toast, even within the same millisecond', () => {
+    const { addToast } = useProjectStore.getState();
+    addToast('error', 'First message');
+    addToast('error', 'Second message');
+
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(2);
+    expect(toasts[0].id).not.toBe(toasts[1].id);
+  });
+});
