@@ -56,8 +56,8 @@ export function AlmostThereSection() {
       <h2 className="text-xl font-semibold text-white mb-2">Almost there!</h2>
       <p className="italic text-sm text-white mb-4">
         <em>
-          Respecte la planète en finissant les projets, n’oublie pas que la résine et le plastique
-          c’est douloureux pour la planète.
+          Care for the planet by finishing your projects — remember, resin and plastic are painful
+          for the planet.
         </em>
       </p>
       {almostThereUnits.length === 0 ? (

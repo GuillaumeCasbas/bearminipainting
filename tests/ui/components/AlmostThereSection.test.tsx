@@ -162,7 +162,7 @@ describe('AlmostThereSection', () => {
     renderSection();
 
     const message = screen.getByText(
-      'Respecte la plan\u00e8te en finissant les projets, n\u2019oublie pas que la r\u00e9sine et le plastique c\u2019est douloureux pour la plan\u00e8te.',
+      'Care for the planet by finishing your projects \u2014 remember, resin and plastic are painful for the planet.',
     );
     expect(message).toBeInTheDocument();
     expect(message.tagName).toBe('EM');
