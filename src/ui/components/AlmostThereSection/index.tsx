@@ -9,6 +9,18 @@ function getRemainingTodos(unit: Unit) {
   return unit.todos.filter((todo) => todo.status === 'TODO').sort((a, b) => a.order - b.order);
 }
 
+function RemainingTodoList({ unit }: { unit: Unit }) {
+  const remainingTodos = getRemainingTodos(unit);
+  if (remainingTodos.length === 0) return null;
+  return (
+    <ul>
+      {remainingTodos.map((todo) => (
+        <li key={todo.id}>{todo.label}</li>
+      ))}
+    </ul>
+  );
+}
+
 export function AlmostThereSection() {
   const { projects } = useProjectStore();
   const [almostThereUnits, setAlmostThereUnits] = useState<Unit[]>([]);
@@ -54,17 +66,7 @@ export function AlmostThereSection() {
                   <ProgressBar completionRate={unit.getCompletionRate()} withLabel />
                 </div>
               </div>
-              {(() => {
-                const remainingTodos = getRemainingTodos(unit);
-                if (remainingTodos.length === 0) return null;
-                return (
-                  <ul>
-                    {remainingTodos.map((todo) => (
-                      <li key={todo.id}>{todo.label}</li>
-                    ))}
-                  </ul>
-                );
-              })()}
+              <RemainingTodoList unit={unit} />
             </li>
           ))}
         </ul>
