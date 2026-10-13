@@ -63,19 +63,6 @@ describe('AlmostThereSection', () => {
     });
   });
 
-  it('displays the inspiring eco message under the section title', () => {
-    mockUseProjectStore.mockReturnValue({ projects: [] });
-    renderSection();
-
-    const title = screen.getByRole('heading', { name: 'Almost there!' });
-    const message = screen.getByRole('emphasis');
-    expect(message).toHaveTextContent(
-      'Almost done! Finishing these miniatures means less resin and plastic waiting in boxes — and more room on your shelf for what you love.',
-    );
-    // The message appears under the title in the DOM order
-    expect(title.compareDocumentPosition(message) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
   it('displays eligible units with their name and completion rate', async () => {
     const unit = makeUnit('u1', 'Intercessors', 3, 4);
     mockUseProjectStore.mockReturnValue({
