@@ -42,7 +42,7 @@ export function AlmostThereSection() {
 
   return (
     <section
-      className="relative bg-green-500 rounded-xl p-6 mt-8 overflow-visible"
+      className="relative bg-green-600 rounded-xl p-6 mt-8 overflow-visible"
       aria-label="Almost there"
     >
       <svg
@@ -54,10 +54,10 @@ export function AlmostThereSection() {
         <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2a8 8 0 110 16 8 8 0 010-16zm0 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm0 2.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z" />
       </svg>
       <h2 className="text-xl font-semibold text-white mb-2">Almost there!</h2>
-      <p className="italic text-sm text-white mb-4">
+      <p className="italic text-white mb-4">
         <em>
-          Care for the planet by finishing your projects — remember, resin and plastic are painful
-          for the planet.
+          Almost done! Finishing these miniatures means less resin and plastic waiting in boxes —
+          and more room on your shelf for what you love.
         </em>
       </p>
       {almostThereUnits.length === 0 ? (
@@ -70,6 +70,7 @@ export function AlmostThereSection() {
             <li
               key={unit.id}
               data-testid="almost-there-card"
+              // UI-only styling rule: units above 80% completion get highlighted (cosmetic, not business logic)
               className={`rounded-lg shadow p-4 hover:shadow-md transition-shadow ${
                 unit.getCompletionRate() > 80 ? 'bg-green-50 border-2 border-green-600' : 'bg-white'
               }`}
