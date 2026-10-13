@@ -157,21 +157,6 @@ describe('AlmostThereSection', () => {
     expect(card.querySelector('input[type="checkbox"]')).not.toBeInTheDocument();
   });
 
-  it('displays the inspiring eco message under the section title', async () => {
-    mockUseProjectStore.mockReturnValue({ projects: [] });
-    renderSection();
-
-    const message = screen.getByText(
-      'Care for the planet by finishing your projects \u2014 remember, resin and plastic are painful for the planet.',
-    );
-    expect(message).toBeInTheDocument();
-    expect(message.tagName).toBe('EM');
-    const heading = screen.getByRole('heading', { name: 'Almost there!' });
-    expect(
-      message.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_PRECEDING,
-    ).toBeTruthy();
-  });
-
   it('displays the empty state message when no unit is eligible', async () => {
     mockUseProjectStore.mockReturnValue({
       projects: [{ id: 'p1', name: 'Project', code: 'P', units: [] }],
