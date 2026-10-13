@@ -6,12 +6,7 @@ import { AlmostThereSection } from '../../../src/ui/components/AlmostThereSectio
 import { Unit } from '@/core/entities/Unit';
 import { Todo } from '@/core/entities/Todo';
 
-const makeUnit = (
-  id: string,
-  name: string,
-  doneTodos: number,
-  totalTodos: number,
-): Unit => {
+const makeUnit = (id: string, name: string, doneTodos: number, totalTodos: number): Unit => {
   const todos = Array.from(
     { length: totalTodos },
     (_, index) =>
@@ -63,9 +58,7 @@ describe('AlmostThereSection', () => {
     expect(screen.getByRole('heading', { name: 'Almost there!' })).toBeInTheDocument();
     await waitFor(() => {
       expect(
-        screen.getByText(
-          'Nothing that close yet. Push a miniature to the final stretch!',
-        ),
+        screen.getByText('Nothing that close yet. Push a miniature to the final stretch!'),
       ).toBeInTheDocument();
     });
   });
@@ -73,9 +66,7 @@ describe('AlmostThereSection', () => {
   it('displays eligible units with their name and completion rate', async () => {
     const unit = makeUnit('u1', 'Intercessors', 3, 4);
     mockUseProjectStore.mockReturnValue({
-      projects: [
-        { id: 'p1', name: 'Project', code: 'P', units: [unit] },
-      ],
+      projects: [{ id: 'p1', name: 'Project', code: 'P', units: [unit] }],
     });
     renderSection();
 
@@ -109,10 +100,7 @@ describe('AlmostThereSection', () => {
   });
 
   it('never displays units at 100% or below 75%', async () => {
-    const units = [
-      makeUnit('u1', 'Finished', 4, 4),
-      makeUnit('u2', 'Barely started', 1, 4),
-    ];
+    const units = [makeUnit('u1', 'Finished', 4, 4), makeUnit('u2', 'Barely started', 1, 4)];
     mockUseProjectStore.mockReturnValue({
       projects: [{ id: 'p1', name: 'Project', code: 'P', units }],
     });
@@ -120,9 +108,7 @@ describe('AlmostThereSection', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          'Nothing that close yet. Push a miniature to the final stretch!',
-        ),
+        screen.getByText('Nothing that close yet. Push a miniature to the final stretch!'),
       ).toBeInTheDocument();
     });
   });
@@ -179,9 +165,7 @@ describe('AlmostThereSection', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          'Nothing that close yet. Push a miniature to the final stretch!',
-        ),
+        screen.getByText('Nothing that close yet. Push a miniature to the final stretch!'),
       ).toBeInTheDocument();
     });
   });

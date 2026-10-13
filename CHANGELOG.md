@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The "Almost there!" section is now highlighted at the top of the home page with an inspiring eco message, so you stay motivated to finish what you started (BEA-64).
+
 - The "Almost there!" section now shows your miniatures from 65% completion instead of 75%, so you can track your advanced units sooner (BEA-85).
 
 ### Deprecated
