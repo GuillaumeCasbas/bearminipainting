@@ -41,8 +41,25 @@ export function AlmostThereSection() {
   }, [projects]);
 
   return (
-    <section className="mt-8" aria-label="Almost there">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Almost there!</h2>
+    <section
+      className="relative bg-green-500 rounded-xl p-6 mt-8 overflow-visible"
+      aria-label="Almost there"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+        className="absolute -top-6 -right-4 w-28 h-28 text-white opacity-25 pointer-events-none sm:w-40 sm:h-40"
+      >
+        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2a8 8 0 110 16 8 8 0 010-16zm0 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm0 2.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z" />
+      </svg>
+      <h2 className="text-xl font-semibold text-white mb-2">Almost there!</h2>
+      <p className="italic text-sm text-white mb-4">
+        <em>
+          Respecte la planète en finissant les projets, n’oublie pas que la résine et le plastique
+          c’est douloureux pour la planète.
+        </em>
+      </p>
       {almostThereUnits.length === 0 ? (
         <p className="text-gray-500 text-center py-4">
           Nothing that close yet. Push a miniature to the final stretch!
@@ -53,7 +70,9 @@ export function AlmostThereSection() {
             <li
               key={unit.id}
               data-testid="almost-there-card"
-              className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+              className={`rounded-lg shadow p-4 hover:shadow-md transition-shadow ${
+                unit.getCompletionRate() > 80 ? 'bg-green-50 border-2 border-green-600' : 'bg-white'
+              }`}
             >
               <div className="flex items-center justify-between gap-4">
                 <Link
