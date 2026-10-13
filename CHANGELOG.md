@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Importing a backup now also rejects files containing duplicate project ids or units attached to the wrong project, so your restored data is always consistent (BEA-59).
+
 - Notifications no longer collide with each other when several appear at once, so each can be closed individually (BEA-54).
 
 - Adding a unit now shows an error message instead of a false success message when the project cannot be found, so you know the unit is not visible yet (BEA-52).

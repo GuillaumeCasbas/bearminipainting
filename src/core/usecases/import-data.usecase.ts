@@ -21,6 +21,9 @@ export class ImportDataUseCase {
       if (projectCodes.has(project.code)) {
         throw new InvalidBackupError(`Duplicate project code: "${project.code}"`);
       }
+      if (projectIds.has(project.id)) {
+        throw new InvalidBackupError(`Duplicate project id: "${project.id}"`);
+      }
       projectCodes.add(project.code);
       projectIds.add(project.id);
 
@@ -37,9 +40,9 @@ export class ImportDataUseCase {
 
     for (const project of projects) {
       for (const unit of project.units) {
-        if (!projectIds.has(unit.projectId)) {
+        if (unit.projectId !== project.id) {
           throw new InvalidBackupError(
-            `Unit "${unit.id}" references unknown project "${unit.projectId}"`,
+            `Unit "${unit.id}" references project "${unit.projectId}" but is nested under project "${project.id}"`,
           );
         }
       }

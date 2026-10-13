@@ -364,7 +364,65 @@ describe('ImportDataUseCase (BEA-46)', () => {
     ]);
 
     await expect(useCase.execute(invalid)).rejects.toThrow(
-      new InvalidBackupError('Unit "unit-1" references unknown project "unknown-project"'),
+      new InvalidBackupError(
+        'Unit "unit-1" references project "unknown-project" but is nested under project "project-1"',
+      ),
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  // === DOMAIN INVARIANTS (BEA-59) ===
+  it('rejects a backup with two projects sharing the same id but different codes', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const invalid = JSON.stringify([
+      { id: 'project-1', name: 'Space Marines', code: 'SM', units: [] },
+      { id: 'project-1', name: 'Salvage Marines', code: 'SA', units: [] },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(
+      new InvalidBackupError('Duplicate project id: "project-1"'),
+    );
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('accepts a unit whose projectId matches its parent project', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const valid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-1', todos: [] },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(valid)).resolves.toBeUndefined();
+    expect(repository.replaceAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a unit nested under a project but referencing another existing project', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-2', todos: [] },
+        ],
+      },
+      { id: 'project-2', name: 'Salvage Marines', code: 'SA', units: [] },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(
+      new InvalidBackupError(
+        'Unit "unit-1" references project "project-2" but is nested under project "project-1"',
+      ),
     );
     expect(repository.replaceAll).not.toHaveBeenCalled();
   });
