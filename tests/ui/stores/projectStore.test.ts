@@ -94,5 +94,8 @@ describe('projectStore addUnit', () => {
 
     expect(result).toBeNull();
     expect(useProjectStore.getState().projects).toHaveLength(0);
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('error');
   });
 });

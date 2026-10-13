@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Adding a unit now shows an error message instead of a false success message when the project cannot be found, so you know the unit is not visible yet (BEA-52).
+
 ### Security
 
 ---

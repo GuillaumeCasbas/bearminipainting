@@ -73,16 +73,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'error',
-            message: 'Failed to load projects',
-          },
-        ],
-      });
+      useProjectStore.getState().addToast('error', 'Failed to load projects');
     }
   },
 
@@ -96,51 +87,17 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects });
 
       // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: `Project "${newProject.name}" created successfully!`,
-          },
-        ],
-      });
+      useProjectStore
+        .getState()
+        .addToast('success', `Project "${newProject.name}" created successfully!`);
     } catch (error) {
       // Handle ProjectNameRequiredError
       if (error instanceof ProjectNameRequiredError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof CodeNotUniqueError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: `Code "${error.code}" is already in use.`,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', `Code "${error.code}" is already in use.`);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to create project',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to create project');
       }
     }
   },
@@ -156,51 +113,15 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects: updatedProjects });
 
       // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: 'Project deleted successfully',
-          },
-        ],
-      });
+      useProjectStore.getState().addToast('success', 'Project deleted successfully');
     } catch (error) {
       // Show error toast with specific message
       if (error instanceof ProjectNotFoundError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof Error) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to delete project',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to delete project');
       }
     }
   },
@@ -226,51 +147,15 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects: updatedProjects });
 
       // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: 'Unit deleted successfully',
-          },
-        ],
-      });
+      useProjectStore.getState().addToast('success', 'Unit deleted successfully');
     } catch (error) {
       // Show error toast with specific message
       if (error instanceof UnitNotFoundError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof Error) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to delete unit',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to delete unit');
       }
     }
   },
@@ -347,16 +232,9 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }
 
       // Error toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'error',
-            message: error instanceof Error ? error.message : 'Failed to reorder todos',
-          },
-        ],
-      });
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to reorder todos');
     }
   },
 
@@ -379,67 +257,31 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         // Update the project in the store
         const updatedProjects = projects.map((p) => (p.id === projectId ? updatedProject : p));
         set({ projects: updatedProjects });
+        // Show success toast
+        useProjectStore
+          .getState()
+          .addToast('success', `Unit "${newUnit.name}" added successfully!`);
+      } else {
+        // Show error toast when the project is missing from the store
+        useProjectStore
+          .getState()
+          .addToast(
+            'error',
+            `Project not found: unit "${newUnit.name}" was saved but is not visible yet. Reload to see it.`,
+          );
       }
-
-      // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: `Unit "${newUnit.name}" added successfully!`,
-          },
-        ],
-      });
 
       return updatedProject;
     } catch (error) {
       // Handle specific errors with user-friendly messages
       if (error instanceof UnitNameEmptyError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof UnitCodeInvalidCharactersError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof UnitCodeNotUniqueError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to create unit',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to create unit');
       }
 
       return null;
@@ -474,27 +316,9 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }
       // Other errors: show toast
       if (error instanceof UnitNotFoundError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to add todo',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to add todo');
       }
     }
   },
@@ -520,38 +344,11 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     } catch (error) {
       // Handle specific errors with user-friendly messages
       if (error instanceof TodoNotFoundError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else if (error instanceof UnitNotFoundError) {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: error.message,
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', error.message);
       } else {
-        set({
-          toasts: [
-            ...useProjectStore.getState().toasts,
-            {
-              id: Date.now().toString(),
-              type: 'error',
-              message: 'Failed to delete todo',
-            },
-          ],
-        });
+        useProjectStore.getState().addToast('error', 'Failed to delete todo');
       }
     }
   },
@@ -647,16 +444,9 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       set({ projects: updatedProjects });
 
       // Error toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'error',
-            message: error instanceof Error ? error.message : 'Failed to toggle todo status',
-          },
-        ],
-      });
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to toggle todo status');
     }
   },
 
@@ -712,16 +502,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       await updateUnitNameUseCase.execute(unitId, newName);
 
       // Show success toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'success',
-            message: 'Unit name updated successfully',
-          },
-        ],
-      });
+      useProjectStore.getState().addToast('success', 'Unit name updated successfully');
 
       return true;
     } catch (error) {
@@ -746,16 +527,9 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       }
 
       // Other errors: show error toast
-      set({
-        toasts: [
-          ...useProjectStore.getState().toasts,
-          {
-            id: Date.now().toString(),
-            type: 'error',
-            message: error instanceof Error ? error.message : 'Failed to update unit name',
-          },
-        ],
-      });
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to update unit name');
 
       return false;
     }
