@@ -27,11 +27,11 @@ const makeUnit = (
 
 describe('GetAlmostThereUnitsUseCase', () => {
   it('exposes the threshold and max count as tunable constants', () => {
-    expect(ALMOST_THERE_MIN_RATE).toBe(75);
+    expect(ALMOST_THERE_MIN_RATE).toBe(65);
     expect(ALMOST_THERE_MAX_COUNT).toBe(3);
   });
 
-  it('returns only unfinished units with a completion rate >= 75%', async () => {
+  it('returns only unfinished units with a completion rate >= 65%', async () => {
     const eligible = makeUnit('u1', 'Almost done', 3, 4);
     const tooLow = makeUnit('u2', 'Barely started', 1, 4);
     const finished = makeUnit('u3', 'Finished', 4, 4);
@@ -77,6 +77,16 @@ describe('GetAlmostThereUnitsUseCase', () => {
     const result = await useCase.execute(units);
 
     expect(result.map((unit) => unit.id)).toEqual(['u2', 'u3', 'u1']);
+  });
+
+  it('includes units at exactly 65% and excludes units at 60%', async () => {
+    const atThreshold = makeUnit('u1', 'Sixty-five', 13, 20);
+    const belowThreshold = makeUnit('u2', 'Sixty', 3, 5);
+
+    const useCase = new GetAlmostThereUnitsUseCase();
+    const result = await useCase.execute([atThreshold, belowThreshold]);
+
+    expect(result.map((unit) => unit.id)).toEqual(['u1']);
   });
 
   it('breaks rate ties by name alphabetical, then by id', async () => {

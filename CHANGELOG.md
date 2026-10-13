@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The "Almost there!" section now shows your miniatures from 65% completion instead of 75%, so you can track your advanced units sooner (BEA-85).
+
 ### Deprecated
 
 ### Removed
