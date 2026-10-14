@@ -23,6 +23,7 @@ import { ProgressBar } from '@/ui/components/ProgressBar';
 import { SortableTodoRow } from '@/ui/components/UnitDetail/SortableTodoRow';
 import { Modal } from '@/ui/components/Modal';
 import { EditableName } from '@/ui/components/EditableName';
+import { UnitNotes } from '@/ui/components/UnitDetail/UnitNotes';
 
 export function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -39,6 +40,7 @@ export function UnitDetail() {
     deleteUnit,
     reorderTodos,
     updateUnitName,
+    updateUnitNotes,
   } = useProjectStore();
   const { hideDoneTodos } = useUiPreferencesStore();
   const [newTodoLabel, setNewTodoLabel] = useState('');
@@ -225,6 +227,7 @@ export function UnitDetail() {
             entityLabel="Unit"
             onSave={(newName) => updateUnitName(unit.id, newName)}
           />
+          <UnitNotes unit={unit} onSave={(newNotes) => updateUnitNotes(unit.id, newNotes)} />
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-500">
               {project.code}-{unit.code}

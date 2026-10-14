@@ -15,7 +15,14 @@ export class UpdateUnitNotesUseCase {
     if (trimmedNotes.length > UNIT_NOTES_MAX_LENGTH) {
       throw new UnitNotesTooLongError(UNIT_NOTES_MAX_LENGTH);
     }
-    const updatedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, unit.todos, trimmedNotes);
+    const updatedUnit = new Unit(
+      unit.id,
+      unit.name,
+      unit.code,
+      unit.projectId,
+      unit.todos,
+      trimmedNotes,
+    );
     await this.unitRepository.update(updatedUnit);
     return updatedUnit;
   }

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- You can now attach notes to each miniature to keep track of your ideas, with markdown display and a 1500-character limit (BEA-83).
+
 - You can now rename a project directly from its page, the same way you rename a unit, so fixing a typo takes seconds (BEA-68).
 
 - The "Almost there!" section now lists the remaining tasks of each miniature, so you know exactly what is left to finish (BEA-84).

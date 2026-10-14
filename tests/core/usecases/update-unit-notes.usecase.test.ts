@@ -5,18 +5,30 @@ import { UnitNotFoundError, UnitNotesTooLongError } from '../../../src/core/erro
 import { UNIT_NOTES_MAX_LENGTH } from '../../../src/core/constants/unit-notes';
 
 const makeUnit = (notes = ''): Unit =>
-  new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', [new Todo('todo-1', 'Assembly', 'TODO', 10)], notes);
+  new Unit(
+    'unit-1',
+    'Intercessor',
+    'IA-01',
+    'project-1',
+    [new Todo('todo-1', 'Assembly', 'TODO', 10)],
+    notes,
+  );
 
 describe('UpdateUnitNotesUseCase', () => {
   it('updates and persists the trimmed notes', async () => {
     const unit = makeUnit();
-    const repository = { findById: jest.fn().mockResolvedValue(unit), update: jest.fn().mockResolvedValue(undefined) };
+    const repository = {
+      findById: jest.fn().mockResolvedValue(unit),
+      update: jest.fn().mockResolvedValue(undefined),
+    };
     const useCase = new UpdateUnitNotesUseCase(repository as never);
 
     const result = await useCase.execute('unit-1', '  Use **blue** for armor.  ');
 
     expect(result.notes).toBe('Use **blue** for armor.');
-    expect(repository.update).toHaveBeenCalledWith(expect.objectContaining({ id: 'unit-1', notes: 'Use **blue** for armor.' }));
+    expect(repository.update).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'unit-1', notes: 'Use **blue** for armor.' }),
+    );
   });
 
   it('keeps the other unit fields unchanged', async () => {
