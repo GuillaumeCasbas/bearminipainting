@@ -112,7 +112,7 @@ export class ImportDataUseCase {
     if (!Array.isArray(candidate.todos)) {
       throw new InvalidBackupError(`unit ${candidate.id} is missing a todos array`);
     }
-    if (candidate.notes !== undefined && !this.isNonEmptyStringOrEmpty(candidate.notes)) {
+    if (candidate.notes !== undefined && !this.isString(candidate.notes)) {
       throw new InvalidBackupError(`unit ${candidate.id} has invalid notes`);
     }
 
@@ -163,7 +163,7 @@ export class ImportDataUseCase {
     return typeof item === 'object' && item !== null && !Array.isArray(item);
   }
 
-  private isNonEmptyStringOrEmpty(value: unknown): boolean {
+  private isString(value: unknown): boolean {
     return typeof value === 'string';
   }
   private isNonEmptyString(value: unknown): boolean {

@@ -123,6 +123,8 @@ describe("ToggleTodoStatusUseCase", () => {
     expect(updateCalled).toBe(false);
   });
 
+  // Guard: the use case rebuilds the Unit via its constructor; forgetting to
+  // propagate unit.notes here would silently erase the user's notes on toggle.
   it('preserves the unit notes when toggling a todo', async () => {
     const todos = [new Todo('todo-1', 'Assembly', 'DONE', 10)];
     const unit = new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', todos, 'My notes');

@@ -431,7 +431,7 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
   });
 });
 
-describe('UnitDetail - unit notes (BEA-83)', () => {
+describe('UnitDetail - unit notes', () => {
   const mockUpdateUnitNotes = jest.fn();
 
   const renderWithNotes = (notes: string) => {

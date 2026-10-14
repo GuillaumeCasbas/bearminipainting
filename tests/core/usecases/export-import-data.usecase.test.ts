@@ -427,7 +427,7 @@ describe('ImportDataUseCase (BEA-46)', () => {
     expect(repository.replaceAll).not.toHaveBeenCalled();
   });
 
-  // === UNIT NOTES (BEA-83) ===
+  // === UNIT NOTES ===
   it('imports a backup containing unit notes', async () => {
     const repository = buildRepository();
     const useCase = new ImportDataUseCase(repository);

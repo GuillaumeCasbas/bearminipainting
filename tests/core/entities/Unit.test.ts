@@ -1,7 +1,6 @@
 import { Unit } from '../../../src/core/entities/Unit';
 import { Todo } from '../../../src/core/entities/Todo';
 import { UnitNotesTooLongError } from '../../../src/core/errors';
-import { UNIT_NOTES_MAX_LENGTH } from '../../../src/core/constants/unit-notes';
 
 describe('Unit', () => {
   it('should create a unit with empty todos when none provided', () => {
@@ -98,10 +97,6 @@ describe('Unit', () => {
     it('should keep the provided notes', () => {
       const unit = new Unit('unit-1', 'Intercessor', 'IA-01', '1', [], 'Some ideas');
       expect(unit.notes).toBe('Some ideas');
-    });
-
-    it('should expose the 1500-character limit as a constant', () => {
-      expect(UNIT_NOTES_MAX_LENGTH).toBe(1500);
     });
 
     it('should reject notes longer than 1500 characters', () => {
