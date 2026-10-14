@@ -1,5 +1,7 @@
 import { Unit } from "../../../src/core/entities/Unit";
 import { Todo } from "../../../src/core/entities/Todo";
+import { UnitNotesTooLongError } from "../../../src/core/errors";
+import { UNIT_NOTES_MAX_LENGTH } from "../../../src/core/constants/unit-notes";
 
 describe("Unit", () => {
   it("should create a unit with empty todos when none provided", () => {
@@ -86,6 +88,35 @@ describe("Unit", () => {
       const unit = new Unit("unit-1", "Intercessor", "IA-01", "1", todos);
 
       expect(unit.getCompletionRate()).toBe(33);
+    });
+  });
+
+  describe("notes", () => {
+    it("should default to an empty string", () => {
+      const unit = new Unit("unit-1", "Intercessor", "IA-01", "1", []);
+      expect(unit.notes).toBe("");
+    });
+
+    it("should keep the provided notes", () => {
+      const unit = new Unit("unit-1", "Intercessor", "IA-01", "1", [], "Some ideas");
+      expect(unit.notes).toBe("Some ideas");
+    });
+
+    it("should expose the 1500-character limit as a constant", () => {
+      expect(UNIT_NOTES_MAX_LENGTH).toBe(1500);
+    });
+
+    it("should reject notes longer than 1500 characters", () => {
+      const tooLong = "a".repeat(1501);
+      expect(() => new Unit("unit-1", "Intercessor", "IA-01", "1", [], tooLong)).toThrow(
+        UnitNotesTooLongError,
+      );
+    });
+
+    it("should accept notes of exactly 1500 characters", () => {
+      const max = "a".repeat(1500);
+      const unit = new Unit("unit-1", "Intercessor", "IA-01", "1", [], max);
+      expect(unit.notes).toBe(max);
     });
   });
 });

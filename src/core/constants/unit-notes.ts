@@ -1,0 +1,1 @@
+export const UNIT_NOTES_MAX_LENGTH = 1500;

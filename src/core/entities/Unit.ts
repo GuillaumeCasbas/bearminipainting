@@ -1,4 +1,6 @@
 import { Todo } from './Todo';
+import { UNIT_NOTES_MAX_LENGTH } from '../constants/unit-notes';
+import { UnitNotesTooLongError } from '../errors';
 
 export class Unit {
   readonly id: string;
@@ -6,13 +8,25 @@ export class Unit {
   readonly code: string;
   readonly projectId: string;
   readonly todos: Todo[];
+  readonly notes: string;
 
-  constructor(id: string, name: string, code: string, projectId: string, todos: Todo[] = []) {
+  constructor(
+    id: string,
+    name: string,
+    code: string,
+    projectId: string,
+    todos: Todo[] = [],
+    notes: string = '',
+  ) {
     this.id = id;
     this.name = name;
     this.code = code;
     this.projectId = projectId;
     this.todos = todos;
+    if (notes.length > UNIT_NOTES_MAX_LENGTH) {
+      throw new UnitNotesTooLongError(UNIT_NOTES_MAX_LENGTH);
+    }
+    this.notes = notes;
   }
 
   getCompletionRate(): number {
