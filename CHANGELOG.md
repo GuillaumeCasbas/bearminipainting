@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+---
+
+## [0.4.0] - 2026-10-14
+
+Fourth release of BearMiniPainting.
+
+### Added
+
 - You can now attach notes to each miniature to keep track of your ideas, with markdown display and a 1500-character limit (BEA-83).
 
 - You can now rename a project directly from its page, the same way you rename a unit, so fixing a typo takes seconds (BEA-68).
@@ -38,7 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Security
 
 ---
-
 ## [0.3.0] - 2026-09-25
 
 Third release of BearMiniPainting.
