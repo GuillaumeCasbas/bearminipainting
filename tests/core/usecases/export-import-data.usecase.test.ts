@@ -427,6 +427,63 @@ describe('ImportDataUseCase (BEA-46)', () => {
     expect(repository.replaceAll).not.toHaveBeenCalled();
   });
 
+  // === UNIT NOTES (BEA-83) ===
+  it('imports a backup containing unit notes', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const valid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-1', todos: [], notes: 'Try blue armor' },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(valid)).resolves.toBeUndefined();
+    const [imported] = (repository.replaceAll as jest.Mock).mock.calls[0][0] as Array<{
+      units: Array<{ notes: string }>;
+    }>;
+    expect(imported.units[0].notes).toBe('Try blue armor');
+  });
+
+  it('rejects a backup with unit notes exceeding 1500 characters', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const invalid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-1', todos: [], notes: 'a'.repeat(1501) },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(invalid)).rejects.toThrow(InvalidBackupError);
+    expect(repository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('imports a backup where units have no notes field (backward compatibility)', async () => {
+    const repository = buildRepository();
+    const useCase = new ImportDataUseCase(repository);
+    const valid = JSON.stringify([
+      {
+        id: 'project-1',
+        name: 'Space Marines',
+        code: 'SM',
+        units: [
+          { id: 'unit-1', name: 'Intercessor', code: 'IA-01', projectId: 'project-1', todos: [] },
+        ],
+      },
+    ]);
+
+    await expect(useCase.execute(valid)).resolves.toBeUndefined();
+  });
+
   it('still imports a valid app export after domain invariant validation (regression guard)', async () => {
     const repository = buildRepository(
       JSON.stringify([{ id: 'old-project', name: 'Old', code: 'OLD', units: [] }]),
