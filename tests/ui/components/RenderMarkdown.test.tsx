@@ -46,6 +46,33 @@ describe('RenderMarkdown', () => {
     expect(screen.getByText('Just a paragraph.')).toBeInTheDocument();
   });
 
+  it('strips script tags injected via markdown content (XSS)', () => {
+    render(<RenderMarkdown content={'Bold **text** <script>alert("xss")</script>'} />);
+
+    expect(document.querySelector('script')).toBeNull();
+    expect(document.body.innerHTML).not.toContain('alert');
+  });
+
+  it('neutralizes javascript: URLs from markdown links (XSS)', () => {
+    render(<RenderMarkdown content={'[Click me](javascript:alert(1))'} />);
+
+    const links = screen.queryAllByRole('link');
+    links.forEach((link) => {
+      expect(link.getAttribute('href') ?? '').not.toContain('javascript:');
+    });
+    expect(document.body.innerHTML).not.toContain('javascript:');
+  });
+
+  it('strips event handlers from raw HTML in markdown content (XSS)', () => {
+    render(<RenderMarkdown content={'<img src=x onerror=alert(1)>Paragraph.'} />);
+
+    expect(document.body.innerHTML).not.toContain('onerror');
+    const img = document.querySelector('img');
+    if (img) {
+      expect(img.getAttribute('onerror')).toBeNull();
+    }
+  });
+
   it('should re-render when the content prop changes', () => {
     const { rerender } = render(<RenderMarkdown content="# First" />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('First');

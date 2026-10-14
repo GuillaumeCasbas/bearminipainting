@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Marked, Renderer } from 'marked';
+import DOMPurify from 'dompurify';
 
 interface RenderMarkdownProps {
   content: string;
@@ -40,7 +41,11 @@ const renderer: Partial<Renderer> = {
 const markedInstance = new Marked({ renderer });
 
 export function RenderMarkdown({ content, className }: RenderMarkdownProps) {
-  const html = useMemo(() => markedInstance.parse(content) as string, [content]);
+  // Sanitize to prevent XSS: content may come from user input (e.g. unit notes)
+  const html = useMemo(
+    () => DOMPurify.sanitize(markedInstance.parse(content) as string),
+    [content],
+  );
 
   return (
     <div

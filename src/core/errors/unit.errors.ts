@@ -43,3 +43,10 @@ export class TodoLabelEmptyError extends BaseError {
     super('Todo label cannot be empty');
   }
 }
+
+export class UnitNotesTooLongError extends BaseError {
+  constructor(maxLength: number) {
+    super(`Unit notes cannot exceed ${maxLength} characters`);
+    this.name = 'UnitNotesTooLongError';
+  }
+}

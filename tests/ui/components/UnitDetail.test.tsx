@@ -52,6 +52,7 @@ const makeUnit = (overrides: Partial<Unit> = {}): Unit =>
       makeTodo('todo-2', 'Primer', 'TODO', 20),
       makeTodo('todo-3', 'Basecoat', 'DONE', 30),
     ],
+    overrides.notes ?? '',
   );
 
 const makeProject = (overrides: Partial<Project> = {}): Project =>
@@ -427,5 +428,87 @@ describe('UnitDetail - toggle DONE todos visibility (BEA-30)', () => {
 
       expect(screen.getByText('33%')).toBeInTheDocument();
     });
+  });
+});
+
+describe('UnitDetail - unit notes', () => {
+  const mockUpdateUnitNotes = jest.fn();
+
+  const renderWithNotes = (notes: string) => {
+    const unit = makeUnit({ notes });
+    mockUseProjectStore.mockReturnValue({
+      projects: [makeProject({ units: [unit] })],
+      toggleTodoStatus: jest.fn(),
+      addTodo: jest.fn(),
+      deleteTodo: jest.fn(),
+      deleteUnit: jest.fn(),
+      reorderTodos: jest.fn(),
+      updateUnitName: jest.fn(),
+      updateUnitNotes: mockUpdateUnitNotes,
+    });
+    mockUseUiPreferencesStore.mockReturnValue({
+      hideDoneTodos: false,
+      setHideDoneTodos: jest.fn(),
+    });
+    render(<UnitDetail />);
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('shows a clickable "add notes to this unit" link when there are no notes', () => {
+    renderWithNotes('');
+    expect(screen.getByText('add notes to this unit')).toBeInTheDocument();
+  });
+
+  it('opens an empty textarea when the add-notes link is clicked', () => {
+    renderWithNotes('');
+    fireEvent.click(screen.getByText('add notes to this unit'));
+    const textarea = screen.getByRole('textbox', { name: 'Unit notes' }) as HTMLTextAreaElement;
+    expect(textarea.value).toBe('');
+    expect(textarea).toHaveAttribute('maxlength', '1500');
+  });
+
+  it('shows a "Notes" title and the notes content when notes exist', () => {
+    renderWithNotes('Use **blue** for the armor.');
+    expect(screen.getByText('Notes')).toBeInTheDocument();
+    expect(screen.getByText('blue')).toBeInTheDocument();
+    expect(screen.getByText('blue').tagName).toBe('STRONG');
+  });
+
+  it('fills the textarea with the current notes when the edit icon is clicked', () => {
+    renderWithNotes('Existing ideas');
+    fireEvent.click(screen.getByLabelText('Edit unit notes'));
+    const textarea = screen.getByRole('textbox', { name: 'Unit notes' }) as HTMLTextAreaElement;
+    expect(textarea.value).toBe('Existing ideas');
+  });
+
+  it('displays the character counter while editing', () => {
+    renderWithNotes('');
+    fireEvent.click(screen.getByText('add notes to this unit'));
+    expect(screen.getByText('0/1500 characters')).toBeInTheDocument();
+  });
+
+  it('saves the notes via the store when the save button is clicked', async () => {
+    mockUpdateUnitNotes.mockResolvedValueOnce(true);
+    renderWithNotes('');
+    fireEvent.click(screen.getByText('add notes to this unit'));
+    const textarea = screen.getByRole('textbox', { name: 'Unit notes' });
+    fireEvent.change(textarea, { target: { value: 'Wash with nuln oil' } });
+    fireEvent.click(screen.getByLabelText('Save unit notes'));
+    await waitFor(() => {
+      expect(mockUpdateUnitNotes).toHaveBeenCalledWith('unit-1', 'Wash with nuln oil');
+    });
+  });
+
+  it('cancels editing without saving', () => {
+    renderWithNotes('Existing ideas');
+    fireEvent.click(screen.getByLabelText('Edit unit notes'));
+    const textarea = screen.getByRole('textbox', { name: 'Unit notes' });
+    fireEvent.change(textarea, { target: { value: 'Should not be saved' } });
+    fireEvent.click(screen.getByLabelText('Cancel unit notes edit'));
+    expect(mockUpdateUnitNotes).not.toHaveBeenCalled();
+    expect(screen.getByText('Existing ideas')).toBeInTheDocument();
   });
 });

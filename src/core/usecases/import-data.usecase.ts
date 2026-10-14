@@ -3,6 +3,7 @@ import { Project } from '../entities/Project';
 import { Unit } from '../entities/Unit';
 import { Todo } from '../entities/Todo';
 import { InvalidBackupError } from '../errors/data.errors';
+import { UNIT_NOTES_MAX_LENGTH } from '../constants/unit-notes';
 
 export class ImportDataUseCase {
   constructor(private readonly repository: DataManagementRepository) {}
@@ -111,14 +112,24 @@ export class ImportDataUseCase {
     if (!Array.isArray(candidate.todos)) {
       throw new InvalidBackupError(`unit ${candidate.id} is missing a todos array`);
     }
+    if (candidate.notes !== undefined && !this.isString(candidate.notes)) {
+      throw new InvalidBackupError(`unit ${candidate.id} has invalid notes`);
+    }
 
     const todos = candidate.todos.map((todo) => this.validateTodo(todo, candidate.id as string));
+    const notes = (candidate.notes as string) ?? '';
+    if (notes.length > UNIT_NOTES_MAX_LENGTH) {
+      throw new InvalidBackupError(
+        `unit ${candidate.id} notes exceed ${UNIT_NOTES_MAX_LENGTH} characters`,
+      );
+    }
     return new Unit(
       candidate.id as string,
       candidate.name as string,
       candidate.code as string,
       candidate.projectId as string,
       todos,
+      notes,
     );
   }
 
@@ -152,6 +163,9 @@ export class ImportDataUseCase {
     return typeof item === 'object' && item !== null && !Array.isArray(item);
   }
 
+  private isString(value: unknown): boolean {
+    return typeof value === 'string';
+  }
   private isNonEmptyString(value: unknown): boolean {
     return typeof value === 'string' && value.trim() !== '';
   }

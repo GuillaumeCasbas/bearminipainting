@@ -1,4 +1,6 @@
 import { Todo } from './Todo';
+import { UNIT_NOTES_MAX_LENGTH } from '../constants/unit-notes';
+import { UnitNotesTooLongError } from '../errors';
 
 export class Unit {
   readonly id: string;
@@ -6,13 +8,28 @@ export class Unit {
   readonly code: string;
   readonly projectId: string;
   readonly todos: Todo[];
+  readonly notes: string;
 
-  constructor(id: string, name: string, code: string, projectId: string, todos: Todo[] = []) {
+  constructor(
+    id: string,
+    name: string,
+    code: string,
+    projectId: string,
+    todos: Todo[] = [],
+    notes: string = '',
+  ) {
     this.id = id;
     this.name = name;
     this.code = code;
     this.projectId = projectId;
     this.todos = todos;
+    // Single source of truth: notes are trimmed here and validated after trim,
+    // so every Unit instance guarantees the same invariant regardless of the caller.
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length > UNIT_NOTES_MAX_LENGTH) {
+      throw new UnitNotesTooLongError(UNIT_NOTES_MAX_LENGTH);
+    }
+    this.notes = trimmedNotes;
   }
 
   getCompletionRate(): number {

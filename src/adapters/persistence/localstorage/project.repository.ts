@@ -17,6 +17,7 @@ interface StoredUnit {
   code: string;
   projectId: string;
   todos: StoredTodo[];
+  notes?: string;
 }
 
 interface StoredProject {
@@ -82,6 +83,7 @@ export class LocalStorageProjectRepository implements ProjectRepository {
                           ),
                       )
                     : [],
+                  unitItem.notes ?? '',
                 ),
             )
           : [];

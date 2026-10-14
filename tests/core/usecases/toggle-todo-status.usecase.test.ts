@@ -1,26 +1,20 @@
-import { ToggleTodoStatusUseCase } from "@/core/usecases/toggle-todo-status.usecase";
-import { UnitRepository } from "@/core/ports/unit.repository";
-import { Unit } from "@/core/entities/Unit";
-import { Todo } from "@/core/entities/Todo";
-import { UnitNotFoundError, TodoNotFoundError } from "@/core/errors";
+import { ToggleTodoStatusUseCase } from '@/core/usecases/toggle-todo-status.usecase';
+import { UnitRepository } from '@/core/ports/unit.repository';
+import { Unit } from '@/core/entities/Unit';
+import { Todo } from '@/core/entities/Todo';
+import { UnitNotFoundError, TodoNotFoundError } from '@/core/errors';
 
-describe("ToggleTodoStatusUseCase", () => {
-  const UNIT_ID = "unit-123";
-  const PROJECT_ID = "project-456";
-  const TODO_ID = "todo-1";
-  const TODO_ID_2 = "todo-2";
+describe('ToggleTodoStatusUseCase', () => {
+  const UNIT_ID = 'unit-123';
+  const PROJECT_ID = 'project-456';
+  const TODO_ID = 'todo-1';
+  const TODO_ID_2 = 'todo-2';
 
   let mockRepository: UnitRepository;
   let useCase: ToggleTodoStatusUseCase;
 
   const createTestUnitWithTodos = (todos: Todo[] = []): Unit => {
-    return new Unit(
-      UNIT_ID,
-      "Test Unit",
-      "TU-01",
-      PROJECT_ID,
-      todos
-    );
+    return new Unit(UNIT_ID, 'Test Unit', 'TU-01', PROJECT_ID, todos);
   };
 
   beforeEach(() => {
@@ -34,8 +28,8 @@ describe("ToggleTodoStatusUseCase", () => {
     useCase = new ToggleTodoStatusUseCase(mockRepository);
   });
 
-  it("should toggle todo status from TODO to DONE", async () => {
-    const todo = new Todo(TODO_ID, "Assembly", "TODO", 10);
+  it('should toggle todo status from TODO to DONE', async () => {
+    const todo = new Todo(TODO_ID, 'Assembly', 'TODO', 10);
     const unit = createTestUnitWithTodos([todo]);
 
     mockRepository.findById = async () => unit;
@@ -43,54 +37,54 @@ describe("ToggleTodoStatusUseCase", () => {
     const result = await useCase.execute(UNIT_ID, TODO_ID);
 
     expect(result).toBeInstanceOf(Unit);
-    expect(result.todos[0].status).toBe("DONE");
+    expect(result.todos[0].status).toBe('DONE');
     expect(result.todos[0].id).toBe(TODO_ID);
   });
 
-  it("should toggle todo status from DONE to TODO", async () => {
-    const todo = new Todo(TODO_ID, "Assembly", "DONE", 10);
+  it('should toggle todo status from DONE to TODO', async () => {
+    const todo = new Todo(TODO_ID, 'Assembly', 'DONE', 10);
     const unit = createTestUnitWithTodos([todo]);
 
     mockRepository.findById = async () => unit;
 
     const result = await useCase.execute(UNIT_ID, TODO_ID);
 
-    expect(result.todos[0].status).toBe("TODO");
+    expect(result.todos[0].status).toBe('TODO');
   });
 
-  it("should preserve other todos when toggling one", async () => {
-    const todo1 = new Todo(TODO_ID, "Assembly", "TODO", 10);
-    const todo2 = new Todo(TODO_ID_2, "Primer", "DONE", 20);
+  it('should preserve other todos when toggling one', async () => {
+    const todo1 = new Todo(TODO_ID, 'Assembly', 'TODO', 10);
+    const todo2 = new Todo(TODO_ID_2, 'Primer', 'DONE', 20);
     const unit = createTestUnitWithTodos([todo1, todo2]);
 
     mockRepository.findById = async () => unit;
 
     const result = await useCase.execute(UNIT_ID, TODO_ID);
 
-    expect(result.todos[0].status).toBe("DONE");
-    expect(result.todos[1].status).toBe("DONE");
-    expect(result.todos[1].label).toBe("Primer");
+    expect(result.todos[0].status).toBe('DONE');
+    expect(result.todos[1].status).toBe('DONE');
+    expect(result.todos[1].label).toBe('Primer');
   });
 
-  it("should throw UnitNotFoundError when unit does not exist", async () => {
+  it('should throw UnitNotFoundError when unit does not exist', async () => {
     mockRepository.findById = async () => null;
 
     await expect(useCase.execute(UNIT_ID, TODO_ID)).rejects.toThrow(UnitNotFoundError);
   });
 
-  it("should throw TodoNotFoundError when todo does not exist in unit", async () => {
-    const todo = new Todo(TODO_ID, "Assembly", "TODO", 10);
+  it('should throw TodoNotFoundError when todo does not exist in unit', async () => {
+    const todo = new Todo(TODO_ID, 'Assembly', 'TODO', 10);
     const unit = createTestUnitWithTodos([todo]);
 
     mockRepository.findById = async () => unit;
 
-    await expect(useCase.execute(UNIT_ID, "nonexistent-todo-id")).rejects.toThrow(
-      TodoNotFoundError
+    await expect(useCase.execute(UNIT_ID, 'nonexistent-todo-id')).rejects.toThrow(
+      TodoNotFoundError,
     );
   });
 
-  it("should call update with the modified unit", async () => {
-    const todo = new Todo(TODO_ID, "Assembly", "TODO", 10);
+  it('should call update with the modified unit', async () => {
+    const todo = new Todo(TODO_ID, 'Assembly', 'TODO', 10);
     const unit = createTestUnitWithTodos([todo]);
     let updateCalledWith: Unit | null = null;
 
@@ -103,10 +97,10 @@ describe("ToggleTodoStatusUseCase", () => {
 
     expect(updateCalledWith).not.toBeNull();
     expect(updateCalledWith!.id).toBe(UNIT_ID);
-    expect(updateCalledWith!.todos[0].status).toBe("DONE");
+    expect(updateCalledWith!.todos[0].status).toBe('DONE');
   });
 
-  it("should not call update when unit is not found", async () => {
+  it('should not call update when unit is not found', async () => {
     let updateCalled = false;
 
     mockRepository.findById = async () => null;
@@ -121,5 +115,18 @@ describe("ToggleTodoStatusUseCase", () => {
     }
 
     expect(updateCalled).toBe(false);
+  });
+
+  // Guard: the use case rebuilds the Unit via its constructor; forgetting to
+  // propagate unit.notes here would silently erase the user's notes on toggle.
+  it('preserves the unit notes when toggling a todo', async () => {
+    const todos = [new Todo('todo-1', 'Assembly', 'DONE', 10)];
+    const unit = new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', todos, 'My notes');
+    const repository = { findById: jest.fn().mockResolvedValue(unit), update: jest.fn() };
+    const useCase = new ToggleTodoStatusUseCase(repository as never);
+
+    const updated = await useCase.execute('unit-1', 'todo-1');
+
+    expect(updated.notes).toBe('My notes');
   });
 });

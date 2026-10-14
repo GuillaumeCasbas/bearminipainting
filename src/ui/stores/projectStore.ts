@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
 import { Todo, TodoStatus } from '@/core/entities/Todo';
-import { CodeNotUniqueError, ProjectNameRequiredError, ProjectNotFoundError } from '@/core/errors';
+import {
+  CodeNotUniqueError,
+  ProjectNameRequiredError,
+  ProjectNotFoundError,
+  UnitNotesTooLongError,
+} from '@/core/errors';
 import {
   UnitNameEmptyError,
   UnitCodeInvalidCharactersError,
@@ -25,6 +30,7 @@ import {
   deleteUnitUseCase,
   reorderTodosUseCase,
   updateUnitNameUseCase,
+  updateUnitNotesUseCase,
   updateProjectNameUseCase,
 } from '@/di/container';
 
@@ -53,6 +59,7 @@ interface ProjectStore {
   deleteTodo: (unitId: string, todoId: string) => Promise<void>;
   toggleTodoStatus: (unitId: string, todoId: string) => Promise<void>;
   updateUnitName: (unitId: string, newName: string) => Promise<boolean>;
+  updateUnitNotes: (unitId: string, newNotes: string) => Promise<boolean>;
   updateProjectName: (projectId: string, newName: string) => Promise<boolean>;
   loadProjects: () => Promise<void>;
   exportData: () => Promise<string>;
@@ -203,6 +210,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         reorderedTodos,
+        targetUnit.notes,
       );
 
       const optimisticProjects = projects.map((p) => {
@@ -405,6 +413,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         updatedTodos,
+        targetUnit.notes,
       );
 
       // Update the store optimistically
@@ -435,7 +444,14 @@ export const useProjectStore = create<ProjectStore>((set) => ({
               }
               return t;
             });
-            const revertedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, todos);
+            const revertedUnit = new Unit(
+              unit.id,
+              unit.name,
+              unit.code,
+              unit.projectId,
+              todos,
+              unit.notes,
+            );
             const updatedUnits = [...p.units];
             updatedUnits[unitIndex] = revertedUnit;
             return new Project(p.id, p.name, p.code, updatedUnits);
@@ -488,6 +504,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         targetUnit.todos,
+        targetUnit.notes,
       );
 
       const optimisticProjects = projects.map((p) => {
@@ -533,6 +550,71 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         .getState()
         .addToast('error', error instanceof Error ? error.message : 'Failed to update unit name');
 
+      return false;
+    }
+  },
+
+  // Update a unit's notes with optimistic update + rollback
+  updateUnitNotes: async (unitId: string, newNotes: string) => {
+    let previousUnit: Unit | null = null;
+    try {
+      const projects = useProjectStore.getState().projects;
+      let targetProject: Project | null = null;
+      let targetUnitIndex = -1;
+      let targetUnit: Unit | null = null;
+      for (const project of projects) {
+        const unitIndex = project.units.findIndex((u) => u.id === unitId);
+        if (unitIndex !== -1) {
+          targetProject = project;
+          targetUnitIndex = unitIndex;
+          targetUnit = project.units[unitIndex];
+          break;
+        }
+      }
+      if (!targetUnit || !targetProject) {
+        throw new UnitNotFoundError(unitId);
+      }
+      previousUnit = targetUnit;
+      const optimisticUnit = new Unit(
+        targetUnit.id,
+        targetUnit.name,
+        targetUnit.code,
+        targetUnit.projectId,
+        targetUnit.todos,
+        newNotes.trim(),
+      );
+      const optimisticProjects = projects.map((p) => {
+        if (p.id === targetProject!.id) {
+          const updatedUnits = [...p.units];
+          updatedUnits[targetUnitIndex] = optimisticUnit;
+          return new Project(p.id, p.name, p.code, updatedUnits);
+        }
+        return p;
+      });
+      set({ projects: optimisticProjects });
+      await updateUnitNotesUseCase.execute(unitId, newNotes);
+      useProjectStore.getState().addToast('success', 'Unit notes updated successfully');
+      return true;
+    } catch (error) {
+      if (previousUnit) {
+        const projects = useProjectStore.getState().projects;
+        const revertedProjects = projects.map((p) => {
+          const unitIndex = p.units.findIndex((u) => u.id === unitId);
+          if (unitIndex !== -1) {
+            const updatedUnits = [...p.units];
+            updatedUnits[unitIndex] = previousUnit!;
+            return new Project(p.id, p.name, p.code, updatedUnits);
+          }
+          return p;
+        });
+        set({ projects: revertedProjects });
+      }
+      if (error instanceof UnitNotesTooLongError) {
+        return false;
+      }
+      useProjectStore
+        .getState()
+        .addToast('error', error instanceof Error ? error.message : 'Failed to update unit notes');
       return false;
     }
   },
