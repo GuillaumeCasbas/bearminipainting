@@ -122,4 +122,15 @@ describe("ToggleTodoStatusUseCase", () => {
 
     expect(updateCalled).toBe(false);
   });
+
+  it('preserves the unit notes when toggling a todo', async () => {
+    const todos = [new Todo('todo-1', 'Assembly', 'DONE', 10)];
+    const unit = new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', todos, 'My notes');
+    const repository = { findById: jest.fn().mockResolvedValue(unit), update: jest.fn() };
+    const useCase = new ToggleTodoStatusUseCase(repository as never);
+
+    const updated = await useCase.execute('unit-1', 'todo-1');
+
+    expect(updated.notes).toBe('My notes');
+  });
 });

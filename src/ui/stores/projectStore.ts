@@ -203,6 +203,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         reorderedTodos,
+        targetUnit.notes,
       );
 
       const optimisticProjects = projects.map((p) => {
@@ -405,6 +406,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         updatedTodos,
+        targetUnit.notes,
       );
 
       // Update the store optimistically
@@ -435,7 +437,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
               }
               return t;
             });
-            const revertedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, todos);
+            const revertedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, todos, unit.notes);
             const updatedUnits = [...p.units];
             updatedUnits[unitIndex] = revertedUnit;
             return new Project(p.id, p.name, p.code, updatedUnits);
@@ -488,6 +490,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         targetUnit.code,
         targetUnit.projectId,
         targetUnit.todos,
+        targetUnit.notes,
       );
 
       const optimisticProjects = projects.map((p) => {

@@ -35,7 +35,7 @@ export class DeleteTodoUseCase {
 
     // Create a new unit instance without the todo
     const updatedTodos = unit.todos.filter((_, index) => index !== todoIndex);
-    const updatedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, updatedTodos);
+    const updatedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, updatedTodos, unit.notes );
 
     // Persist the changes via repository
     await this.unitRepository.update(updatedUnit);

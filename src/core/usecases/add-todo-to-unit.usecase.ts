@@ -29,7 +29,7 @@ export class AddTodoToUnitUseCase {
     const updatedUnit = new Unit(unit.id, unit.name, unit.code, unit.projectId, [
       ...unit.todos,
       newTodo,
-    ]);
+    ], unit.notes );
 
     // Persist the changes via repository
     await this.unitRepository.update(updatedUnit);
