@@ -71,6 +71,7 @@ export {
   addTodoToUnitUseCase,
   deleteTodoUseCase,
   updateUnitNameUseCase,
+  updateUnitNotesUseCase,
   updateProjectNameUseCase,
   exportDataUseCase,
   importDataUseCase,

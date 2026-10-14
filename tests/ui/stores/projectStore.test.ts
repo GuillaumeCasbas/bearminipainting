@@ -6,6 +6,7 @@ import { UnitCodeNotUniqueError } from '@/core/errors';
 const mockCreateUnitUseCase = { execute: jest.fn() };
 const mockGetProjectByIdUseCase = { execute: jest.fn() };
 const mockUpdateProjectNameUseCase = { execute: jest.fn() };
+const mockUpdateUnitNotesUseCase = { execute: jest.fn() };
 
 jest.mock('@/di/container', () => ({
   getAllProjectsUseCase: { execute: jest.fn() },
@@ -22,6 +23,7 @@ jest.mock('@/di/container', () => ({
   reorderTodosUseCase: { execute: jest.fn() },
   updateUnitNameUseCase: { execute: jest.fn() },
   updateProjectNameUseCase: mockUpdateProjectNameUseCase,
+  updateUnitNotesUseCase: mockUpdateUnitNotesUseCase,
 }));
 
 import { useProjectStore } from '@/ui/stores/projectStore';
@@ -170,5 +172,52 @@ describe('projectStore addToast', () => {
     const toasts = useProjectStore.getState().toasts;
     expect(toasts).toHaveLength(2);
     expect(toasts[0].id).not.toBe(toasts[1].id);
+  });
+});
+
+describe('projectStore updateUnitNotes', () => {
+  let unit: Unit;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    unit = new Unit('unit-1', 'Intercessor', 'IA-01', 'project-1', [], 'Existing notes');
+    useProjectStore.setState({
+      projects: [new Project('project-1', 'Space Marines', 'SM', [unit])],
+      isLoading: false,
+      toasts: [],
+    });
+  });
+
+  it('optimistically updates the notes in the store and returns true', async () => {
+    mockUpdateUnitNotesUseCase.execute.mockResolvedValueOnce(undefined);
+    const result = await useProjectStore.getState().updateUnitNotes('unit-1', 'New notes');
+    expect(result).toBe(true);
+    const storedUnit = useProjectStore
+      .getState()
+      .projects.flatMap((p) => p.units)
+      .find((u) => u.id === 'unit-1');
+    expect(storedUnit!.notes).toBe('New notes');
+    expect(mockUpdateUnitNotesUseCase.execute).toHaveBeenCalledWith('unit-1', 'New notes');
+  });
+
+  it('shows a success toast after saving notes', async () => {
+    mockUpdateUnitNotesUseCase.execute.mockResolvedValueOnce(undefined);
+    await useProjectStore.getState().updateUnitNotes('unit-1', 'New notes');
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('success');
+  });
+
+  it('rolls back the notes and shows an error toast on failure', async () => {
+    mockUpdateUnitNotesUseCase.execute.mockRejectedValueOnce(new Error('boom'));
+    const result = await useProjectStore.getState().updateUnitNotes('unit-1', 'New notes');
+    expect(result).toBe(false);
+    const storedUnit = useProjectStore
+      .getState()
+      .projects.flatMap((p) => p.units)
+      .find((u) => u.id === 'unit-1');
+    expect(storedUnit!.notes).toBe('Existing notes');
+    const toasts = useProjectStore.getState().toasts;
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].type).toBe('error');
   });
 });
