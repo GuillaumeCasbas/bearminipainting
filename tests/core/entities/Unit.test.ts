@@ -106,6 +106,18 @@ describe('Unit', () => {
       );
     });
 
+    it('should trim the provided notes', () => {
+      const unit = new Unit('unit-1', 'Intercessor', 'IA-01', '1', [], '  Some ideas  ');
+      expect(unit.notes).toBe('Some ideas');
+    });
+
+    it('should accept notes whose trimmed length is exactly 1500 characters even if longer before trim', () => {
+      const maxAfterTrim = 'a'.repeat(1500);
+      const notes = `  ${maxAfterTrim}  `;
+      const unit = new Unit('unit-1', 'Intercessor', 'IA-01', '1', [], notes);
+      expect(unit.notes).toBe(maxAfterTrim);
+    });
+
     it('should accept notes of exactly 1500 characters', () => {
       const max = 'a'.repeat(1500);
       const unit = new Unit('unit-1', 'Intercessor', 'IA-01', '1', [], max);

@@ -23,10 +23,13 @@ export class Unit {
     this.code = code;
     this.projectId = projectId;
     this.todos = todos;
-    if (notes.length > UNIT_NOTES_MAX_LENGTH) {
+    // Single source of truth: notes are trimmed here and validated after trim,
+    // so every Unit instance guarantees the same invariant regardless of the caller.
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length > UNIT_NOTES_MAX_LENGTH) {
       throw new UnitNotesTooLongError(UNIT_NOTES_MAX_LENGTH);
     }
-    this.notes = notes;
+    this.notes = trimmedNotes;
   }
 
   getCompletionRate(): number {
