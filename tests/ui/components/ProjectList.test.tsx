@@ -91,6 +91,29 @@ describe('ProjectList', () => {
     expect(getRenderedCards()).toHaveLength(2);
   });
 
+  it('should wrap the projects section in a card even when there is at least one project (BEA-90)', () => {
+    const project = createTestProject({
+      id: 'proj-1',
+      name: 'Space Marines',
+      code: 'SM',
+    });
+
+    mockUseProjectStore.mockReturnValue({
+      projects: [project],
+      isLoading: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <ProjectList />
+      </MemoryRouter>,
+    );
+
+    const sectionCard = screen.getByText('My Projects').closest('div');
+    expect(sectionCard).toHaveClass('bg-white', 'rounded-lg', 'shadow-md', 'p-6');
+    expect(getRenderedCards()).toHaveLength(1);
+  });
+
   it('should navigate to the project detail page when a project name is clicked', async () => {
     const project = createTestProject({
       id: 'proj-1',

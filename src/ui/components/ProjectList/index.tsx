@@ -32,7 +32,7 @@ export default function ProjectList() {
   });
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">My Projects</h2>
       <div className="space-y-4">
         {sortedProjects.map((project: Project) => (
