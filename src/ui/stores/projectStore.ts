@@ -43,6 +43,23 @@ export interface ToastNotification {
   message: string;
 }
 
+export type ProjectStoreEvent = { type: 'PROJECT_CREATED'; projectId: string };
+
+type ProjectStoreEventListener = (event: ProjectStoreEvent) => void;
+
+const projectStoreEventListeners = new Set<ProjectStoreEventListener>();
+
+export function subscribeProjectEvents(listener: ProjectStoreEventListener): () => void {
+  projectStoreEventListeners.add(listener);
+  return () => {
+    projectStoreEventListeners.delete(listener);
+  };
+}
+
+function emitProjectStoreEvent(event: ProjectStoreEvent) {
+  projectStoreEventListeners.forEach((listener) => listener(event));
+}
+
 interface ProjectStore {
   // State
   projects: Project[];
@@ -94,6 +111,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       // Reload the project list
       const projects = await getAllProjectsUseCase.execute();
       set({ projects });
+      emitProjectStoreEvent({ type: 'PROJECT_CREATED', projectId: newProject.id });
 
       // Show success toast
       useProjectStore

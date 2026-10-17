@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export interface SidebarProps {
   children: React.ReactNode;
   title: string;
+  isMobileOpen: boolean;
+  onMobileOpenChange: (isOpen: boolean) => void;
 }
 
-export function Sidebar({ children, title }: SidebarProps) {
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+export function Sidebar({ children, title, isMobileOpen, onMobileOpenChange }: SidebarProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fabRef = useRef<HTMLButtonElement>(null);
 
-  const closeMobileSidebar = () => setIsMobileOpen(false);
+  const closeMobileSidebar = () => onMobileOpenChange(false);
 
   // Focus the close button when the mobile modal opens
   useEffect(() => {
@@ -25,14 +26,14 @@ export function Sidebar({ children, title }: SidebarProps) {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsMobileOpen(false);
+        onMobileOpenChange(false);
         fabRef.current?.focus();
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isMobileOpen]);
+  }, [isMobileOpen, onMobileOpenChange]);
 
   return (
     <>
@@ -49,7 +50,7 @@ export function Sidebar({ children, title }: SidebarProps) {
       <button
         ref={fabRef}
         type="button"
-        onClick={() => setIsMobileOpen(true)}
+        onClick={() => onMobileOpenChange(true)}
         aria-label="Open sidebar"
         className="md:hidden fixed bottom-6 right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
       >
