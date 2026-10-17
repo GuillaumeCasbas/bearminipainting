@@ -6,7 +6,7 @@ import { AlmostThereSection } from '../AlmostThereSection';
 export function HomePage() {
   return (
     <div className="flex flex-row gap-6 items-start">
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 flex flex-col gap-6">
         <AlmostThereSection />
         <ProjectList />
       </main>

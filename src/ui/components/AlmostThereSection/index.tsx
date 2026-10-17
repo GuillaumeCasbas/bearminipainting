@@ -42,7 +42,7 @@ export function AlmostThereSection() {
 
   return (
     <section
-      className="relative bg-green-600 rounded-xl p-6 mt-8 overflow-visible"
+      className="relative bg-green-600 rounded-xl p-6 overflow-visible"
       aria-label="Almost there"
     >
       <svg
