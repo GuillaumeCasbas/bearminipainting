@@ -1,4 +1,25 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
+import { Project } from '@/core/entities/Project';
+import { CodeNotUniqueError } from '@/core/errors';
+import { useProjectStore } from '@/ui/stores/projectStore';
+
+jest.mock('@/di/container', () => ({
+  getAllProjectsUseCase: { execute: jest.fn() },
+  createProjectUseCase: { execute: jest.fn() },
+  exportDataUseCase: { execute: jest.fn() },
+  importDataUseCase: { execute: jest.fn() },
+  createUnitUseCase: { execute: jest.fn() },
+  getProjectByIdUseCase: { execute: jest.fn() },
+  toggleTodoStatusUseCase: { execute: jest.fn() },
+  addTodoToUnitUseCase: { execute: jest.fn() },
+  deleteTodoUseCase: { execute: jest.fn() },
+  deleteProjectUseCase: { execute: jest.fn() },
+  deleteUnitUseCase: { execute: jest.fn() },
+  reorderTodosUseCase: { execute: jest.fn() },
+  updateUnitNameUseCase: { execute: jest.fn() },
+  updateProjectNameUseCase: { execute: jest.fn() },
+  updateUnitNotesUseCase: { execute: jest.fn() },
+}));
 import '@testing-library/jest-dom';
 import { Sidebar } from '../../../src/ui/components/Sidebar';
 
@@ -99,5 +120,50 @@ describe('Sidebar', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
+describe('Sidebar PROJECT_CREATED subscription (BEA-93)', () => {
+  it('closes the open mobile modal when a project is created', async () => {
+    render(
+      <Sidebar title="Create a new project">
+        <div>Form content</div>
+      </Sidebar>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open sidebar' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    const { createProjectUseCase, getAllProjectsUseCase } = jest.requireMock('@/di/container');
+    createProjectUseCase.execute.mockResolvedValueOnce(
+      new Project('proj-1', 'Orks', 'ORK', []),
+    );
+    getAllProjectsUseCase.execute.mockResolvedValueOnce([new Project('proj-1', 'Orks', 'ORK', [])]);
+
+    await act(async () => {
+      await useProjectStore.getState().addProject('Orks', 'ORK');
+    });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the mobile modal open when project creation fails', async () => {
+    render(
+      <Sidebar title="Create a new project">
+        <div>Form content</div>
+      </Sidebar>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open sidebar' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    const { createProjectUseCase } = jest.requireMock('@/di/container');
+    createProjectUseCase.execute.mockRejectedValueOnce(new CodeNotUniqueError('ORK'));
+
+    await act(async () => {
+      await useProjectStore.getState().addProject('Orks', 'ORK');
+    });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

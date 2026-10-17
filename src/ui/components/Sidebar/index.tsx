@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { subscribeProjectEvents } from '@/ui/stores/projectStore';
 
 export interface SidebarProps {
   children: React.ReactNode;
@@ -18,6 +19,17 @@ export function Sidebar({ children, title }: SidebarProps) {
       closeButtonRef.current.focus();
     }
   }, [isMobileOpen]);
+
+  // Close the mobile modal when a project is created (BEA-93)
+  useEffect(
+    () =>
+      subscribeProjectEvents((event) => {
+        if (event.type === 'PROJECT_CREATED') {
+          setIsMobileOpen(false);
+        }
+      }),
+    [],
+  );
 
   // Close on Escape and restore focus to the FAB
   useEffect(() => {

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Project } from '@/core/entities/Project';
 import { Unit } from '@/core/entities/Unit';
-import { UnitCodeNotUniqueError } from '@/core/errors';
+import { CodeNotUniqueError, UnitCodeNotUniqueError } from '@/core/errors';
 
 const mockCreateUnitUseCase = { execute: jest.fn() };
 const mockGetProjectByIdUseCase = { execute: jest.fn() };
@@ -26,7 +26,7 @@ jest.mock('@/di/container', () => ({
   updateUnitNotesUseCase: mockUpdateUnitNotesUseCase,
 }));
 
-import { useProjectStore } from '@/ui/stores/projectStore';
+import { subscribeProjectEvents, useProjectStore } from '@/ui/stores/projectStore';
 
 const makeUnit = (id: string, name: string, code: string): Unit =>
   new Unit(id, name, code, 'project-1', []);
@@ -219,5 +219,61 @@ describe('projectStore updateUnitNotes', () => {
     const toasts = useProjectStore.getState().toasts;
     expect(toasts).toHaveLength(1);
     expect(toasts[0].type).toBe('error');
+  });
+});
+
+describe('projectStore PROJECT_CREATED event', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useProjectStore.setState({
+      projects: [],
+      isLoading: false,
+      toasts: [],
+    });
+  });
+
+  it('emits PROJECT_CREATED with the project id when addProject succeeds', async () => {
+    const { createProjectUseCase, getAllProjectsUseCase } = jest.requireMock('@/di/container');
+    createProjectUseCase.execute.mockResolvedValueOnce(new Project('proj-1', 'Orks', 'ORK', []));
+    getAllProjectsUseCase.execute.mockResolvedValueOnce([new Project('proj-1', 'Orks', 'ORK', [])]);
+
+    const events: { type: string; projectId?: string }[] = [];
+    const unsubscribe = subscribeProjectEvents((event) => events.push(event));
+
+    await useProjectStore.getState().addProject('Orks', 'ORK');
+
+    expect(events).toHaveLength(1);
+    expect(events[0].type).toBe('PROJECT_CREATED');
+    expect(events[0].projectId).toBe('proj-1');
+
+    unsubscribe();
+  });
+
+  it('does not emit PROJECT_CREATED when addProject fails', async () => {
+    const { createProjectUseCase } = jest.requireMock('@/di/container');
+    createProjectUseCase.execute.mockRejectedValueOnce(new CodeNotUniqueError('ORK'));
+
+    const events: { type: string; projectId?: string }[] = [];
+    const unsubscribe = subscribeProjectEvents((event) => events.push(event));
+
+    await useProjectStore.getState().addProject('Orks', 'ORK');
+
+    expect(events).toHaveLength(0);
+
+    unsubscribe();
+  });
+
+  it('stops delivering events after unsubscribe', async () => {
+    const { createProjectUseCase, getAllProjectsUseCase } = jest.requireMock('@/di/container');
+    createProjectUseCase.execute.mockResolvedValueOnce(new Project('proj-2', 'Necrons', 'NEC', []));
+    getAllProjectsUseCase.execute.mockResolvedValueOnce([new Project('proj-2', 'Necrons', 'NEC', [])]);
+
+    const events: { type: string; projectId?: string }[] = [];
+    const unsubscribe = subscribeProjectEvents((event) => events.push(event));
+    unsubscribe();
+
+    await useProjectStore.getState().addProject('Necrons', 'NEC');
+
+    expect(events).toHaveLength(0);
   });
 });
