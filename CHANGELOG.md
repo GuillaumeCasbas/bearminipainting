@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Refreshing or opening a project or unit page directly from its link now shows the page instead of a 404 error. (BEA-91)
+
 ### Security
 
 ---
