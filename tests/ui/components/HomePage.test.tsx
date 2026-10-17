@@ -23,6 +23,7 @@ jest.mock('../../../src/ui/components/Sidebar', () => ({
 }));
 
 jest.mock('../../../src/ui/stores/projectStore', () => ({
+  ...jest.requireActual('../../../src/ui/stores/projectStore'),
   useProjectStore: () => ({ projects: [] }),
 }));
 
