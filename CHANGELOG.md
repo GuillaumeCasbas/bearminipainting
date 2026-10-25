@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Project and unit cards now have distinct icons and styles so painters can tell at a glance whether a card represents a Project or a Unit. (BEA-89)
+
 ### Deprecated
 
 ### Removed
@@ -22,10 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Refreshing or opening a project or unit page directly from its link now shows the page instead of a 404 error. (BEA-91)
 - The projects section on the home page is now displayed in a card even when projects exist, and the two home page sections are clearly spaced apart. (BEA-90)
 - On mobile, creating a project now closes the creation panel automatically so you can immediately see your updated project list. (BEA-93)
-
-### Changed
-
-- Project and unit cards now have distinct icons and styles so painters can tell at a glance whether a card represents a Project or a Unit. (BEA-89)
 
 ### Security
 
