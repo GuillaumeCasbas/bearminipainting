@@ -4,6 +4,7 @@ import { getAlmostThereUnitsUseCase } from '@/di/container';
 import { Unit } from '@/core/entities/Unit';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { useProjectStore } from '@/ui/stores/projectStore';
+import { UnitIcon } from '@/ui/components/Icons';
 
 function getRemainingTodos(unit: Unit) {
   return unit.todos.filter((todo) => todo.status === 'TODO').sort((a, b) => a.order - b.order);
@@ -69,19 +70,21 @@ export function AlmostThereSection() {
           {almostThereUnits.map((unit) => (
             <li
               key={unit.id}
-              data-testid="almost-there-card"
-              // UI-only styling rule: units above 80% completion get highlighted (cosmetic, not business logic)
-              className={`rounded-lg shadow p-4 hover:shadow-md transition-shadow ${
-                unit.getCompletionRate() > 80 ? 'bg-green-50 border-2 border-green-600' : 'bg-white'
+              data-testid="unit-card"
+              className={`bg-amber-50 border border-amber-200 rounded-lg shadow p-4 hover:shadow-md transition-shadow ${
+                unit.getCompletionRate() > 80 ? 'border-2 border-amber-600' : 'border-amber-200'
               }`}
             >
               <div className="flex items-center justify-between gap-4">
-                <Link
-                  to={`/units/${unit.id}`}
-                  className="text-lg font-semibold text-blue-600 hover:text-blue-800"
-                >
-                  {unit.name}
-                </Link>
+                <div className="flex items-center gap-2">
+                  <UnitIcon className="w-5 h-5 text-amber-700" />
+                  <Link
+                    to={`/units/${unit.id}`}
+                    className="text-lg font-semibold text-amber-800 hover:text-amber-900"
+                  >
+                    {unit.name}
+                  </Link>
+                </div>
                 <div className="w-40">
                   <ProgressBar completionRate={unit.getCompletionRate()} withLabel />
                 </div>
