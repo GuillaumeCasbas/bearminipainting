@@ -151,7 +151,7 @@ describe('AlmostThereSection', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: 'Intercessors' })).toBeInTheDocument();
     });
-    const card = screen.getByTestId('almost-there-card');
+    const card = screen.getByTestId('unit-card');
     const todoItems = Array.from(card.querySelectorAll('li'));
     expect(todoItems.map((item) => item.textContent)).toEqual(['Base', 'Varnish']);
     expect(card.querySelector('input[type="checkbox"]')).not.toBeInTheDocument();

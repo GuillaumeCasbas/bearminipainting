@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Project and unit cards now have distinct icons and styles so painters can tell at a glance whether a card represents a Project or a Unit. (BEA-89)
+
 ### Deprecated
 
 ### Removed

@@ -8,6 +8,7 @@ import { useProjectStore } from '@/ui/stores/projectStore';
 import { ProgressBar } from '@/ui/components/ProgressBar';
 import { Modal } from '@/ui/components/Modal';
 import { EditableName } from '@/ui/components/EditableName';
+import { UnitIcon } from '@/ui/components/Icons';
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -168,15 +169,19 @@ export function ProjectDetail() {
                 .map((unit: Unit) => (
                   <div
                     key={unit.id}
-                    className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+                    data-testid="unit-card"
+                    className="bg-amber-50 border border-amber-200 rounded-lg shadow p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <Link
-                        to={`/units/${unit.id}`}
-                        className="text-lg font-semibold text-blue-600 hover:text-blue-800"
-                      >
-                        {unit.name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <UnitIcon className="w-5 h-5 text-amber-700" />
+                        <Link
+                          to={`/units/${unit.id}`}
+                          className="text-lg font-semibold text-amber-800 hover:text-amber-900"
+                        >
+                          {unit.name}
+                        </Link>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">
