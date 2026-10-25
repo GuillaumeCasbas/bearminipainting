@@ -17,8 +17,9 @@ export const UnitIcon: FC<UnitIconProps> = ({ className = 'w-5 h-5', ...props })
     {...props}
     aria-hidden="true"
   >
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <line x1="3" y1="9" x2="21" y2="9" />
-    <line x1="9" y1="21" x2="9" y2="9" />
+    <circle cx="12" cy="6" r="3" />
+    <path d="M12 9v8" />
+    <path d="M9 17l3-3 3 3" />
+    <path d="M12 14l-2-2 2 2 2-2" />
   </svg>
 );
